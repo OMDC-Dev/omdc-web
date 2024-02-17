@@ -7,6 +7,7 @@ import Reimbursement from '../pages/Dashboard/Reimbursement';
 import RiwayatPengajuan from '../pages/Dashboard/RiwayatPengajuan';
 import SignIn from '../pages/Authentication/SignIn';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import SignInProfile from '../pages/Authentication/SignInProfile';
 
 const Routes = () => {
   const { token } = useAuth();
@@ -71,6 +72,15 @@ const Routes = () => {
         <>
           <PageTitle title={TITLE + 'Login'} />
           <SignIn />
+        </>
+      ),
+    },
+    {
+      path: '/login-profile',
+      element: (
+        <>
+          <PageTitle title={TITLE + 'Login'} />
+          <SignInProfile />
         </>
       ),
     },

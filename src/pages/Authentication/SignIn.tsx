@@ -7,11 +7,16 @@ import useFetch from '../../hooks/useFetch';
 import { LOGIN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
+import Button from '../../components/Button';
+import useModal from '../../hooks/useModal';
+import Modal from '../../components/Modal/Modal';
 
 const SignIn: React.FC = () => {
   const [userId, setUserId] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
-  const { setToken } = useAuth();
+  const [errorMessage, setErrorMessage] = React.useState<string | any>('');
+  const { toggle, visible, hide, show } = useModal();
+  const { setToken, setUser } = useAuth();
   const navigate = useNavigate();
 
   function onUserIdChange(event: any) {
@@ -25,6 +30,10 @@ const SignIn: React.FC = () => {
   async function onSubmit(e: any) {
     e.preventDefault();
 
+    show();
+
+    setErrorMessage(null);
+
     const body = {
       iduser: userId,
       password: password,
@@ -37,16 +46,24 @@ const SignIn: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
-      setToken(data.userToken);
-      navigate('/', { replace: true });
+      hide();
+
+      if (data.iseProfileComplete) {
+        setToken(data.userToken);
+        setUser(data);
+        navigate('/', { replace: true });
+      } else {
+        navigate('/login-profile', { replace: false, state: data });
+      }
     } else {
-      console.log(error);
+      hide();
+      setErrorMessage(error.error);
     }
   }
 
   return (
     <>
-      <div className=" xl:grid xl:place-items-center h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className=" xl:grid xl:place-items-center h-full sm:h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
@@ -66,7 +83,7 @@ const SignIn: React.FC = () => {
             </div>
           </div>
 
-          <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
+          <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2 hidden xl:block ">
             <div className="w-full p-4 hidden sm:block md:p-24 sm:p-32 xl:p-20.5">
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Masuk ke OMDC
@@ -111,11 +128,16 @@ const SignIn: React.FC = () => {
                     Masuk
                   </button>
                 </div>
+                {errorMessage && (
+                  <div className=" grid place-items-center text-sm text-red-400">
+                    {errorMessage}
+                  </div>
+                )}
               </form>
             </div>
           </div>
 
-          <div className=" grid min-h-screen w-full place-items-center sm:hidden">
+          <div className=" grid min-h-screen w-full place-items-center xl:hidden">
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
@@ -126,7 +148,7 @@ const SignIn: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md dark: bg-slate-700 p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
                 <form>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
@@ -158,18 +180,19 @@ const SignIn: React.FC = () => {
                     </div>
                   </div>
                 </form>
-                <div className="mb-2">
-                  <button
-                    onClick={onSubmit}
-                    className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-1 text-white transition hover:bg-opacity-90"
-                  >
-                    Masuk
-                  </button>
+                <div className="mb-4">
+                  <Button onClick={onSubmit}>Masuk</Button>
                 </div>
+                {errorMessage && (
+                  <div className=" grid place-items-center text-sm text-red-400">
+                    {errorMessage}
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
+        <Modal visible={visible} toggle={toggle} dismissOnBackdrop />
       </div>
     </>
   );

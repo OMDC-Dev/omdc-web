@@ -2,7 +2,13 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BASE_URL } from '../api/routes';
 import { API_STATES } from '../constants/ApiEnum';
 
-async function useFetch(props: AxiosRequestConfig) {
+type TApiResponse = {
+  state: string;
+  data: any;
+  error: any;
+};
+
+async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
   return axios({
     ...props,
     baseURL: BASE_URL,

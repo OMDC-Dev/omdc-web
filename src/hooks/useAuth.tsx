@@ -13,10 +13,16 @@ const AuthContext = createContext({} as any);
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   // State to hold the authentication token
   const [token, setToken_] = useState(localStorage.getItem('token'));
+  const [user, setUser_] = useState(localStorage.getItem('USER_SESSION'));
 
   // Function to set the authentication token
   const setToken = (newToken: string) => {
     setToken_(newToken);
+  };
+
+  // user
+  const setUser = (user: any) => {
+    setUser_(user);
   };
 
   useEffect(() => {
@@ -34,8 +40,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       token,
       setToken,
+      user,
+      setUser,
     }),
-    [token],
+    [token, user],
   );
 
   // Provide the authentication context to the children components
