@@ -22,6 +22,9 @@ import useFetch from '../../hooks/useFetch';
 import { GET_BANK_NAME } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import COAModal from '../../components/Modal/COAModal';
+import CabangModal from '../../components/Modal/CabangModal';
+import { useAuth } from '../../hooks/useAuth';
+import AdminModal from '../../components/Modal/AdminModal';
 
 function TrashIcon() {
   return (
@@ -42,20 +45,21 @@ function TrashIcon() {
 
 const BuatPengajuan: React.FC = () => {
   const { toggle, visible, hide, show } = useModal();
+  const { user } = useAuth();
 
   // state
   const [jenis, setJenis] = React.useState<string>();
   const [coa, setCoa] = React.useState<string>();
-  const [cabang, setCabang] = React.useState<string>();
+  const [cabang, setCabang] = React.useState<string | any>();
   const [nominal, setNominal] = React.useState<string | number>();
-  const [nomorWA, setNomorWA] = React.useState<string>();
+  const [nomorWA, setNomorWA] = React.useState<string>(user?.nomorwa);
   const [desc, setDesc] = React.useState<string>();
   const [name, setName] = React.useState<string>();
   const [result, setResult] = React.useState<any>();
   const [fileInfo, setFileInfo] = React.useState<any>();
   const [selectDate, setSelectDate] = React.useState<Date>();
   const [item, setItem] = React.useState<any>([]);
-  const [admin, setAdmin] = React.useState<string>();
+  const [admin, setAdmin] = React.useState<any>();
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -65,6 +69,8 @@ const BuatPengajuan: React.FC = () => {
 
   // Data Modal Satte
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
@@ -170,11 +176,31 @@ const BuatPengajuan: React.FC = () => {
                   </div>
 
                   <div className="w-full">
-                    <CabangGroup value={(val) => setCabang(val)} />
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Cabang
+                      </label>
+                      <div
+                        onClick={() => setShowCabang(!showCabang)}
+                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                      >
+                        {cabang?.label || 'Pilih Cabang'}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="w-full">
-                    <ApprovalGroup value={(val) => setAdmin(val)} />
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Approval Admin
+                      </label>
+                      <div
+                        onClick={() => setShowAdmin(!showAdmin)}
+                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                      >
+                        {admin?.nm_user || 'Pilih Admin'}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="w-full">
@@ -377,6 +403,16 @@ const BuatPengajuan: React.FC = () => {
         visible={showCoa}
         toggle={() => setShowCoa(!showCoa)}
         value={(val: any) => setCoa(val)}
+      />
+      <CabangModal
+        visible={showCabang}
+        toggle={() => setShowCabang(!showCabang)}
+        value={(val: any) => setCabang(val)}
+      />
+      <AdminModal
+        visible={showAdmin}
+        toggle={() => setShowAdmin(!showAdmin)}
+        value={(val: any) => setAdmin(val)}
       />
     </DefaultLayout>
   );

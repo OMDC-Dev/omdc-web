@@ -26,12 +26,14 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (token && user) {
       //axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
       localStorage.setItem('token', token);
+      localStorage.setItem('USER_SESSION', user);
     } else {
       //delete axios.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');
+      localStorage.removeItem('USER_SESSION');
     }
   }, [token]);
 
