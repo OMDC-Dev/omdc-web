@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Payment Request",
+    "value": "PR"
+  },
+  {
+    "label": "Reimbursement",
+    "value": "RR"
+  },
+  {
+    "label": "Cash Advance",
+    "value": "CA"
+  },
+  {
+    "label": "Petty Cash Request",
+    "value": "PCR"
+  },
+  {
+    "label": "Petty Cash Report",
+    "value": "PC"
+  }
+]

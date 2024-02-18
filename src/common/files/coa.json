@@ -1,0 +1,186 @@
+[
+  {
+    "label": "Asuransi dibayar di muka - Kesehatan",
+    "value": "115310 - Asuransi dibayar di muka - Kesehatan"
+  },
+  {
+    "label": "Sewa dibayar di muka - Gedung dan Bangunan",
+    "value": "115410 - Sewa dibayar di muka - Gedung dan Bangunan"
+  },
+  {
+    "label": "Biaya Dibayar Di Muka - Lain-Lain",
+    "value": "115510 - Biaya Dibayar Di Muka - Lain-Lain"
+  },
+  {"label": "Persediaan Bahan", "value": "114110 - Persediaan Bahan"},
+  {
+    "label": "Persediaan Obat & Alkes",
+    "value": "114120 - Persediaan Obat & Alkes"
+  },
+  {
+    "label": "Persediaan Stationary & Office Supplies",
+    "value": "114210 - Persediaan Stationary & Office Supplies"
+  },
+  {
+    "label": "Persediaan Guest & Cleaning Service",
+    "value": "114220 - Persediaan Guest & Cleaning Service"
+  },
+  {
+    "label": "Persediaan Other Inventory",
+    "value": "114230 - Persediaan Other Inventory"
+  },
+  {
+    "label": "Tanah, Gedung dan Renovasi",
+    "value": "121111 - Tanah, Gedung dan Renovasi"
+  },
+  {
+    "label": "Furniture& Perlengkapan",
+    "value": "121121 - Furniture& Perlengkapan"
+  },
+  {
+    "label": "Mesin dan Peralatan Medis",
+    "value": "121131 - Mesin dan Peralatan Medis"
+  },
+  {"label": "IT & Peralatan", "value": "121141 - IT & Peralatan"},
+  {"label": "Kendaraan", "value": "121151 - Kendaraan"},
+  {"label": "Biaya Seragam Dokter", "value": "711008 - Biaya Seragam Dokter"},
+  {
+    "label": "Biaya Peralatan Kantor",
+    "value": "714001 - Biaya Peralatan Kantor"
+  },
+  {
+    "label": "Biaya alat tulis dan Perlengkapan Kantor",
+    "value": "714002 - Biaya alat tulis dan Perlengkapan Kantor"
+  },
+  {"label": "Biaya fotocopy", "value": "714003 - Biaya fotocopy"},
+  {"label": "Biaya Rumah Tangga", "value": "714004 - Biaya Rumah Tangga"},
+  {
+    "label": "Biaya Materai/Pos/Paket",
+    "value": "714005 - Biaya Materai/Pos/Paket"
+  },
+  {
+    "label": "Biaya Surat Kabar dan Majalah",
+    "value": "714006 - Biaya Surat Kabar dan Majalah"
+  },
+  {"label": "Biaya Pengiriman", "value": "714007 - Biaya Pengiriman"},
+  {"label": "Biaya Dokumentasi", "value": "714008 - Biaya Dokumentasi"},
+  {"label": "Biaya Cetakan", "value": "714009 - Biaya Cetakan"},
+  {"label": "Biaya Sampah Medis", "value": "714010 - Biaya Sampah Medis"},
+  {"label": "Biaya Kebersihan", "value": "714011 - Biaya Kebersihan"},
+  {"label": "Biaya Keamanan", "value": "714012 - Biaya Keamanan"},
+  {
+    "label": "Biaya Perlengkapan lain-lain",
+    "value": "714013 - Biaya Perlengkapan lain-lain"
+  },
+  {
+    "label": "Biaya Perlengkapan Poli",
+    "value": "714014 - Biaya Perlengkapan Poli"
+  },
+  {
+    "label": "Biaya Asuransi Kendaraan",
+    "value": "714306 - Biaya Asuransi Kendaraan"
+  },
+  {
+    "label": "Biaya Asuransi Kesehatan",
+    "value": "714307 - Biaya Asuransi Kesehatan"
+  },
+  {"label": "Biaya Training", "value": "715101 - Biaya Training"},
+  {"label": "Biaya Koran, Majalah", "value": "715102 - Biaya Koran, Majalah"},
+  {
+    "label": "Biaya Rapat dan Perjamuan",
+    "value": "715103 - Biaya Rapat dan Perjamuan"
+  },
+  {"label": "Biaya Perijinan", "value": "715105 - Biaya Perijinan"},
+  {"label": "Biaya Keanggotaan", "value": "715106 - Biaya Keanggotaan"},
+  {"label": "Biaya Perpajakan", "value": "715107 - Biaya Perpajakan"},
+  {"label": "Biaya Rekrutmen", "value": "715108 - Biaya Rekrutmen"},
+  {
+    "label": "Biaya Transportasi dalam Kota",
+    "value": "715109 - Biaya Transportasi dalam Kota"
+  },
+  {
+    "label": "Biaya Perjalanan Dinas Dalam Negeri",
+    "value": "715110 - Biaya Perjalanan Dinas Dalam Negeri"
+  },
+  {"label": "Biaya Sewa Alat", "value": "715111 - Biaya Sewa Alat"},
+  {
+    "label": "Biaya Donasi - Sumbangan",
+    "value": "715112 - Biaya Donasi - Sumbangan"
+  },
+  {"label": "Biaya Makan Employee", "value": "715113 - Biaya Makan Employee"},
+  {"label": "Biaya Jasa Parkir", "value": "715115 - Biaya Jasa Parkir"},
+  {"label": "Biaya Jasa Laundry", "value": "715116 - Biaya Jasa Laundry"},
+  {
+    "label": "Biaya Donasi - Parcel dan hadiah",
+    "value": "715117 - Biaya Donasi - Parcel dan hadiah"
+  },
+  {
+    "label": "Biaya Donasi - Entertainment",
+    "value": "715118 - Biaya Donasi - Entertainment"
+  },
+  {
+    "label": "Biaya Perpanjangan STNK & KIR",
+    "value": "715120 - Biaya Perpanjangan STNK & KIR"
+  },
+  {"label": "Biaya Lain - lain", "value": "715122 - Biaya Lain - lain"},
+  {"label": "Biaya Sewa", "value": "715123 - Biaya Sewa"},
+  {
+    "label": "Biaya BBM/Toll/Parkir. Opr",
+    "value": "715124 - Biaya BBM/Toll/Parkir. Opr"
+  },
+  {"label": "Biaya Jasa Profesi", "value": "715200 - Biaya Jasa Profesi"},
+  {"label": "Honorarium", "value": "715201 - Honorarium"},
+  {"label": "Biaya Audit", "value": "715202 - Biaya Audit"},
+  {
+    "label": "Biaya Manajemen Profesional",
+    "value": "715204 - Biaya Manajemen Profesional"
+  },
+  {"label": "Biaya Konsultan", "value": "715205 - Biaya Konsultan"},
+  {
+    "label": "Biaya Software Aplikasi",
+    "value": "715206 - Biaya Software Aplikasi"
+  },
+  {
+    "label": "Biaya Jasa Penyimpanan",
+    "value": "715207 - Biaya Jasa Penyimpanan"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Gedung dan Bangunan",
+    "value": "714410 - Biaya Perbaikan dan Pemeliharaan Gedung dan Bangunan"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Peralatan Kantor - Perabot",
+    "value": "714420 - Biaya Perbaikan dan Pemeliharaan Peralatan Kantor - Perabot"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Peralatan Kantor - Komputer",
+    "value": "714430 - Biaya Perbaikan dan Pemeliharaan Peralatan Kantor - Komputer"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Peralatan Kantor - Lain-Lain",
+    "value": "714440 - Biaya Perbaikan dan Pemeliharaan Peralatan Kantor - Lain-Lain"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Kendaraan Operasional",
+    "value": "714450 - Biaya Perbaikan dan Pemeliharaan Kendaraan Operasional"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Mesin",
+    "value": "714460 - Biaya Perbaikan dan Pemeliharaan Mesin"
+  },
+  {
+    "label": "Biaya Perbaikan dan Pemeliharaan Peralatan Medis Rumah Sakit",
+    "value": "714470 - Biaya Perbaikan dan Pemeliharaan Peralatan Medis Rumah Sakit"
+  },
+  {"label": "Biaya Promosi", "value": "611000 - Biaya Promosi"},
+  {"label": "Biaya Entertainment", "value": "612000 - Biaya Entertainment"},
+  {
+    "label": "Biaya Transport Pemasaran",
+    "value": "613000 - Biaya Transport Pemasaran"
+  },
+  {
+    "label": "Biaya Perjalanan Dinas Pemasaran",
+    "value": "614000 - Biaya Perjalanan Dinas Pemasaran"
+  },
+  {"label": "Biaya Iklan", "value": "615000 - Biaya Iklan"},
+  {"label": "Biaya Event", "value": "616000 - Biaya Event"}
+]

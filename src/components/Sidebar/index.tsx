@@ -138,7 +138,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                              Buat Pengajuan
+                              Daftar Pengajuan
                             </NavLink>
                           </li>
                           {/* ------ BUAT PENGAJUAN --------- */}

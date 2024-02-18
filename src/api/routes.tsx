@@ -25,7 +25,7 @@ export const REIMBURSEMENT_ACCEPTANCE = (id: number) => {
 
 // BANK
 export const GET_BANK = 'bank';
-export const GET_BANK_NAME = (code: string, number: number) => {
+export const GET_BANK_NAME = (code: string, number: string) => {
   return `bank/name?code=${code}&number=${number}`;
 };
 

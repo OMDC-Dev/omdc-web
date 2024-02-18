@@ -48,7 +48,7 @@ const SignIn: React.FC = () => {
     if (state == API_STATES.OK) {
       hide();
 
-      if (data.iseProfileComplete) {
+      if (data.isProfileComplete) {
         setToken(data.userToken);
         setUser(data);
         navigate('/', { replace: true });

@@ -8,6 +8,7 @@ import RiwayatPengajuan from '../pages/Dashboard/RiwayatPengajuan';
 import SignIn from '../pages/Authentication/SignIn';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import SignInProfile from '../pages/Authentication/SignInProfile';
+import BuatPengajuan from '../pages/Dashboard/BuatPengajuan';
 
 const Routes = () => {
   const { token } = useAuth();
@@ -48,6 +49,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Riwayat Pengajuan'} />
               <RiwayatPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/ajukan',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Buat Pengajuan'} />
+              <BuatPengajuan />
             </>
           ),
         },

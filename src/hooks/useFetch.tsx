@@ -9,9 +9,20 @@ type TApiResponse = {
 };
 
 async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
+  const userToken = localStorage.getItem('token');
+
+  let headers: any = {};
+
+  if (userToken) {
+    console.log('User Auth');
+
+    headers.Authorization = `Bearer ${userToken}`;
+  }
+
   return axios({
     ...props,
     baseURL: BASE_URL,
+    headers: { ...headers, ...props.headers },
   })
     .then((resData: AxiosResponse) => {
       return { state: API_STATES.OK, data: resData.data?.data, error: [] };
