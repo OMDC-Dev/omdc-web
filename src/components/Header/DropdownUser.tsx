@@ -10,7 +10,7 @@ const DropdownUser = () => {
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
 
-  const { setToken } = useAuth();
+  const { setToken, user } = useAuth();
   const navigate = useNavigate();
 
   // close on click outside
@@ -55,9 +55,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {user?.nm_user}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{user.departemen}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">

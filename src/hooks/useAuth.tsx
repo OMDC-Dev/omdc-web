@@ -22,7 +22,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // user
   const setUser = (user: any) => {
-    setUser_(user);
+    setUser_(JSON.stringify(user));
   };
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       token,
       setToken,
-      user,
+      user: user ? JSON.parse(user) : null,
       setUser,
     }),
     [token, user],

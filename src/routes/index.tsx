@@ -6,12 +6,19 @@ import Calendar from '../pages/Calendar';
 import Reimbursement from '../pages/Dashboard/Reimbursement';
 import RiwayatPengajuan from '../pages/Dashboard/RiwayatPengajuan';
 import SignIn from '../pages/Authentication/SignIn';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import {
+  Navigate,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom';
 import SignInProfile from '../pages/Authentication/SignInProfile';
 import BuatPengajuan from '../pages/Dashboard/BuatPengajuan';
+import DetailPengajuan from '../pages/Dashboard/DetailPengajuan';
+import AdminDetailPengajuan from '../pages/Dashboard/AdminDetalPengajuan';
+import RiwayatDiajukan from '../pages/Dashboard/RiwayatDiajukan';
 
 const Routes = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   // TITLE
   const TITLE = 'OMDC - ';
@@ -62,6 +69,15 @@ const Routes = () => {
           ),
         },
         {
+          path: '/reimbursement/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Detail Pengajuan'} />
+              <DetailPengajuan />
+            </>
+          ),
+        },
+        {
           path: '/calendar',
           element: (
             <>
@@ -71,6 +87,42 @@ const Routes = () => {
           ),
         },
       ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
+  const routesForAuthenticatedAdmin: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/reimbursement/admin/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Detail Pengajuan'} />
+              <AdminDetailPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/diajukan',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Pengajuan'} />
+              <RiwayatDiajukan />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
     },
   ];
 
@@ -94,11 +146,16 @@ const Routes = () => {
         </>
       ),
     },
+    {
+      path: '*',
+      element: <Navigate to="/login" replace />,
+    },
   ];
 
   const router = createBrowserRouter([
     ...(!token ? routesForUnAuth : []),
     ...routesForAuthenticated,
+    ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
   ]);
 
   return <RouterProvider router={router} />;

@@ -12,11 +12,10 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT } from '../../api/routes';
+import { PENGAJUAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -32,17 +31,12 @@ const TABLE_HEAD = [
   '',
 ];
 
-function Reimbursement() {
+function RiwayatDiajukan() {
   const [rList, setRList] = React.useState([]);
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
 
   const navigate = useNavigate();
-
-  const { token, user } = useAuth();
-
-  console.log('TOKEN : ' + token);
-  console.log('USER : ' + user);
 
   React.useEffect(() => {
     getReimbursementList();
@@ -50,7 +44,7 @@ function Reimbursement() {
 
   async function getReimbursementList() {
     const { state, data, error } = await useFetch({
-      url: REIMBURSEMENT + `?limit=${limit}&page=${page}`,
+      url: PENGAJUAN + `?limit=${limit}&page=${page}`,
       method: 'GET',
     });
 
@@ -69,23 +63,11 @@ function Reimbursement() {
           <div className="flex items-center justify-between gap-8 bg-boxdark">
             <div>
               <Typography variant="h5" color="white">
-                Riwayat Pengajuan
+                Diajukan ke Saya
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua riwayat pengajuan.
+                Menampilkan semua riwayat pengajuan oleh user.
               </Typography>
-            </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                variant="filled"
-                size="sm"
-                color="blue"
-                onClick={() =>
-                  navigate('/reimbursement/ajukan', { replace: false })
-                }
-              >
-                Buat Pengajuan
-              </Button>
             </div>
           </div>
         </CardHeader>
@@ -195,7 +177,7 @@ function Reimbursement() {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(`/reimbursement/${item?.id}`, {
+                                navigate(`/reimbursement/admin/${item?.id}`, {
                                   replace: false,
                                   state: item,
                                 });
@@ -235,4 +217,4 @@ function Reimbursement() {
   );
 }
 
-export default Reimbursement;
+export default RiwayatDiajukan;

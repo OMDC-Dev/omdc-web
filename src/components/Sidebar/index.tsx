@@ -6,6 +6,7 @@ import IconReimbursement from '../../images/sidebar/IconReimbursement';
 import IconBarang from '../../images/sidebar/IconBarang';
 import IconSidebar from '../../images/sidebar/IconSidebar';
 import IconArrow from '../../images/sidebar/IconArrow';
+import { useAuth } from '../../hooks/useAuth';
 
 // Icon
 
@@ -25,6 +26,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
   );
+
+  const { user } = useAuth();
+  const IS_ADMIN = user?.isAdmin;
 
   // close on click outside
   useEffect(() => {
@@ -153,6 +157,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               Riwayat Pengajuan
                             </NavLink>
                           </li>
+                          {/* ------ BUAT PENGAJUAN --------- */}
+                          {IS_ADMIN ? (
+                            <li>
+                              <NavLink
+                                to="/reimbursement/diajukan"
+                                className={({ isActive }) =>
+                                  'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                  (isActive && '!text-white')
+                                }
+                              >
+                                Diajukan ke Saya
+                              </NavLink>
+                            </li>
+                          ) : null}
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}

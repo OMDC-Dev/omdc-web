@@ -62,8 +62,8 @@ const SignIn: React.FC = () => {
   }
 
   return (
-    <>
-      <div className=" xl:grid xl:place-items-center h-full sm:h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+    <div className=" bg-boxdark h-screen flex flex-col justify-center">
+      <div className=" xl:grid xl:place-items-center  rounded-sm bg-boxdark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
@@ -194,7 +194,7 @@ const SignIn: React.FC = () => {
         </div>
         <Modal visible={visible} toggle={toggle} dismissOnBackdrop />
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,15 +1,16 @@
 import React from 'react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import JenisGroup from '../../components/SelectGroup/JenisGroup';
-import COAGroup from '../../components/SelectGroup/COAGroup';
 import DatePicker from '../../components/Forms/DatePicker/DatePicker';
-import CabangGroup from '../../components/SelectGroup/CabangGroup';
-import ApprovalGroup from '../../components/SelectGroup/ApprovalGroup';
 import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import ItemModal from '../../components/Modal/ItemModal';
 import {
   Card,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
   IconButton,
   List,
   ListItem,
@@ -19,12 +20,15 @@ import formatRupiah from '../../common/formatRupiah';
 import { hitungTotalNominal } from '../../common/utils';
 import BankModal from '../../components/Modal/BankModal';
 import useFetch from '../../hooks/useFetch';
-import { GET_BANK_NAME } from '../../api/routes';
+import { GET_BANK_NAME, REIMBURSEMENT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import COAModal from '../../components/Modal/COAModal';
 import CabangModal from '../../components/Modal/CabangModal';
 import { useAuth } from '../../hooks/useAuth';
 import AdminModal from '../../components/Modal/AdminModal';
+import Modal from '../../components/Modal/Modal';
+import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 
 function TrashIcon() {
   return (
@@ -46,6 +50,9 @@ function TrashIcon() {
 const BuatPengajuan: React.FC = () => {
   const { toggle, visible, hide, show } = useModal();
   const { user } = useAuth();
+
+  // use nav
+  const navigate = useNavigate();
 
   // state
   const [jenis, setJenis] = React.useState<string>();
@@ -71,9 +78,48 @@ const BuatPengajuan: React.FC = () => {
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
+  const [showItem, setShowItem] = React.useState<boolean>(false);
+
+  // Dialog
+  const [showDialog, setShowDialog] = React.useState(false);
+  const [dialogtype, setDialogType] = React.useState<string>('OK');
+
+  const DIALOG_PROPS =
+    dialogtype == 'OK'
+      ? {
+          title: 'Pengajuan Berhasil!',
+          message:
+            'Pengajuan telah berhasil dilakukan, mohon menunggu untuk proses approval.',
+        }
+      : {
+          title: 'Pengajuan Gagal!',
+          message:
+            'Pengajuan gagal dilakukan, mohon periksa data dan coba lagi!',
+        };
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
+
+  // dsabled n=button
+  const disabledByType = () => {
+    if (isNeedName) {
+      return !name;
+    }
+  };
+
+  const buttonDisabled =
+    !jenis ||
+    !coa ||
+    !cabang ||
+    !nominal ||
+    !nomorWA ||
+    !desc ||
+    !result ||
+    !selectDate ||
+    !admin ||
+    !item.length ||
+    !bankDetail ||
+    disabledByType();
 
   // handle attachment
   function handleAttachment(event: any) {
@@ -100,9 +146,11 @@ const BuatPengajuan: React.FC = () => {
     reader.readAsDataURL(file);
 
     reader.onload = () => {
-      const base64string = reader.result;
+      const base64string: any = reader.result;
 
-      setResult(base64string);
+      const splitted = base64string?.split(';base64,');
+
+      setResult(splitted[1]);
     };
 
     setFileInfo(fileInfo);
@@ -136,6 +184,58 @@ const BuatPengajuan: React.FC = () => {
       console.log(data);
     } else {
       alert('Ada kesalahan, mohon coba lagi!');
+    }
+  }
+
+  // delete item by ID
+  function hapusDataById(id: number) {
+    let data = item;
+    data = data.filter((item: any) => item.id !== id);
+
+    for (let index = 0; index < data.length; index++) {
+      const element = data[index];
+      element.id = index;
+    }
+
+    setItem(data);
+  }
+
+  // Pengajuan
+  async function pengajuanReimbursement() {
+    show();
+    // formated date
+    const formattedDate = moment(selectDate).format('YYYY-MM-DD');
+
+    const body = {
+      type: jenis,
+      date: formattedDate,
+      cabang: cabang?.value,
+      description: desc,
+      attachment: result,
+      bank_detail: bankDetail,
+      nominal: nominal,
+      name: name,
+      item: item,
+      coa: coa,
+      file: fileInfo,
+      approved_by: admin?.iduser,
+      parentId: '',
+    };
+
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT,
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setDialogType('OK');
+      setShowDialog(true);
+    } else {
+      hide();
+      setDialogType('ERROR');
+      setShowDialog(true);
     }
   }
 
@@ -342,7 +442,11 @@ const BuatPengajuan: React.FC = () => {
                               {item?.name}
                               <ListItemSuffix className="flex gap-x-4">
                                 {formatRupiah(item.nominal, true)}
-                                <IconButton variant="text" color="blue-gray">
+                                <IconButton
+                                  variant="text"
+                                  color="blue-gray"
+                                  onClick={() => hapusDataById(item?.id)}
+                                >
                                   <TrashIcon />
                                 </IconButton>
                               </ListItemSuffix>
@@ -359,7 +463,7 @@ const BuatPengajuan: React.FC = () => {
                     mode="outlined"
                     onClick={(e: any) => {
                       e.preventDefault();
-                      toggle();
+                      setShowItem(!showItem);
                     }}
                   >
                     Tambah Item
@@ -379,15 +483,26 @@ const BuatPengajuan: React.FC = () => {
                     value={nominal}
                   />
                 </div>
-                <Button>Buat Pengajuan</Button>
+                <Button
+                  onClick={(e: any) => {
+                    e.preventDefault();
+                    pengajuanReimbursement();
+                  }}
+                  isLoading
+                  disabled={false}
+                >
+                  Buat Pengajuan
+                </Button>
               </div>
             </form>
           </div>
         </div>
       </div>
+      {/* MODAL CONTAINER */}
+      <Modal visible={visible} toggle={toggle} />
       <ItemModal
-        visible={visible}
-        toggle={toggle}
+        visible={showItem}
+        toggle={() => setShowItem(!showItem)}
         value={(cb: any) => setItem([...item, { ...cb, id: item.length + 1 }])}
       />
       <BankModal
@@ -414,6 +529,27 @@ const BuatPengajuan: React.FC = () => {
         toggle={() => setShowAdmin(!showAdmin)}
         value={(val: any) => setAdmin(val)}
       />
+      {/* DIALOG */}
+      <Dialog
+        open={showDialog}
+        size={'xs'}
+        handler={() => setShowDialog(!showDialog)}
+        dismiss={{ enabled: false }}
+      >
+        <DialogHeader>{DIALOG_PROPS.title}</DialogHeader>
+        <DialogBody>{DIALOG_PROPS.message}</DialogBody>
+        <DialogFooter>
+          <Button
+            onClick={(e: any) => {
+              e.preventDefault();
+              setShowDialog(!showDialog);
+              dialogtype == 'OK' ? navigate('/', { replace: true }) : null;
+            }}
+          >
+            Ok
+          </Button>
+        </DialogFooter>
+      </Dialog>
     </DefaultLayout>
   );
 };
