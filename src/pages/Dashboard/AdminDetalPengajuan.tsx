@@ -205,7 +205,7 @@ const AdminDetailPengajuan: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    disabled={ACCEPTANCE_STATUS_BY_ID == 'APPROVED'}
+                    disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
                     defaultValue={data?.nominal}
                     placeholder="Masukan Nominal"
                     className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -244,7 +244,7 @@ const AdminDetailPengajuan: React.FC = () => {
                   </label>
                   <textarea
                     rows={3}
-                    disabled={ACCEPTANCE_STATUS_BY_ID == 'APPROVED'}
+                    disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
                     placeholder="Masukan Catatan"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     value={note}
@@ -440,7 +440,7 @@ const AdminDetailPengajuan: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      disabled={ACCEPTANCE_STATUS_BY_ID == 'APPROVED'}
+                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
                       defaultValue={data?.nominal}
                       placeholder="Masukan Nominal"
                       className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -479,7 +479,7 @@ const AdminDetailPengajuan: React.FC = () => {
                     </label>
                     <textarea
                       rows={3}
-                      disabled={ACCEPTANCE_STATUS_BY_ID == 'APPROVED'}
+                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
                       placeholder="Masukan Catatan"
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       value={note}
