@@ -45,7 +45,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // data state
   const [data, setData] = React.useState(state);
-  const [nominal, setNominal] = React.useState(state.nominal);
+  const [nominal, setNominal] = React.useState(data.nominal);
   const [admin, setAdmin] = React.useState<any>('');
   const [note, setNote] = React.useState<string>('');
   const [status, setStatus] = React.useState<any>();
@@ -243,7 +243,7 @@ const AdminDetailPengajuan: React.FC = () => {
                     Catatan ( Opsional )
                   </label>
                   <textarea
-                    rows={6}
+                    rows={3}
                     disabled={ACCEPTANCE_STATUS_BY_ID == 'APPROVED'}
                     placeholder="Masukan Catatan"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -478,7 +478,7 @@ const AdminDetailPengajuan: React.FC = () => {
                       Catatan ( Opsional )
                     </label>
                     <textarea
-                      rows={6}
+                      rows={3}
                       disabled={ACCEPTANCE_STATUS_BY_ID == 'APPROVED'}
                       placeholder="Masukan Catatan"
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"

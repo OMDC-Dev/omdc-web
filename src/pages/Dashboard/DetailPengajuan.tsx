@@ -100,7 +100,7 @@ const DetailPengajuan: React.FC = () => {
                     </label>
                     {data?.accepted_by.map((item: any, index: number) => {
                       return (
-                        <div className=" py-2 flex justify-between">
+                        <div className=" py-4 flex justify-between">
                           <span className=" text-white font-bold">
                             {item.nm_user}
                           </span>
@@ -112,6 +112,18 @@ const DetailPengajuan: React.FC = () => {
                         </div>
                       );
                     })}
+                  </div>
+                  <div className="w-full mt-4.5">
+                    <label className="mb-3 block text-black dark:text-white">
+                      Catatan
+                    </label>
+                    <textarea
+                      rows={3}
+                      disabled
+                      placeholder="Masukan Deskripsi"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      defaultValue={data?.note || '-'}
+                    ></textarea>
                   </div>
                 </div>
               </div>
@@ -129,6 +141,15 @@ const DetailPengajuan: React.FC = () => {
             <form action="#">
               <div className="p-6.5">
                 <div className="mb-4.5 flex flex-col gap-6">
+                  <div className="w-full">
+                    <label className="mb-3 block text-black dark:text-white">
+                      No. Dok
+                    </label>
+                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                      {data?.no_doc}
+                    </div>
+                  </div>
+
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
                       Jenis Reimbursement
@@ -248,7 +269,7 @@ const DetailPengajuan: React.FC = () => {
                     </label>
                     {data?.accepted_by.map((item: any, index: number) => {
                       return (
-                        <div className=" py-2 flex justify-between">
+                        <div className=" py-4 flex justify-between">
                           <span className=" text-white font-bold">
                             {item.nm_user}
                           </span>
@@ -260,6 +281,18 @@ const DetailPengajuan: React.FC = () => {
                         </div>
                       );
                     })}
+                  </div>
+                  <div className="w-full mt-4.5">
+                    <label className="mb-3 block text-black dark:text-white">
+                      Catatan
+                    </label>
+                    <textarea
+                      rows={3}
+                      disabled
+                      placeholder="Masukan Deskripsi"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      defaultValue={data?.description}
+                    ></textarea>
                   </div>
                 </div>
               </div>
