@@ -22,7 +22,7 @@ import FileModal from '../../components/Modal/FileModal';
 import { downloadPDF, getDataById, unformatRupiah } from '../../common/utils';
 import AdminModal from '../../components/Modal/AdminModal';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT_ACCEPTANCE } from '../../api/routes';
+import { FINANCE_ACCEPTANCE, REIMBURSEMENT_ACCEPTANCE } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -53,6 +53,7 @@ const AdminDetailPengajuan: React.FC = () => {
   // CONST
   const RID = data?.id;
   const EX_STATUS = data?.status;
+  const ADMIN_TYPE = user?.type;
 
   const ACCEPTANCE_STATUS_BY_ID = getDataById(
     status?.accepted_by,
@@ -71,6 +72,7 @@ const AdminDetailPengajuan: React.FC = () => {
     React.useState<boolean>(false);
   const [dialogtype, setDialogType] = React.useState<string>('OK');
   const [dialogAcctype, setDialogAccType] = React.useState<string>('OK');
+  const [finDialog, setFinDialog] = React.useState<boolean>(false);
 
   const DIALOG_PROPS =
     dialogtype == 'OK'
@@ -92,16 +94,25 @@ const AdminDetailPengajuan: React.FC = () => {
   };
 
   // handle status
-  const STATUS_WORDING = (status: string): { tx: string; color: colors } => {
+  const STATUS_WORDING = (
+    status: string,
+    isFinance?: boolean,
+  ): { tx: string; color: colors } => {
     switch (status) {
       case 'WAITING':
-        return { tx: 'Menunggu Disetujui', color: 'amber' };
+        return {
+          tx: isFinance ? 'Menunggu Ditransfer' : 'Menunggu Disetujui',
+          color: 'amber',
+        };
         break;
       case 'APPROVED':
         return { tx: 'Disetujui', color: 'green' };
         break;
       case 'REJECTED':
         return { tx: 'DItolak', color: 'red' };
+        break;
+      case 'DONE':
+        return { tx: 'Selesai', color: 'green' };
         break;
       default:
         return { tx: 'Menunggu Disetujui', color: 'amber' };
@@ -124,6 +135,34 @@ const AdminDetailPengajuan: React.FC = () => {
       setStatus(data);
     } else {
       setStatus(EX_STATUS);
+    }
+  }
+
+  // acceptance finance
+  async function acceptance_fin() {
+    setFinDialog(!finDialog);
+    show();
+
+    const fnominal = formatRupiah(unformatRupiah(nominal), false);
+
+    const body = {
+      nominal: fnominal,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: FINANCE_ACCEPTANCE(RID),
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setDialogType('OK');
+      setShowResultDialog(!showResultDialog);
+    } else {
+      hide();
+      setDialogType('ERROR');
+      setShowResultDialog(!showResultDialog);
     }
   }
 
@@ -196,6 +235,20 @@ const AdminDetailPengajuan: React.FC = () => {
                         </div>
                       );
                     })}
+                    {status?.status_finance !== 'IDLE' ? (
+                      <div className=" py-4 flex justify-between">
+                        <span className=" text-white font-bold">Finance</span>
+                        <Chip
+                          variant={'ghost'}
+                          color={
+                            STATUS_WORDING(status?.status_finance, true).color
+                          }
+                          value={
+                            STATUS_WORDING(status?.status_finance, true).tx
+                          }
+                        />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
 
@@ -205,7 +258,11 @@ const AdminDetailPengajuan: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                    disabled={
+                      ADMIN_TYPE == 'FINANCE'
+                        ? data?.status_finance !== 'WAITING'
+                        : ACCEPTANCE_STATUS_BY_ID !== 'WAITING'
+                    }
                     defaultValue={data?.nominal}
                     placeholder="Masukan Nominal"
                     className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -251,6 +308,20 @@ const AdminDetailPengajuan: React.FC = () => {
                     onChange={(e) => setNote(e.target.value)}
                   ></textarea>
                 </div>
+
+                {ADMIN_TYPE == 'FINANCE' &&
+                status?.status_finance == 'WAITING' ? (
+                  <div className=" mt-4.5">
+                    <Button
+                      onClick={(e: any) => {
+                        e.preventDefault();
+                        setFinDialog(!finDialog);
+                      }}
+                    >
+                      Konfirmasi Sudah Ditransfer
+                    </Button>
+                  </div>
+                ) : null}
 
                 {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
                   <div className=" flex flex-col gap-y-4 mt-4.5">
@@ -431,6 +502,20 @@ const AdminDetailPengajuan: React.FC = () => {
                           </div>
                         );
                       })}
+                      {status?.status_finance !== 'IDLE' ? (
+                        <div className=" py-4 flex justify-between">
+                          <span className=" text-white font-bold">Finance</span>
+                          <Chip
+                            variant={'ghost'}
+                            color={
+                              STATUS_WORDING(status?.status_finance, true).color
+                            }
+                            value={
+                              STATUS_WORDING(status?.status_finance, true).tx
+                            }
+                          />
+                        </div>
+                      ) : null}
                     </div>
                   </div>
 
@@ -659,6 +744,30 @@ const AdminDetailPengajuan: React.FC = () => {
             variant="gradient"
             color="green"
             onClick={() => acceptance(dialogAcctype)}
+          >
+            <span>Konfirmasi</span>
+          </MButton>
+        </DialogFooter>
+      </Dialog>
+      {/* DIALOG FINANCE*/}
+      <Dialog open={finDialog} handler={() => setFinDialog(!finDialog)}>
+        <DialogHeader>Konfirmasi</DialogHeader>
+        <DialogBody>
+          Apakah anda yakin ingin mengkonfirmasi bahwa dana telah di trasnfer?
+        </DialogBody>
+        <DialogFooter>
+          <MButton
+            variant="text"
+            color="red"
+            onClick={() => setFinDialog(false)}
+            className="mr-1"
+          >
+            <span>Batalkan</span>
+          </MButton>
+          <MButton
+            variant="gradient"
+            color="green"
+            onClick={() => acceptance_fin()}
           >
             <span>Konfirmasi</span>
           </MButton>

@@ -9,13 +9,15 @@ import {
   CardFooter,
   IconButton,
   Tooltip,
+  Chip,
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { PENGAJUAN } from '../../api/routes';
+import { FINANCE_PENGAJUAN, PENGAJUAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -31,10 +33,33 @@ const TABLE_HEAD = [
   '',
 ];
 
+const TABLE_HEAD_FINANCE = [
+  'Pengajuan',
+  'Tanggal',
+  'Induk Cabang',
+  'Diajukan Oleh',
+  'Nama Client / Vendor',
+  'COA',
+  'Nominal',
+  'Tanggal Disetujui',
+  'Tanggal Pengajuan',
+  'Status',
+  'Status Finance',
+  '',
+];
+
 function RiwayatDiajukan() {
   const [rList, setRList] = React.useState([]);
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
+
+  const { user } = useAuth();
+
+  const ADMIN_TYPE = user?.type;
+
+  const URL = ADMIN_TYPE == 'ADMIN' ? PENGAJUAN : FINANCE_PENGAJUAN;
+
+  const TABLE = ADMIN_TYPE == 'ADMIN' ? TABLE_HEAD : TABLE_HEAD_FINANCE;
 
   const navigate = useNavigate();
 
@@ -44,7 +69,7 @@ function RiwayatDiajukan() {
 
   async function getReimbursementList() {
     const { state, data, error } = await useFetch({
-      url: PENGAJUAN + `?limit=${limit}&page=${page}`,
+      url: URL + `?limit=${limit}&page=${page}`,
       method: 'GET',
     });
 
@@ -53,6 +78,26 @@ function RiwayatDiajukan() {
     } else {
       setRList([]);
       console.log(error);
+    }
+  }
+
+  function statusChip(status: string) {
+    switch (status) {
+      case 'WAITING':
+        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
+        break;
+      case 'APPROVED':
+        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
+        break;
+      case 'REJECTED':
+        return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+        break;
+      case 'DONE':
+        return <Chip variant={'outlined'} color="green" value={'Selesai'} />;
+        break;
+      default:
+        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
+        break;
     }
   }
 
@@ -83,7 +128,7 @@ function RiwayatDiajukan() {
               <table className="mt-4 w-full min-w-max table-auto text-left">
                 <thead>
                   <tr>
-                    {TABLE_HEAD.map((head) => (
+                    {TABLE.map((head) => (
                       <th
                         key={head}
                         className="border-y border-blue-gray-800 bg-strokedark p-4"
@@ -167,10 +212,19 @@ function RiwayatDiajukan() {
                           </Typography>
                         </td>
                         <td className={classes}>
-                          <Typography variant="small" className="font-normal">
+                          {/* <Typography variant="small" className="font-normal">
                             {item?.status}
-                          </Typography>
+                          </Typography> */}
+                          {statusChip(item?.status)}
                         </td>
+                        {ADMIN_TYPE == 'FINANCE' ? (
+                          <td className={classes}>
+                            {/* <Typography variant="small" className="font-normal">
+                              {item?.status_finance}
+                            </Typography> */}
+                            {statusChip(item?.status_finance)}
+                          </td>
+                        ) : null}
                         <td className={classes}>
                           <Tooltip content="Detail">
                             <IconButton

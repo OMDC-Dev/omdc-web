@@ -9,6 +9,7 @@ import {
   CardFooter,
   IconButton,
   Tooltip,
+  Chip,
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
@@ -16,7 +17,6 @@ import { REIMBURSEMENT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -39,11 +39,6 @@ function Reimbursement() {
 
   const navigate = useNavigate();
 
-  const { token, user } = useAuth();
-
-  console.log('TOKEN : ' + token);
-  console.log('USER : ' + user);
-
   React.useEffect(() => {
     getReimbursementList();
   }, []);
@@ -59,6 +54,26 @@ function Reimbursement() {
     } else {
       setRList([]);
       console.log(error);
+    }
+  }
+
+  function statusChip(status: string) {
+    switch (status) {
+      case 'WAITING':
+        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
+        break;
+      case 'APPROVED':
+        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
+        break;
+      case 'REJECTED':
+        return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+        break;
+      case 'DONE':
+        return <Chip variant={'outlined'} color="green" value={'Selesai'} />;
+        break;
+      default:
+        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
+        break;
     }
   }
 
@@ -185,9 +200,10 @@ function Reimbursement() {
                           </Typography>
                         </td>
                         <td className={classes}>
-                          <Typography variant="small" className="font-normal">
+                          {/* <Typography variant="small" className="font-normal">
                             {item?.status}
-                          </Typography>
+                          </Typography> */}
+                          {statusChip(item?.status)}
                         </td>
                         <td className={classes}>
                           <Tooltip content="Detail">

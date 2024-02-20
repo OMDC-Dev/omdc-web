@@ -59,10 +59,16 @@ const DetailPengajuan: React.FC = () => {
         };
 
   // handle status
-  const STATUS_WORDING = (status: string): { tx: string; color: colors } => {
+  const STATUS_WORDING = (
+    status: string,
+    isFinance?: boolean,
+  ): { tx: string; color: colors } => {
     switch (status) {
       case 'WAITING':
-        return { tx: 'Menunggu Disetujui', color: 'amber' };
+        return {
+          tx: isFinance ? 'Menunggu Ditransfer' : 'Menunggu Disetujui',
+          color: 'amber',
+        };
         break;
       case 'APPROVED':
         return { tx: 'Disetujui', color: 'green' };
@@ -75,6 +81,8 @@ const DetailPengajuan: React.FC = () => {
         break;
     }
   };
+
+  console.log('fin : ' + data?.status_finance);
 
   return (
     <DefaultLayout>
@@ -112,6 +120,18 @@ const DetailPengajuan: React.FC = () => {
                         </div>
                       );
                     })}
+                    {data?.status_finance !== 'IDLE' ? (
+                      <div className=" py-4 flex justify-between">
+                        <span className=" text-white font-bold">Finance</span>
+                        <Chip
+                          variant={'ghost'}
+                          color={
+                            STATUS_WORDING(data?.status_finance, true).color
+                          }
+                          value={STATUS_WORDING(data?.status_finance, true).tx}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                   <div className="w-full mt-4.5">
                     <label className="mb-3 block text-black dark:text-white">
@@ -281,6 +301,18 @@ const DetailPengajuan: React.FC = () => {
                         </div>
                       );
                     })}
+                    {data?.status_finance !== 'IDLE' ? (
+                      <div className=" py-4 flex justify-between">
+                        <span className=" text-white font-bold">Finance</span>
+                        <Chip
+                          variant={'ghost'}
+                          color={
+                            STATUS_WORDING(data?.status_finance, true).color
+                          }
+                          value={STATUS_WORDING(data?.status_finance, true).tx}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                   <div className="w-full mt-4.5">
                     <label className="mb-3 block text-black dark:text-white">
