@@ -1,6 +1,6 @@
 import React from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { List, ListItem } from '@material-tailwind/react';
+import { Dialog, List, ListItem } from '@material-tailwind/react';
 import useFetch from '../../hooks/useFetch';
 import { GET_CABANG, SUPERUSER } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -60,11 +60,8 @@ const AdminModal = ({
   }
 
   return (
-    <div
-      onClick={dismissOnBackdrop ? toggle : null}
-      className="fixed z-50 bg-black bg-opacity-40 top-0 bottom-0 left-0 right-0 w-full h-full flex justify-center items-center"
-    >
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-96">
+    <Dialog className="bg-transparent" open={visible} handler={toggle}>
+      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-full">
         <div className=" flex flex-row items-center border-b border-blue-gray-800 pt-2 pb-4 mb-4.5">
           <div className=" flex-1">Pilih Admin</div>
           <XMarkIcon className=" w-5 h-5 cursor-pointer" onClick={toggle} />
@@ -89,7 +86,7 @@ const AdminModal = ({
             })}
         </List>
       </div>
-    </div>
+    </Dialog>
   );
 };
 

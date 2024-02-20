@@ -60,8 +60,13 @@ const DropdownUser = () => {
           <span className="block text-xs">{user.departemen}</span>
         </span>
 
-        <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
+        <span className="h-9 w-9 rounded-full">
+          <img
+            src={
+              'https://www.pngall.com/wp-content/uploads/5/Profile-Male-PNG.png'
+            }
+            alt="User"
+          />
         </span>
 
         <svg

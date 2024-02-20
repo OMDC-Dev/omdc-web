@@ -295,19 +295,21 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 ) : null}
 
-                <div className=" w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Catatan ( Opsional )
-                  </label>
-                  <textarea
-                    rows={3}
-                    disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
-                    placeholder="Masukan Catatan"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                  ></textarea>
-                </div>
+                {ADMIN_TYPE == 'ADMIN' ? (
+                  <div className=" w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Catatan ( Opsional )
+                    </label>
+                    <textarea
+                      rows={3}
+                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                      placeholder="Masukan Catatan"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                    ></textarea>
+                  </div>
+                ) : null}
 
                 {ADMIN_TYPE == 'FINANCE' &&
                 status?.status_finance == 'WAITING' ? (
@@ -525,7 +527,11 @@ const AdminDetailPengajuan: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                      disabled={
+                        ADMIN_TYPE == 'FINANCE'
+                          ? data?.status_finance !== 'WAITING'
+                          : ACCEPTANCE_STATUS_BY_ID !== 'WAITING'
+                      }
                       defaultValue={data?.nominal}
                       placeholder="Masukan Nominal"
                       className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -558,19 +564,35 @@ const AdminDetailPengajuan: React.FC = () => {
                     </div>
                   ) : null}
 
-                  <div className=" w-full">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Catatan ( Opsional )
-                    </label>
-                    <textarea
-                      rows={3}
-                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
-                      placeholder="Masukan Catatan"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                    ></textarea>
-                  </div>
+                  {ADMIN_TYPE == 'ADMIN' ? (
+                    <div className=" w-full">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Catatan ( Opsional )
+                      </label>
+                      <textarea
+                        rows={3}
+                        disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                        placeholder="Masukan Catatan"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                      ></textarea>
+                    </div>
+                  ) : null}
+
+                  {ADMIN_TYPE == 'FINANCE' &&
+                  status?.status_finance == 'WAITING' ? (
+                    <div className=" mt-4.5">
+                      <Button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          setFinDialog(!finDialog);
+                        }}
+                      >
+                        Konfirmasi Sudah Ditransfer
+                      </Button>
+                    </div>
+                  ) : null}
 
                   {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
                     <div className=" flex flex-col gap-y-4 mt-4.5">

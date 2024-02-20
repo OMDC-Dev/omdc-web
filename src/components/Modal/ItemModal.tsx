@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from '../Button';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Dialog } from '@material-tailwind/react';
 
 const ItemModal = ({
   visible,
@@ -34,11 +35,8 @@ const ItemModal = ({
   }
 
   return (
-    <div
-      onClick={dismissOnBackdrop ? toggle : null}
-      className="fixed z-50 bg-black bg-opacity-40 top-0 bottom-0 left-0 right-0 w-full h-full flex justify-center items-center"
-    >
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-72">
+    <Dialog className="bg-transparent" open={visible} handler={toggle}>
+      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-full">
         <div className=" flex flex-row items-center border-b border-blue-gray-800 py-2 mb-4.5">
           <div className=" flex-1">Tambah Item</div>
           <XMarkIcon className=" w-5 h-5 cursor-pointer" onClick={toggle} />
@@ -74,7 +72,7 @@ const ItemModal = ({
           Simpan
         </Button>
       </div>
-    </div>
+    </Dialog>
   );
 };
 
