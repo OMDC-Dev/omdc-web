@@ -16,6 +16,7 @@ import BuatPengajuan from '../pages/Dashboard/BuatPengajuan';
 import DetailPengajuan from '../pages/Dashboard/DetailPengajuan';
 import AdminDetailPengajuan from '../pages/Dashboard/AdminDetalPengajuan';
 import RiwayatDiajukan from '../pages/Dashboard/RiwayatDiajukan';
+import BuatReport from '../pages/Dashboard/BuatReport';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -65,6 +66,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Buat Pengajuan'} />
               <BuatPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/:id/report',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Buat Report Realisasi'} />
+              <BuatReport />
             </>
           ),
         },

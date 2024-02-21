@@ -1,3 +1,4 @@
+import { Dialog } from '@material-tailwind/react';
 import React from 'react';
 
 const Modal = ({
@@ -12,25 +13,29 @@ const Modal = ({
   if (!visible) return null;
 
   return (
-    <div
-      onClick={dismissOnBackdrop ? toggle : null}
-      className="fixed z-50 bg-black bg-opacity-40 top-0 bottom-0 left-0 right-0 w-full h-full flex justify-center items-center"
+    <Dialog
+      className="bg-transparent grid place-items-center shadow-transparent"
+      open={visible}
+      handler={toggle}
+      dismiss={{
+        enabled: false,
+      }}
     >
       <div
         onClick={(e) => {
           e.stopPropagation();
         }}
-        className="bg-white p-4 lg:p-5 rounded-md shadow-md"
+        className="bg-white p-4 lg:p-5 rounded-md shadow-md w-18 h-18 grid place-items-center"
       >
         <div
-          className="inline-block w-10 h-10 
+          className="inline-block w-8 h-8 
             border-t-2
             border-t-indigo-500  
             rounded-full 
             animate-spin"
         ></div>
       </div>
-    </div>
+    </Dialog>
   );
 };
 

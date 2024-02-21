@@ -15,10 +15,13 @@ import {
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
 import Modal from '../../components/Modal/Modal';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
 import FileModal from '../../components/Modal/FileModal';
 import { downloadPDF } from '../../common/utils';
+import useFetch from '../../hooks/useFetch';
+import { REIMBURSEMENT_DETAIL } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
 
 const DetailPengajuan: React.FC = () => {
   const { toggle, visible, hide, show } = useModal();
@@ -26,8 +29,11 @@ const DetailPengajuan: React.FC = () => {
   // use nav
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams();
 
   const state = location.state;
+
+  const IS_PUSHED = state?.pushed;
 
   React.useEffect(() => {
     if (!state) {
@@ -73,6 +79,9 @@ const DetailPengajuan: React.FC = () => {
       case 'APPROVED':
         return { tx: 'Disetujui', color: 'green' };
         break;
+      case 'DONE':
+        return { tx: 'Selesai', color: 'green' };
+        break;
       case 'REJECTED':
         return { tx: 'DItolak', color: 'red' };
         break;
@@ -82,7 +91,55 @@ const DetailPengajuan: React.FC = () => {
     }
   };
 
-  console.log('fin : ' + data?.status_finance);
+  function onReportButtonPressed(e: any) {
+    e.preventDefault();
+    if (data?.childId) {
+      navigate(`/reimbursement/${data?.childId}`, {
+        replace: false,
+        state: {
+          pushed: true,
+        },
+      });
+    } else {
+      navigate(`/reimbursement/${data?.id}/report`, {
+        replace: false,
+        state: data,
+      });
+    }
+  }
+
+  function onSeeButtonPressed(e: any) {
+    e.preventDefault();
+    if (data?.parentId) {
+      navigate(`/reimbursement/${data?.parentId}`, {
+        replace: false,
+        state: {
+          pushed: true,
+        },
+      });
+    }
+  }
+
+  React.useEffect(() => {
+    if (id) {
+      getDetails(id);
+    }
+  }, [location.key]);
+
+  async function getDetails(id: any) {
+    show();
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_DETAIL(id),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setData(data);
+    } else {
+      hide();
+    }
+  }
 
   return (
     <DefaultLayout>
@@ -145,6 +202,24 @@ const DetailPengajuan: React.FC = () => {
                       defaultValue={data?.note || '-'}
                     ></textarea>
                   </div>
+                  {data?.jenis_reimbursement == 'Cash Advance' &&
+                  data?.status_finance == 'DONE' &&
+                  !IS_PUSHED ? (
+                    <div className="w-full mt-4.5">
+                      <Button onClick={onReportButtonPressed}>
+                        {data?.childId ? 'Lihat' : 'Buat'} Report Realisasi
+                      </Button>
+                    </div>
+                  ) : null}
+                  {data?.jenis_reimbursement == 'Cash Advance Report' &&
+                  data?.parentId &&
+                  !IS_PUSHED ? (
+                    <div className="w-full mt-4.5">
+                      <Button onClick={onSeeButtonPressed}>
+                        Lihat Pengajuan Cash Advance
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </form>
@@ -326,6 +401,24 @@ const DetailPengajuan: React.FC = () => {
                       defaultValue={data?.description}
                     ></textarea>
                   </div>
+                  {data?.jenis_reimbursement == 'Cash Advance' &&
+                  data?.status_finance == 'DONE' &&
+                  !IS_PUSHED ? (
+                    <div className="w-full mt-4.5">
+                      <Button onClick={onReportButtonPressed}>
+                        {data?.childId ? 'Lihat' : 'Buat'} Report Realisasi
+                      </Button>
+                    </div>
+                  ) : null}
+                  {data?.jenis_reimbursement == 'Cash Advance Report' &&
+                  data?.parentId &&
+                  !IS_PUSHED ? (
+                    <div className="w-full mt-4.5">
+                      <Button onClick={onSeeButtonPressed}>
+                        Lihat Pengajuan Cash Advance
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </form>
@@ -360,7 +453,7 @@ const DetailPengajuan: React.FC = () => {
                 </div>
                 <div className="mb-1">
                   <label className="mb-2.5 block text-black dark:text-white">
-                    Nominal
+                    Nominal Diajukan
                   </label>
                   <input
                     disabled
@@ -370,6 +463,20 @@ const DetailPengajuan: React.FC = () => {
                     className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
                 </div>
+                {data?.realisasi ? (
+                  <div className="mt-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nominal Realisasi
+                    </label>
+                    <input
+                      disabled
+                      type="text"
+                      defaultValue={'Rp. ' + data?.realisasi}
+                      placeholder="Enter your full name"
+                      className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </div>
+                ) : null}
               </div>
             </form>
           </div>

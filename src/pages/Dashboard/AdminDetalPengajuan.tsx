@@ -16,13 +16,17 @@ import {
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
 import Modal from '../../components/Modal/Modal';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
 import FileModal from '../../components/Modal/FileModal';
 import { downloadPDF, getDataById, unformatRupiah } from '../../common/utils';
 import AdminModal from '../../components/Modal/AdminModal';
 import useFetch from '../../hooks/useFetch';
-import { FINANCE_ACCEPTANCE, REIMBURSEMENT_ACCEPTANCE } from '../../api/routes';
+import {
+  FINANCE_ACCEPTANCE,
+  REIMBURSEMENT_ACCEPTANCE,
+  REIMBURSEMENT_DETAIL,
+} from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -34,8 +38,11 @@ const AdminDetailPengajuan: React.FC = () => {
   // use nav
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams();
 
   const state = location.state;
+
+  const IS_PUSHED = state?.pushed;
 
   React.useEffect(() => {
     if (!state) {
@@ -122,7 +129,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
   React.useEffect(() => {
     getStatus();
-  }, []);
+  }, [location.key]);
 
   // get status
   async function getStatus() {
@@ -199,6 +206,48 @@ const AdminDetailPengajuan: React.FC = () => {
     }
   }
 
+  // CAR
+  function onReportButtonPressed(e: any) {
+    e.preventDefault();
+    if (data?.childId) {
+      navigate(`/reimbursement/${data?.childId}`, {
+        replace: false,
+        state: { ...state, pushed: true },
+      });
+    }
+  }
+
+  function onSeeButtonPressed(e: any) {
+    e.preventDefault();
+    if (data?.parentId) {
+      navigate(`/reimbursement/${data?.parentId}`, {
+        replace: false,
+        state: { ...state, pushed: true },
+      });
+    }
+  }
+
+  React.useEffect(() => {
+    if (id) {
+      getDetails(id);
+    }
+  }, [location.key]);
+
+  async function getDetails(id: any) {
+    show();
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_DETAIL(id),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setData(data);
+    } else {
+      hide();
+    }
+  }
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -214,14 +263,14 @@ const AdminDetailPengajuan: React.FC = () => {
                 value={STATUS_WORDING(status?.status).tx}
               />
             </div>
-            <form action="#">
+            <div>
               <div className="p-6.5">
                 <div className="mb-4.5 border-b pb-4 border-blue-gray-800">
                   <div>
                     <label className="mb-3 block text-black dark:text-white">
                       Status Admin
                     </label>
-                    {status?.accepted_by.map((item: any, index: number) => {
+                    {status?.accepted_by?.map((item: any, index: number) => {
                       return (
                         <div className=" py-4 flex justify-between">
                           <span className=" text-white font-bold">
@@ -254,15 +303,15 @@ const AdminDetailPengajuan: React.FC = () => {
 
                 <div className="w-full mb-4.5">
                   <label className="mb-2.5 block text-black dark:text-white">
-                    Nominal Diajukan ( Ubah nominal bila diperlukan )
+                    Nominal Diajukan{' '}
+                    {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' &&
+                    ADMIN_TYPE == 'ADMIN'
+                      ? '( Ubah nominal bila diperlukan )'
+                      : ''}
                   </label>
                   <input
                     type="text"
-                    disabled={
-                      ADMIN_TYPE == 'FINANCE'
-                        ? data?.status_finance !== 'WAITING'
-                        : ACCEPTANCE_STATUS_BY_ID !== 'WAITING'
-                    }
+                    disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
                     defaultValue={data?.nominal}
                     placeholder="Masukan Nominal"
                     className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -311,6 +360,26 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 ) : null}
 
+                {data?.jenis_reimbursement == 'Cash Advance' &&
+                data?.status_finance == 'DONE' &&
+                data?.childId &&
+                !IS_PUSHED ? (
+                  <div className="w-full mt-4.5">
+                    <Button onClick={onReportButtonPressed}>
+                      Lihat Report Realisasi
+                    </Button>
+                  </div>
+                ) : null}
+                {data?.jenis_reimbursement == 'Cash Advance Report' &&
+                data?.parentId &&
+                !IS_PUSHED ? (
+                  <div className="w-full mt-4.5">
+                    <Button onClick={onSeeButtonPressed}>
+                      Lihat Pengajuan Cash Advance
+                    </Button>
+                  </div>
+                ) : null}
+
                 {ADMIN_TYPE == 'FINANCE' &&
                 status?.status_finance == 'WAITING' ? (
                   <div className=" mt-4.5">
@@ -349,7 +418,7 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 ) : null}
               </div>
-            </form>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-9">
@@ -490,7 +559,7 @@ const AdminDetailPengajuan: React.FC = () => {
                       <label className="mb-3 block text-black dark:text-white">
                         Status Admin
                       </label>
-                      {status?.accepted_by.map((item: any, index: number) => {
+                      {status?.accepted_by?.map((item: any, index: number) => {
                         return (
                           <div className=" py-4 flex justify-between">
                             <span className=" text-white font-bold">
@@ -523,15 +592,15 @@ const AdminDetailPengajuan: React.FC = () => {
 
                   <div className="w-full mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Nominal Diajukan ( Ubah nominal bila diperlukan )
+                      Nominal Diajukan{' '}
+                      {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' &&
+                      ADMIN_TYPE == 'ADMIN'
+                        ? '( Ubah nominal bila diperlukan )'
+                        : ''}
                     </label>
                     <input
                       type="text"
-                      disabled={
-                        ADMIN_TYPE == 'FINANCE'
-                          ? data?.status_finance !== 'WAITING'
-                          : ACCEPTANCE_STATUS_BY_ID !== 'WAITING'
-                      }
+                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
                       defaultValue={data?.nominal}
                       placeholder="Masukan Nominal"
                       className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
@@ -577,6 +646,26 @@ const AdminDetailPengajuan: React.FC = () => {
                         value={note}
                         onChange={(e) => setNote(e.target.value)}
                       ></textarea>
+                    </div>
+                  ) : null}
+
+                  {data?.jenis_reimbursement == 'Cash Advance' &&
+                  data?.status_finance == 'DONE' &&
+                  data?.childId &&
+                  !IS_PUSHED ? (
+                    <div className="w-full mt-4.5">
+                      <Button onClick={onReportButtonPressed}>
+                        Lihat Report Realisasi
+                      </Button>
+                    </div>
+                  ) : null}
+                  {data?.jenis_reimbursement == 'Cash Advance Report' &&
+                  data?.parentId &&
+                  !IS_PUSHED ? (
+                    <div className="w-full mt-4.5">
+                      <Button onClick={onSeeButtonPressed}>
+                        Lihat Pengajuan Cash Advance
+                      </Button>
                     </div>
                   ) : null}
 
@@ -632,7 +721,7 @@ const AdminDetailPengajuan: React.FC = () => {
                 <div className="mb-4">
                   <Card className=" rounded-md">
                     <List>
-                      {data?.item.map((item: any, index: number) => {
+                      {data?.item?.map((item: any, index: number) => {
                         return (
                           <ListItem
                             key={item + index}
@@ -661,6 +750,20 @@ const AdminDetailPengajuan: React.FC = () => {
                     className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
                 </div>
+                {data?.realisasi ? (
+                  <div className="mt-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nominal Realisasi
+                    </label>
+                    <input
+                      disabled
+                      type="text"
+                      defaultValue={'Rp. ' + data?.realisasi}
+                      placeholder="Enter your full name"
+                      className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </div>
+                ) : null}
               </div>
             </form>
           </div>
