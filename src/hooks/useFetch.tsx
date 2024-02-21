@@ -27,8 +27,12 @@ async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
     .then((resData: AxiosResponse) => {
       return { state: API_STATES.OK, data: resData.data?.data, error: [] };
     })
-    .catch((err: AxiosError) => {
-      return { state: API_STATES.ERROR, data: [], error: err.response?.data };
+    .catch((err: AxiosError | any) => {
+      return {
+        state: API_STATES.ERROR,
+        data: [],
+        error: err.response?.data?.error,
+      };
     });
 }
 

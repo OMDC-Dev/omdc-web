@@ -57,7 +57,7 @@ const SignIn: React.FC = () => {
       }
     } else {
       hide();
-      setErrorMessage(error.error);
+      setErrorMessage(error);
     }
   }
 

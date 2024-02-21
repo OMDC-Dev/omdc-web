@@ -2,7 +2,6 @@ import { ReactElement } from 'react';
 import PageTitle from '../components/PageTitle';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
-import Calendar from '../pages/Calendar';
 import Reimbursement from '../pages/Dashboard/Reimbursement';
 import RiwayatPengajuan from '../pages/Dashboard/RiwayatPengajuan';
 import SignIn from '../pages/Authentication/SignIn';
@@ -17,6 +16,9 @@ import DetailPengajuan from '../pages/Dashboard/DetailPengajuan';
 import AdminDetailPengajuan from '../pages/Dashboard/AdminDetalPengajuan';
 import RiwayatDiajukan from '../pages/Dashboard/RiwayatDiajukan';
 import BuatReport from '../pages/Dashboard/BuatReport';
+import ChangePassword from '../pages/Authentication/ChangePassword';
+import PermintaanBarang from '../pages/PermintaanBarang/PermintaanBarang';
+import ListBarang from '../pages/PermintaanBarang/ListBarang';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -87,15 +89,6 @@ const Routes = () => {
             </>
           ),
         },
-        {
-          path: '/calendar',
-          element: (
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Calendar />
-            </>
-          ),
-        },
       ],
     },
     {
@@ -162,10 +155,67 @@ const Routes = () => {
     },
   ];
 
+  // routes for authenticated user
+  const routesForPublic: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/change-password',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Ubah Password'} />
+              <ChangePassword />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
+  const routesForPermintaanBarang: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/request-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <PermintaanBarang />
+            </>
+          ),
+        },
+        {
+          path: '/barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <ListBarang />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
   const router = createBrowserRouter([
     ...(!token ? routesForUnAuth : []),
     ...routesForAuthenticated,
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
+    ...routesForPublic,
+    ...routesForPermintaanBarang,
   ]);
 
   return <RouterProvider router={router} />;

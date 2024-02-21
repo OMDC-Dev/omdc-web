@@ -97,9 +97,12 @@ const DropdownUser = () => {
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 dark:border-strokedark">
           <li>
-            <Link
-              to="/profile"
-              className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/change-password');
+              }}
+              className=" cursor-pointer flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
             >
               <svg
                 className="fill-current"
@@ -118,8 +121,8 @@ const DropdownUser = () => {
                   fill=""
                 />
               </svg>
-              Update Password
-            </Link>
+              Ganti Password
+            </div>
           </li>
         </ul>
         <button
