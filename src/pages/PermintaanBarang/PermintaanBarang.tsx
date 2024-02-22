@@ -21,13 +21,13 @@ import moment from 'moment';
 const TABLE_HEAD = [
   'ID PB',
   'ID User',
-  'Jam Transaksi',
   'Kode Cabang',
   'Kode Induk',
   'Nama Cabang',
   'Nama Induk',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
+  'Jam Transaksi',
   'Status',
   '',
 ];
@@ -36,28 +36,31 @@ function PermintaanBarang() {
   const [list, setList] = React.useState([]);
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
+  const [pageInfo, setPageInfo] = React.useState<any>();
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
 
   React.useEffect(() => {
     getList();
-  }, []);
+  }, [page]);
 
   async function getList() {
+    setLoading(true);
     const { state, data, error } = await useFetch({
       url: LIST_REQUEST_BARANG + `?limit=${limit}&page=${page}`,
       method: 'GET',
     });
 
     if (state == API_STATES.OK) {
-      setList(data);
+      setLoading(false);
+      setList(data.rows);
+      setPageInfo(data?.pageInfo);
     } else {
+      setLoading(false);
       setList([]);
-      console.log(error);
     }
   }
-
-  console.log(list);
 
   function statusChip(status: string) {
     switch (status) {
@@ -104,7 +107,7 @@ function PermintaanBarang() {
             </div>
           </div>
         </CardHeader>
-        {!list.length ? (
+        {!list?.length ? (
           <CardBody>
             <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm">
               Belum ada pengajuan
@@ -132,8 +135,8 @@ function PermintaanBarang() {
                   </tr>
                 </thead>
                 <tbody>
-                  {list.map((item: any, index) => {
-                    const isLast = index === list.length - 1;
+                  {list?.map((item: any, index) => {
+                    const isLast = index === list?.length - 1;
                     const classes = isLast
                       ? 'p-4'
                       : 'p-4 border-b border-blue-gray-800';
@@ -156,16 +159,6 @@ function PermintaanBarang() {
                           <div className="flex flex-col">
                             <Typography variant="small" className="font-normal">
                               {item?.iduser}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="w-max">
-                            <Typography
-                              variant="small"
-                              className="font-normal "
-                            >
-                              {item?.jam_trans}
                             </Typography>
                           </div>
                         </td>
@@ -196,8 +189,18 @@ function PermintaanBarang() {
                         </td>
                         <td className={classes}>
                           <Typography variant="small" className="font-normal">
-                            {moment(item?.tgl_trans).format('lll') || '-'}
+                            {moment(item?.tgl_trans).format('ll') || '-'}
                           </Typography>
+                        </td>
+                        <td className={classes}>
+                          <div className="w-max">
+                            <Typography
+                              variant="small"
+                              className="font-normal "
+                            >
+                              {item?.jam_trans}
+                            </Typography>
+                          </div>
                         </td>
                         <td className={classes}>
                           {/* <Typography variant="small" className="font-normal">
@@ -211,7 +214,7 @@ function PermintaanBarang() {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(`/reimbursement/${item?.id}`, {
+                                navigate(`/request-barang/${item?.id_pb}`, {
                                   replace: false,
                                   state: item,
                                 });
@@ -228,18 +231,30 @@ function PermintaanBarang() {
               </table>
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-              <Typography
-                variant="small"
-                color="blue-gray"
-                className="font-normal"
-              >
-                Page 1 of 10
+              <Typography variant="small" color="white" className="font-normal">
+                Halaman {page} dari {pageInfo?.pageCount}
               </Typography>
               <div className="flex gap-2">
-                <Button variant="outlined" size="sm">
+                <Button
+                  disabled={page < 2 || loading}
+                  variant="outlined"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page - 1);
+                  }}
+                >
                   Previous
                 </Button>
-                <Button variant="outlined" size="sm">
+                <Button
+                  disabled={page == pageInfo.pageCount || loading}
+                  variant="outlined"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page + 1);
+                  }}
+                >
                   Next
                 </Button>
               </div>

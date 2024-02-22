@@ -7,11 +7,13 @@ const BarangModal = ({
   visible,
   toggle,
   value,
+  data,
 }: {
   visible: boolean;
   toggle: any;
   dismissOnBackdrop?: boolean;
   value?: any;
+  data?: any;
 }) => {
   const [stock, setStock] = React.useState<string>();
   const [permintaan, setPermintaan] = React.useState<string>();
@@ -21,7 +23,14 @@ const BarangModal = ({
 
   function onSaveButtonPress() {
     // set callback value
-    value({ stock, permintaan, keterangan });
+    value({
+      kode_barang: data?.kd_brg,
+      requestData: {
+        stock: stock,
+        request: permintaan,
+        keterangan: keterangan || '-',
+      },
+    });
 
     // clear state
     setStock('');
@@ -41,7 +50,7 @@ const BarangModal = ({
         </div>
         <div className="mb-4.5">
           <label className="mb-2.5 block text-black dark:text-white">
-            Jumlah Stock ( PCS )
+            Jumlah Stock ( {data?.nm_kemasan} )
           </label>
           <input
             type="number"
@@ -53,7 +62,7 @@ const BarangModal = ({
         </div>
         <div className="mb-4.5">
           <label className="mb-2.5 block text-black dark:text-white">
-            Jumlah Permintaan ( PCS )
+            Jumlah Permintaan ( {data?.nm_kemasan} )
           </label>
           <input
             type="number"

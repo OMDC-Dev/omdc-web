@@ -13,7 +13,11 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { GET_BARANG } from '../../api/routes';
+import {
+  CREATE_REQUEST_BARANG,
+  GET_BARANG,
+  GET_CABANG_DETAIL,
+} from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
@@ -22,6 +26,9 @@ import Button from '../../components/Button';
 import BarangModal from '../../components/Modal/BarangModal';
 import CabangModal from '../../components/Modal/CabangModal';
 import AnakCabangModal from '../../components/Modal/AnakCabangModal';
+import ListBarangModal from '../../components/Modal/ListBarangModal';
+import useModal from '../../hooks/useModal';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 const TABLE_HEAD = [
   'Kode Barang',
@@ -46,18 +53,30 @@ function ListBarang() {
   // item
   const [cabang, setCabang] = React.useState<any>();
   const [anakCabang, setAnakCabang] = React.useState<any>();
-  const [barangs, setBarangs] = React.useState<any>();
+  const [detailCabang, setDetailCabang] = React.useState<any>();
+  const [alamat, setAlamat] = React.useState<string>();
+  const [barangs, setBarangs] = React.useState<any>([]);
+  const [selectedBarang, setSelectedBarang] = React.useState<any>();
 
   // Modal
   const [barangModal, setBarangModal] = React.useState<boolean>(false);
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showAnakCabang, setShowAnakCabang] = React.useState<boolean>(false);
+  const [showList, setShowList] = React.useState<boolean>(false);
+
+  const { show, hide, toggle, visible, type, changeType } = useModal();
 
   const navigate = useNavigate();
 
   React.useEffect(() => {
     getList();
   }, [page]);
+
+  React.useEffect(() => {
+    if (anakCabang) {
+      getCabangDetail();
+    }
+  }, [anakCabang]);
 
   async function getList() {
     setLoading(true);
@@ -75,6 +94,57 @@ function ListBarang() {
       setList([]);
       setLoading(false);
     }
+  }
+
+  async function getCabangDetail() {
+    setLoading(true);
+
+    const { state, data, error } = await useFetch({
+      url: GET_CABANG_DETAIL(anakCabang?.value),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setDetailCabang(data);
+      const alamat = `${data?.alamat_cabang}\n${data?.kelurahan} - ${data?.kecamatan}\n${data?.kota} - ${data?.provinsi}\n${data?.kd_pos}`;
+      setAlamat(alamat);
+    } else {
+      setDetailCabang({});
+    }
+  }
+
+  async function createRequest() {
+    changeType('LOADING');
+    const body = {
+      kodeIndukCabang: cabang?.value,
+      kodeAnakCabang: anakCabang?.value,
+      barang: barangs,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: CREATE_REQUEST_BARANG,
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  // delete item by ID
+  function hapusDataById(id: number) {
+    let datas = barangs;
+    datas = datas.filter((item: any) => item.id !== id);
+
+    for (let index = 0; index < datas.length; index++) {
+      const element = datas[index];
+      element.id = index;
+    }
+
+    setBarangs(datas);
   }
 
   return (
@@ -122,6 +192,20 @@ function ListBarang() {
                 </div>
               </div>
             ) : null}
+            {alamat ? (
+              <div className="w-full">
+                <label className="mb-3 block text-black dark:text-white">
+                  Alamat Pengiriman
+                </label>
+                <textarea
+                  rows={5}
+                  disabled
+                  placeholder="Masukan Keterangan"
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  value={alamat}
+                ></textarea>
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -154,11 +238,26 @@ function ListBarang() {
               </form>
             </div>
             <div className="w-full bg-boxdark flex pt-4 gap-x-4">
-              <div className="w-full cursor-pointer rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary">
-                0 Barang Ditambahkan
+              <div
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  setShowList(!showList);
+                }}
+                className="w-full cursor-pointer rounded-md border-[1.5px] border-teal-700 bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:bg-form-input dark:text-white "
+              >
+                {barangs.length} barang ditambahkan
               </div>
 
-              <Button>Buat Permintaan Barang</Button>
+              <Button
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  changeType('CONFIRM');
+                  show();
+                }}
+                disabled={!barangs?.length || !cabang || !anakCabang}
+              >
+                Buat Permintaan Barang
+              </Button>
             </div>
           </CardHeader>
           {!list.length ? (
@@ -198,7 +297,7 @@ function ListBarang() {
                         : 'p-4 border-b border-blue-gray-800';
 
                       return (
-                        <tr key={item?.id}>
+                        <tr key={item?.kd_brg}>
                           <td className={classes}>
                             <div className="flex items-center gap-3 ">
                               <div className="flex flex-col">
@@ -262,6 +361,7 @@ function ListBarang() {
                                 variant="text"
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  setSelectedBarang(item);
                                   setBarangModal(!barangModal);
                                 }}
                               >
@@ -281,7 +381,7 @@ function ListBarang() {
                   color="white"
                   className="font-normal"
                 >
-                  Page {page} of {pageInfo.pageCount}
+                  Halaman {page} dari {pageInfo.pageCount}
                 </Typography>
                 <div className="flex gap-2">
                   <MButton
@@ -312,8 +412,12 @@ function ListBarang() {
           )}
         </Card>
         <BarangModal
+          data={selectedBarang}
           visible={barangModal}
           toggle={() => setBarangModal(!barangModal)}
+          value={(val: any) =>
+            setBarangs([...barangs, { ...val, id: barangs + 1 }])
+          }
         />
         <CabangModal
           visible={showCabang}
@@ -325,6 +429,19 @@ function ListBarang() {
           kodeInduk={cabang?.value}
           toggle={() => setShowAnakCabang(!showAnakCabang)}
           value={(val: any) => setAnakCabang(val)}
+        />
+        <ListBarangModal
+          data={barangs}
+          visible={showList}
+          toggle={() => setShowList(!showList)}
+          onDeletePress={(id: any) => hapusDataById(id)}
+        />
+        <ModalSelector
+          type={type}
+          visible={visible}
+          toggle={toggle}
+          onConfirm={() => createRequest()}
+          onDone={() => navigate('/request-barang')}
         />
       </div>
     </DefaultLayout>

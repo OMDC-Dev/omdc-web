@@ -19,6 +19,7 @@ import BuatReport from '../pages/Dashboard/BuatReport';
 import ChangePassword from '../pages/Authentication/ChangePassword';
 import PermintaanBarang from '../pages/PermintaanBarang/PermintaanBarang';
 import ListBarang from '../pages/PermintaanBarang/ListBarang';
+import DetailPermintaanBarang from '../pages/PermintaanBarang/DetailPermintaanBarang';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -199,6 +200,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Permintaan Barang'} />
               <ListBarang />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <DetailPermintaanBarang />
             </>
           ),
         },
