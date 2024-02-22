@@ -20,6 +20,7 @@ import ChangePassword from '../pages/Authentication/ChangePassword';
 import PermintaanBarang from '../pages/PermintaanBarang/PermintaanBarang';
 import ListBarang from '../pages/PermintaanBarang/ListBarang';
 import DetailPermintaanBarang from '../pages/PermintaanBarang/DetailPermintaanBarang';
+import Pengumuman from '../pages/Pengumuman/Pengumuman';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -220,12 +221,36 @@ const Routes = () => {
     },
   ];
 
+  // routes for authenticated user
+  const routesForPengumuman: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/pengumuman',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Pengumuman'} />
+              <Pengumuman />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
   const router = createBrowserRouter([
     ...(!token ? routesForUnAuth : []),
     ...routesForAuthenticated,
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
     ...routesForPermintaanBarang,
+    ...routesForPengumuman,
   ]);
 
   return <RouterProvider router={router} />;

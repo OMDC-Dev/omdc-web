@@ -1,12 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useFetch from '../../hooks/useFetch';
+import {
+  GET_NOTIFICATION,
+  GET_NOTIFICATION_COUNT,
+  READ_NOTIFICATION,
+} from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
+import moment from 'moment';
+import useNotif from '../../store/useNotif';
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
+  const [list, setList] = useState<any>([]);
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
+
+  const { toggle, setNotif } = useNotif();
 
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
@@ -33,12 +45,55 @@ const DropdownNotification = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
 
+  useEffect(() => {
+    getUnread();
+    getNotif();
+  }, [dropdownOpen]);
+
+  async function getUnread() {
+    const { state, data, error } = await useFetch({
+      url: GET_NOTIFICATION_COUNT,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setNotifying(data?.unreadCount > 0);
+    } else {
+      setNotifying(false);
+    }
+  }
+
+  async function getNotif() {
+    const { state, data, error } = await useFetch({
+      url: GET_NOTIFICATION,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setList(data?.rows);
+    } else {
+      setList([]);
+    }
+  }
+
+  async function readNotif(id: any) {
+    const { state, data, error } = await useFetch({
+      url: READ_NOTIFICATION(id),
+      method: 'POST',
+    });
+
+    if (state == API_STATES.OK) {
+      console.log('OK READ');
+    } else {
+      console.log('ERROR READ');
+    }
+  }
+
   return (
     <li className="relative">
       <Link
         ref={trigger}
         onClick={() => {
-          setNotifying(false);
           setDropdownOpen(!dropdownOpen);
         }}
         to="#"
@@ -71,7 +126,7 @@ const DropdownNotification = () => {
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80 ${
+        className={`absolute -right-27 mt-2.5 flex h-90 w-90 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80 ${
           dropdownOpen === true ? 'block' : 'hidden'
         }`}
       >
@@ -80,22 +135,43 @@ const DropdownNotification = () => {
         </div>
 
         <ul className="flex h-auto flex-col overflow-y-auto">
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              to="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  Edit your information in a swipe
-                </span>{' '}
-                Sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim.
-              </p>
+          {list.map((item: any) => {
+            return (
+              <li
+                className=" cursor-pointer"
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  readNotif(item?.id);
+                  setDropdownOpen(false);
+                  setNotif({
+                    title: item?.title,
+                    message: item?.message,
+                    date: moment(item?.createdAt).format('lll'),
+                  });
+                  toggle();
+                }}
+              >
+                <div className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4">
+                  <div>
+                    <div className=" flex items-center gap-x-2">
+                      <span className="text-black dark:text-white">
+                        {item?.title}
+                      </span>
+                      {!item?.isRead ? (
+                        <div className=" h-2 w-2 bg-meta-1 rounded-full" />
+                      ) : null}
+                    </div>
 
-              <p className="text-xs">12 May, 2025</p>
-            </Link>
-          </li>
+                    <div className=" truncate text-sm">{item?.message}</div>
+                  </div>
+
+                  <p className="text-xs">
+                    {moment(item?.createdAt).format('lll')}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </li>

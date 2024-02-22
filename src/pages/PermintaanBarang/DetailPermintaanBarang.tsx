@@ -145,7 +145,11 @@ const DetailPermintaanBarang: React.FC = () => {
               <h3 className="font-medium text-black dark:text-white">
                 Status Pengajuan
               </h3>
-              <Chip variant={'outlined'} color={'amber'} value={'Menunggu'} />
+              <Chip
+                variant={'outlined'}
+                color={'light-blue'}
+                value={data?.status_pb || 'Menunggu'}
+              />
             </div>
             <div className=" p-6.5 flex flex-col gap-y-6">
               <div className=" w-full flex justify-between">
