@@ -176,7 +176,7 @@ function SuperAdmin() {
 
           <div className="w-full">
             <label className="mb-2.5 block text-black dark:text-white">
-              Password
+              Password ( min. 6 karakter )
             </label>
             <input
               type="password"
@@ -189,7 +189,14 @@ function SuperAdmin() {
 
           <div className=" w-full">
             <Button
-              disabled={!name || !typeAcc || !dept || !password || !jabatan}
+              disabled={
+                !name ||
+                !typeAcc ||
+                !dept ||
+                !password ||
+                !jabatan ||
+                password.length < 6
+              }
               onClick={(e: any) => {
                 e.preventDefault();
                 changeType('CONFIRM');

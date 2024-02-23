@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo.svg';
-import IconReimbursement from '../../images/sidebar/IconReimbursement';
+import Logo from '../../images/logo/logo.jpg';
 import IconBarang from '../../images/sidebar/IconBarang';
 import IconSidebar from '../../images/sidebar/IconSidebar';
 import IconArrow from '../../images/sidebar/IconArrow';
 import { useAuth } from '../../hooks/useAuth';
 import { cekAkses } from '../../common/utils';
+import {
+  BanknotesIcon,
+  RectangleGroupIcon,
+  BellAlertIcon,
+} from '@heroicons/react/24/outline';
 
 // Icon
 
@@ -80,8 +84,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
-        <NavLink to="/">
-          <img src={Logo} alt="Logo" />
+        <NavLink className={' flex items-center gap-x-4'} to="/">
+          <img className=" h-10 w-10" src={Logo} alt="Logo" />
+          <span className=" text-title-sm font-bold">OMDC V.0.1</span>
         </NavLink>
 
         <button
@@ -169,7 +174,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               : setSidebarExpanded(true);
                           }}
                         >
-                          <IconReimbursement />
+                          <BanknotesIcon className=" h-5 w-5" />
                           Reimbursement
                           <IconArrow open={open} />
                         </NavLink>
@@ -224,7 +229,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >
-                      <IconBarang />
+                      <RectangleGroupIcon className=" h-5 w-5" />
                       Permintaan Barang
                     </NavLink>
                   </li>
@@ -239,7 +244,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >
-                      <IconBarang />
+                      <BellAlertIcon className=" w-5 h-5" />
                       Buat Pengumuman
                     </NavLink>
                   </li>

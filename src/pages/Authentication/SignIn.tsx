@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo-dark.svg';
-import Logo from '../../images/logo/logo.svg';
+import Logo from '../../images/logo/logo.jpg';
 import HeroAuth from '../../images/hero/AuthHero';
 import useFetch from '../../hooks/useFetch';
 import { LOGIN } from '../../api/routes';
@@ -77,14 +77,14 @@ const SignIn: React.FC = () => {
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
               <Link className="mb-5.5 inline-block" to="/">
-                <img className="hidden dark:block" src={Logo} alt="Logo" />
-                <img className="dark:hidden" src={LogoDark} alt="Logo" />
+                <img
+                  className="hidden dark:block h-20 w-20"
+                  src={Logo}
+                  alt="Logo"
+                />
               </Link>
 
-              <p className="2xl:px-20">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                suspendisse.
-              </p>
+              <p className="2xl:px-20">Aplikasi untuk kemudahan bertransaksi</p>
 
               <span className="mt-15 inline-block">
                 <HeroAuth />
@@ -95,7 +95,7 @@ const SignIn: React.FC = () => {
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2 hidden xl:block ">
             <div className="w-full p-4 hidden sm:block md:p-24 sm:p-32 xl:p-20.5">
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                Masuk ke OMDC
+                Masuk ke OMDC App
               </h2>
 
               <form>
@@ -150,10 +150,14 @@ const SignIn: React.FC = () => {
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img className="hidden dark:block" src={Logo} alt="Logo" />
+                  <img
+                    className="hidden dark:block h-20 w-20"
+                    src={Logo}
+                    alt="Logo"
+                  />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
-                  Masuk ke OMDC
+                  Masuk ke OMDC App
                 </h2>
               </div>
 

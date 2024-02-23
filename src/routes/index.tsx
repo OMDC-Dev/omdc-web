@@ -3,7 +3,6 @@ import PageTitle from '../components/PageTitle';
 import { ProtectedRoute } from './ProtectedRoute';
 import { useAuth } from '../hooks/useAuth';
 import Reimbursement from '../pages/Dashboard/Reimbursement';
-import RiwayatPengajuan from '../pages/Dashboard/RiwayatPengajuan';
 import SignIn from '../pages/Authentication/SignIn';
 import {
   Navigate,
@@ -29,8 +28,8 @@ const Routes = () => {
   const { token, user } = useAuth();
 
   // cek akses
-  const hasRequestBarangAkses = cekAkses('#2');
-  const hasPengumumanAkses = cekAkses('#3');
+  const hasRequestBarangAkses = token ? cekAkses('#2') : null;
+  const hasPengumumanAkses = token ? cekAkses('#3') : null;
 
   // TITLE
   const TITLE = 'OMDC - ';
@@ -59,15 +58,6 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Reimbursement'} />
               <Reimbursement />
-            </>
-          ),
-        },
-        {
-          path: '/reimbursement/riwayat',
-          element: (
-            <>
-              <PageTitle title={TITLE + 'Riwayat Pengajuan'} />
-              <RiwayatPengajuan />
             </>
           ),
         },
@@ -298,7 +288,9 @@ const Routes = () => {
   ]);
 
   return (
-    <RouterProvider router={user.type == 'SUPERADMIN' ? routerSa : router} />
+    <RouterProvider
+      router={user && user?.type == 'SUPERADMIN' ? routerSa : router}
+    />
   );
 };
 
