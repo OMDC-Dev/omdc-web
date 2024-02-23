@@ -218,7 +218,7 @@ const BuatPengajuan: React.FC = () => {
       cabang: cabang?.value,
       description: desc,
       attachment: result,
-      bank_detail: bankDetail,
+      bank_detail: bankDetail || {},
       nominal: nominal,
       name: name,
       item: item,
