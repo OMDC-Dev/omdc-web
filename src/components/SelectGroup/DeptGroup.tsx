@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import useFetch from '../../hooks/useFetch';
+import { DEPT } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
 
 const DeptGroup = ({ value }: { value: (arg0: string) => void }) => {
+  const [list, setList] = React.useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -11,6 +15,23 @@ const DeptGroup = ({ value }: { value: (arg0: string) => void }) => {
   React.useEffect(() => {
     value(selectedOption);
   }, [selectedOption]);
+
+  React.useEffect(() => {
+    getList();
+  }, []);
+
+  async function getList() {
+    const { state, data, error } = await useFetch({
+      url: DEPT + `?limit=100`,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setList(data.rows);
+    } else {
+      setList([]);
+    }
+  }
 
   return (
     <div>
@@ -32,9 +53,16 @@ const DeptGroup = ({ value }: { value: (arg0: string) => void }) => {
           <option value="" disabled className="text-body dark:text-bodydark">
             Pilih Departemen
           </option>
-          <option value={'DEPT A'} className="text-body dark:text-bodydark">
-            DEPT A
-          </option>
+          {list.map((item: any) => {
+            return (
+              <option
+                value={item?.label}
+                className="text-body dark:text-bodydark"
+              >
+                {item?.label}
+              </option>
+            );
+          })}
         </select>
 
         <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">

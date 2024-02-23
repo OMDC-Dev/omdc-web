@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DocumentTextIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { TrashIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardHeader,
@@ -9,21 +9,18 @@ import {
   CardFooter,
   IconButton,
   Tooltip,
-  Chip,
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { DELETE_PENGUMUMAN, GET_NOTIFICATION } from '../../api/routes';
+import { DEPT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import useNotif from '../../store/useNotif';
-import { useAuth } from '../../hooks/useAuth';
 
-const TABLE_HEAD = ['ID Pengumuman', 'Judul', 'Tanggal Dibuat', '', ''];
+const TABLE_HEAD = ['ID', 'Nama Departemen', ''];
 
 function Departemen() {
   const [list, setList] = React.useState<any>([]);
@@ -33,17 +30,12 @@ function Departemen() {
   const [loading, setLoading] = React.useState<boolean>(false);
 
   // === Pengumuman
-  const [judul, setJudul] = React.useState<string>('');
-  const [pesan, setPesan] = React.useState<string>('');
+  const [name, setName] = React.useState<string>('');
   const [selected, setSelected] = React.useState<any>();
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
   const [context, setContext] = React.useState<string>();
-  const notifStore = useNotif();
-
-  // === User
-  const { user } = useAuth();
 
   // === Navigate
   const navigate = useNavigate();
@@ -55,8 +47,7 @@ function Departemen() {
   async function getList() {
     setLoading(true);
     const { state, data, error } = await useFetch({
-      url:
-        GET_NOTIFICATION + `?page=${page}&limit=${limit}&owner=${user?.iduser}`,
+      url: DEPT + `?page=${page}&limit=${limit}&get=1`,
       method: 'GET',
     });
 
@@ -70,34 +61,26 @@ function Departemen() {
     }
   }
 
-  async function createPengumuman() {
+  async function createAccount() {
     changeType('LOADING');
 
-    const body = {
-      title: judul,
-      message: pesan,
-    };
-
     const { state, data, error } = await useFetch({
-      url: GET_NOTIFICATION,
+      url: DEPT + `?name=${name}`,
       method: 'POST',
-      data: body,
     });
 
     if (state == API_STATES.OK) {
       changeType('SUCCESS');
-      setJudul('');
-      setPesan('');
     } else {
       changeType('FAILED');
     }
   }
 
-  async function deletePengumuman() {
+  async function deleteAccount() {
     changeType('LOADING');
 
     const { state, data, error } = await useFetch({
-      url: DELETE_PENGUMUMAN(selected),
+      url: DEPT + `/${selected}`,
       method: 'DELETE',
     });
 
@@ -113,47 +96,33 @@ function Departemen() {
       <div className="rounded-md border mb-6 border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
           <h3 className="font-medium text-black dark:text-white">
-            Buat Pengumuman Baru
+            Tambah Departemen Baru
           </h3>
         </div>
         <div className=" p-6.5 flex flex-col gap-y-6">
           <div className="w-full">
             <label className="mb-2.5 block text-black dark:text-white">
-              Judul Pengumuman
+              Nama User
             </label>
             <input
               type="text"
-              placeholder="Masukan Judul Pengumuman"
+              placeholder="Masukan Nama Departemen"
               className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              onChange={(e) => setJudul(e.target.value)}
-              value={judul}
+              onChange={(e) => setName(e.target.value)}
+              value={name}
             />
           </div>
-
-          <div className="w-full">
-            <label className="mb-2.5 block text-black dark:text-white">
-              Pesan Pengumuman
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Masukan Pesan Pengumuman"
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              onChange={(e) => setPesan(e.target.value)}
-              value={pesan}
-            ></textarea>
-          </div>
-
           <div className=" w-full">
             <Button
+              disabled={!name}
               onClick={(e: any) => {
                 e.preventDefault();
                 changeType('CONFIRM');
                 setContext('CREATE');
                 toggle();
               }}
-              disabled={!judul || !pesan}
             >
-              Buat Pengumuman
+              Simpan
             </Button>
           </div>
         </div>
@@ -164,10 +133,10 @@ function Departemen() {
           <div className="flex items-center justify-between gap-8 bg-boxdark">
             <div>
               <Typography variant="h5" color="white">
-                Pengumuman
+                Akun Admin dan Finance
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua riwayat pengumuman yang telah dibuat.
+                Menampilkan semua akun admin dan finance.
               </Typography>
             </div>
           </div>
@@ -215,16 +184,9 @@ function Departemen() {
                                 variant="small"
                                 className="font-normal"
                               >
-                                {item?.pid}
+                                {item?.id}
                               </Typography>
                             </div>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex flex-col">
-                            <Typography variant="small" className="font-normal">
-                              {item?.title}
-                            </Typography>
                           </div>
                         </td>
                         <td className={classes}>
@@ -233,27 +195,9 @@ function Departemen() {
                               variant="small"
                               className="font-normal "
                             >
-                              {moment(item?.createdAt).format('lll')}
+                              {item?.label}
                             </Typography>
                           </div>
-                        </td>
-                        <td className={classes}>
-                          <Tooltip content="Lihat">
-                            <IconButton
-                              variant="text"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                notifStore.setNotif({
-                                  title: item?.title,
-                                  message: item?.message,
-                                  date: moment(item?.createdAt).format('lll'),
-                                });
-                                notifStore.toggle();
-                              }}
-                            >
-                              <DocumentTextIcon className="h-4 w-4" />
-                            </IconButton>
-                          </Tooltip>
                         </td>
                         <td className={classes}>
                           <Tooltip content="Hapus">
@@ -261,7 +205,7 @@ function Departemen() {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                setSelected(item.pid);
+                                setSelected(item.id);
                                 changeType('CONFIRM');
                                 setContext('DELETE');
                                 toggle();
@@ -314,7 +258,7 @@ function Departemen() {
         toggle={toggle}
         type={type}
         onConfirm={() =>
-          context == 'CREATE' ? createPengumuman() : deletePengumuman()
+          context == 'CREATE' ? createAccount() : deleteAccount()
         }
       />
     </DefaultLayout>
