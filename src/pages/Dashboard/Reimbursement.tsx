@@ -36,22 +36,28 @@ function Reimbursement() {
   const [rList, setRList] = React.useState([]);
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
+  const [pageInfo, setPageInfo] = React.useState<any>();
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
 
   React.useEffect(() => {
     getReimbursementList();
-  }, []);
+  }, [page]);
 
   async function getReimbursementList() {
+    setLoading(true);
     const { state, data, error } = await useFetch({
       url: REIMBURSEMENT + `?limit=${limit}&page=${page}`,
       method: 'GET',
     });
 
     if (state == API_STATES.OK) {
-      setRList(data);
+      setLoading(false);
+      setRList(data?.rows);
+      setPageInfo(data?.pageInfo);
     } else {
+      setLoading(false);
       setRList([]);
       console.log(error);
     }
@@ -104,7 +110,7 @@ function Reimbursement() {
             </div>
           </div>
         </CardHeader>
-        {!rList.length ? (
+        {!rList?.length ? (
           <CardBody>
             <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm">
               Belum ada pengajuan
@@ -133,7 +139,7 @@ function Reimbursement() {
                 </thead>
                 <tbody>
                   {rList.map((item: any, index) => {
-                    const isLast = index === rList.length - 1;
+                    const isLast = index === rList?.length - 1;
                     const classes = isLast
                       ? 'p-4'
                       : 'p-4 border-b border-blue-gray-800';
@@ -228,18 +234,30 @@ function Reimbursement() {
               </table>
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-              <Typography
-                variant="small"
-                color="blue-gray"
-                className="font-normal"
-              >
-                Page 1 of 10
+              <Typography variant="small" color="white" className="font-normal">
+                Page {page} of {pageInfo?.pageCount}
               </Typography>
               <div className="flex gap-2">
-                <Button variant="outlined" size="sm">
+                <Button
+                  disabled={page < 2 || loading}
+                  variant="outlined"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page - 1);
+                  }}
+                >
                   Previous
                 </Button>
-                <Button variant="outlined" size="sm">
+                <Button
+                  disabled={page == pageInfo?.pageCount || loading}
+                  variant="outlined"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page + 1);
+                  }}
+                >
                   Next
                 </Button>
               </div>

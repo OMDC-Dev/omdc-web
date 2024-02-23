@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '../Button';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Dialog } from '@material-tailwind/react';
+import formatRupiah from '../../common/formatRupiah';
 
 const ItemModal = ({
   visible,
@@ -23,7 +24,7 @@ const ItemModal = ({
     // set callback value
     value({
       name: name,
-      nominal: nominal,
+      nominal: formatRupiah(nominal, true),
     });
 
     // clear state
