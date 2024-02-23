@@ -17,6 +17,7 @@ import { REIMBURSEMENT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import { cekAkses } from '../../common/utils';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -40,6 +41,9 @@ function Reimbursement() {
   const [loading, setLoading] = React.useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  // reimbursement akses
+  const hasReimbursementAkses = cekAkses('#1');
 
   React.useEffect(() => {
     getReimbursementList();
@@ -97,16 +101,18 @@ function Reimbursement() {
               </Typography>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
-                variant="filled"
-                size="sm"
-                color="blue"
-                onClick={() =>
-                  navigate('/reimbursement/ajukan', { replace: false })
-                }
-              >
-                Buat Pengajuan
-              </Button>
+              {hasReimbursementAkses ? (
+                <Button
+                  variant="filled"
+                  size="sm"
+                  color="blue"
+                  onClick={() =>
+                    navigate('/reimbursement/ajukan', { replace: false })
+                  }
+                >
+                  Buat Pengajuan
+                </Button>
+              ) : null}
             </div>
           </div>
         </CardHeader>

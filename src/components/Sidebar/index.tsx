@@ -7,6 +7,7 @@ import IconBarang from '../../images/sidebar/IconBarang';
 import IconSidebar from '../../images/sidebar/IconSidebar';
 import IconArrow from '../../images/sidebar/IconArrow';
 import { useAuth } from '../../hooks/useAuth';
+import { cekAkses } from '../../common/utils';
 
 // Icon
 
@@ -30,6 +31,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const { user } = useAuth();
   const IS_ADMIN = user?.isAdmin;
   const IS_SUPER_ADMIN = user?.type == 'SUPERADMIN';
+
+  // check akses
+  const hasRequestBarangAkses = cekAkses('#2');
+  const hasPengumumanAkses = cekAkses('#3');
 
   // close on click outside
   useEffect(() => {
@@ -210,31 +215,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 {/* <!-- Menu Item Dashboard --> */}
 
                 {/* <!-- Menu Item Calendar --> */}
-                <li>
-                  <NavLink
-                    to="/request-barang"
-                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                      pathname.includes('calendar') &&
-                      'bg-graydark dark:bg-meta-4'
-                    }`}
-                  >
-                    <IconBarang />
-                    Permintaan Barang
-                  </NavLink>
-                </li>
+                {hasRequestBarangAkses ? (
+                  <li>
+                    <NavLink
+                      to="/request-barang"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('calendar') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <IconBarang />
+                      Permintaan Barang
+                    </NavLink>
+                  </li>
+                ) : null}
                 {/* <!-- Menu Item Calendar --> */}
-                <li>
-                  <NavLink
-                    to="/pengumuman"
-                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                      pathname.includes('calendar') &&
-                      'bg-graydark dark:bg-meta-4'
-                    }`}
-                  >
-                    <IconBarang />
-                    Buat Pengumuman
-                  </NavLink>
-                </li>
+                {hasPengumumanAkses ? (
+                  <li>
+                    <NavLink
+                      to="/pengumuman"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('calendar') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <IconBarang />
+                      Buat Pengumuman
+                    </NavLink>
+                  </li>
+                ) : null}
               </ul>
             </div>
           </nav>

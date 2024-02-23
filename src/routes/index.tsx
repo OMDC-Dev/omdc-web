@@ -23,9 +23,14 @@ import DetailPermintaanBarang from '../pages/PermintaanBarang/DetailPermintaanBa
 import Pengumuman from '../pages/Pengumuman/Pengumuman';
 import SuperAdmin from '../pages/SuperAdmin/SuperAdmin';
 import Departemen from '../pages/SuperAdmin/Departemen';
+import { cekAkses } from '../common/utils';
 
 const Routes = () => {
   const { token, user } = useAuth();
+
+  // cek akses
+  const hasRequestBarangAkses = cekAkses('#2');
+  const hasPengumumanAkses = cekAkses('#3');
 
   // TITLE
   const TITLE = 'OMDC - ';
@@ -283,8 +288,8 @@ const Routes = () => {
     ...routesForAuthenticated,
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
-    ...routesForPermintaanBarang,
-    ...routesForPengumuman,
+    ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
+    ...(hasPengumumanAkses ? routesForPengumuman : []),
   ]);
 
   const routerSa = createBrowserRouter([

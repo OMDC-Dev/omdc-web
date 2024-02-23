@@ -1,3 +1,5 @@
+import { useAuth } from '../hooks/useAuth';
+
 export function hitungTotalNominal(data: any) {
   let total = 0;
   data.forEach((item: any) => {
@@ -52,3 +54,26 @@ export function generateRandomNumber(min: number, max: number) {
   // Menghasilkan nomor acak di antara min (inklusif) dan max (inklusif)
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export const cekAkses = (akses: string) => {
+  /**
+   * REIMBURSEMENT -> 1170 -> #1
+   * PERMINTAAN BARANG -> 1157 -> #2
+   * PENGUMUMAN -> 1171 -> #3
+   */
+  const { user } = useAuth();
+
+  const kd = user?.kodeAkses;
+
+  if (akses == '#1') {
+    return kd.findIndex((item: string) => item == '1170') !== -1;
+  }
+
+  if (akses == '#2') {
+    return kd.findIndex((item: string) => item == '1157') !== -1;
+  }
+
+  if (akses == '#3') {
+    return kd.findIndex((item: string) => item == '1171') !== -1;
+  }
+};
