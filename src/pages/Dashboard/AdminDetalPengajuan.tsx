@@ -52,7 +52,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // data state
   const [data, setData] = React.useState(state);
-  const [nominal, setNominal] = React.useState(data.nominal);
+  const [nominal, setNominal] = React.useState(data?.nominal);
   const [admin, setAdmin] = React.useState<any>('');
   const [note, setNote] = React.useState<string>('');
   const [status, setStatus] = React.useState<any>();
@@ -730,7 +730,7 @@ const AdminDetailPengajuan: React.FC = () => {
                           >
                             {item?.name}
                             <ListItemSuffix className="flex gap-x-4">
-                              {formatRupiah(item.nominal, true)}
+                              {item.nominal}
                             </ListItemSuffix>
                           </ListItem>
                         );
