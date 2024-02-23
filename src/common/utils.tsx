@@ -47,3 +47,8 @@ export function getDataById(data: any, id: any, idKey: string, key: string) {
     }
   }
 }
+
+export function generateRandomNumber(min: number, max: number) {
+  // Menghasilkan nomor acak di antara min (inklusif) dan max (inklusif)
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

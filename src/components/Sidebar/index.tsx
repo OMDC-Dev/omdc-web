@@ -29,6 +29,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   const { user } = useAuth();
   const IS_ADMIN = user?.isAdmin;
+  const IS_SUPER_ADMIN = user?.type == 'SUPERADMIN';
 
   // close on click outside
   useEffect(() => {
@@ -90,114 +91,155 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       </div>
       {/* <!-- SIDEBAR HEADER --> */}
 
-      <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
-        {/* <!-- Sidebar Menu --> */}
-        <nav className="mt-5 py-4 px-4 lg:mt-9 lg:px-6">
-          {/* <!-- Menu Group --> */}
-          <div>
-            <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
-              Menu
-            </h3>
+      {IS_SUPER_ADMIN ? (
+        <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+          {/* <!-- Sidebar Menu --> */}
+          <nav className="mt-5 py-4 px-4 lg:mt-9 lg:px-6">
+            {/* <!-- Menu Group --> */}
+            <div>
+              <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
+                Menu
+              </h3>
 
-            <ul className="mb-6 flex flex-col gap-1.5">
-              {/* <!-- Menu Item Dashboard --> */}
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/' || pathname.includes('reimbursement')
-                }
-              >
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      <NavLink
-                        to="#"
-                        className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                          (pathname === '/' ||
-                            pathname.includes('reimbursement')) &&
-                          'bg-graydark dark:bg-meta-4'
-                        }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          sidebarExpanded
-                            ? handleClick()
-                            : setSidebarExpanded(true);
-                        }}
-                      >
-                        <IconReimbursement />
-                        Reimbursement
-                        <IconArrow open={open} />
-                      </NavLink>
-                      {/* <!-- Dropdown Menu Start --> */}
-                      <div
-                        className={`translate transform overflow-hidden ${
-                          !open && 'hidden'
-                        }`}
-                      >
-                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <NavLink
-                              to="/"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Riwayat Pengajuan
-                            </NavLink>
-                          </li>
-                          {/* ------ BUAT PENGAJUAN --------- */}
-                          {IS_ADMIN ? (
+              <ul className="mb-6 flex flex-col gap-1.5">
+                <li>
+                  <NavLink
+                    to="/"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      !pathname.includes('/departemen') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Super Admin
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/departemen"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/departemen') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Departemen
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      ) : (
+        <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+          {/* <!-- Sidebar Menu --> */}
+          <nav className="mt-5 py-4 px-4 lg:mt-9 lg:px-6">
+            {/* <!-- Menu Group --> */}
+            <div>
+              <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
+                Menu
+              </h3>
+
+              <ul className="mb-6 flex flex-col gap-1.5">
+                {/* <!-- Menu Item Dashboard --> */}
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname === '/' || pathname.includes('reimbursement')
+                  }
+                >
+                  {(handleClick, open) => {
+                    return (
+                      <React.Fragment>
+                        <NavLink
+                          to="#"
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                            (pathname === '/' ||
+                              pathname.includes('reimbursement')) &&
+                            'bg-graydark dark:bg-meta-4'
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            sidebarExpanded
+                              ? handleClick()
+                              : setSidebarExpanded(true);
+                          }}
+                        >
+                          <IconReimbursement />
+                          Reimbursement
+                          <IconArrow open={open} />
+                        </NavLink>
+                        {/* <!-- Dropdown Menu Start --> */}
+                        <div
+                          className={`translate transform overflow-hidden ${
+                            !open && 'hidden'
+                          }`}
+                        >
+                          <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
                             <li>
                               <NavLink
-                                to="/reimbursement/diajukan"
+                                to="/"
                                 className={({ isActive }) =>
                                   'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                   (isActive && '!text-white')
                                 }
                               >
-                                Diajukan ke Saya
+                                Riwayat Pengajuan
                               </NavLink>
                             </li>
-                          ) : null}
-                        </ul>
-                      </div>
-                      {/* <!-- Dropdown Menu End --> */}
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup>
-              {/* <!-- Menu Item Dashboard --> */}
+                            {/* ------ BUAT PENGAJUAN --------- */}
+                            {IS_ADMIN ? (
+                              <li>
+                                <NavLink
+                                  to="/reimbursement/diajukan"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Diajukan ke Saya
+                                </NavLink>
+                              </li>
+                            ) : null}
+                          </ul>
+                        </div>
+                        {/* <!-- Dropdown Menu End --> */}
+                      </React.Fragment>
+                    );
+                  }}
+                </SidebarLinkGroup>
+                {/* <!-- Menu Item Dashboard --> */}
 
-              {/* <!-- Menu Item Calendar --> */}
-              <li>
-                <NavLink
-                  to="/request-barang"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('calendar') &&
-                    'bg-graydark dark:bg-meta-4'
-                  }`}
-                >
-                  <IconBarang />
-                  Permintaan Barang
-                </NavLink>
-              </li>
-              {/* <!-- Menu Item Calendar --> */}
-              <li>
-                <NavLink
-                  to="/pengumuman"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                    pathname.includes('calendar') &&
-                    'bg-graydark dark:bg-meta-4'
-                  }`}
-                >
-                  <IconBarang />
-                  Buat Pengumuman
-                </NavLink>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </div>
+                {/* <!-- Menu Item Calendar --> */}
+                <li>
+                  <NavLink
+                    to="/request-barang"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('calendar') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Permintaan Barang
+                  </NavLink>
+                </li>
+                {/* <!-- Menu Item Calendar --> */}
+                <li>
+                  <NavLink
+                    to="/pengumuman"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('calendar') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Buat Pengumuman
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      )}
     </aside>
   );
 };

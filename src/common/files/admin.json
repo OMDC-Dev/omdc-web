@@ -1,0 +1,16 @@
+{
+  "iduser": "DEVSA",
+  "nm_user": "SA",
+  "level_user": "SuperAdmin",
+  "tgl_trans": "2024-02-05",
+  "user_add": "Admin",
+  "status": "Aktif",
+  "userToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzZXIiOiJERVYxMjMiLCJubV91c2VyIjoiSm9obiBEb2UiLCJsZXZlbF91c2VyIjoiQWRtaW4iLCJwYXNzd29yZCI6ImUxMGFkYzM5NDliYTU5YWJiZTU2ZTA1N2YyMGY4ODNlIiwidGdsX3RyYW5zIjoiMjAyNC0wMi0wNSIsInVzZXJfYWRkIjoiQWRtaW5EZXYiLCJzdGF0dXMiOiJBa3RpZiIsImZsYWciOiIiLCJpYXQiOjE3MDg2NTkzOTEsImV4cCI6MTcwOTI2NDE5MX0.aEhgaks6vGDZaInhd34QeM1b0mZ8IqVEqfcsS5juOtY",
+  "isProfileComplete": true,
+  "isAdmin": true,
+  "departemen": "SA",
+  "nomorwa": "0",
+  "fcmToken": "",
+  "type": "SUPERADMIN",
+  "kodeAkses": []
+}

@@ -30,12 +30,12 @@ const AdminModal = ({
 
   async function getList() {
     const { state, data, error } = await useFetch({
-      url: SUPERUSER,
+      url: SUPERUSER + '?limit=100',
       method: 'GET',
     });
 
     if (state == API_STATES.OK) {
-      setList(data);
+      setList(data.rows);
     } else {
       setList([]);
     }

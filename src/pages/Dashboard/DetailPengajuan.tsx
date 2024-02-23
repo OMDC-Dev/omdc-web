@@ -15,7 +15,12 @@ import {
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
 import Modal from '../../components/Modal/Modal';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  redirect,
+  useLocation,
+  useNavigate,
+  useParams,
+} from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
 import FileModal from '../../components/Modal/FileModal';
 import { downloadPDF } from '../../common/utils';

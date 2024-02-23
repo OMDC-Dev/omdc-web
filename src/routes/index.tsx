@@ -21,6 +21,8 @@ import PermintaanBarang from '../pages/PermintaanBarang/PermintaanBarang';
 import ListBarang from '../pages/PermintaanBarang/ListBarang';
 import DetailPermintaanBarang from '../pages/PermintaanBarang/DetailPermintaanBarang';
 import Pengumuman from '../pages/Pengumuman/Pengumuman';
+import SuperAdmin from '../pages/SuperAdmin/SuperAdmin';
+import Departemen from '../pages/SuperAdmin/Departemen';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -244,6 +246,38 @@ const Routes = () => {
     },
   ];
 
+  // routes for super admin
+  const routesForSuperAdmin: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <SuperAdmin />
+            </>
+          ),
+        },
+        {
+          path: '/departemen',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Departemen'} />
+              <Departemen />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
   const router = createBrowserRouter([
     ...(!token ? routesForUnAuth : []),
     ...routesForAuthenticated,
@@ -253,7 +287,14 @@ const Routes = () => {
     ...routesForPengumuman,
   ]);
 
-  return <RouterProvider router={router} />;
+  const routerSa = createBrowserRouter([
+    ...(!token ? routesForUnAuth : []),
+    ...routesForSuperAdmin,
+  ]);
+
+  return (
+    <RouterProvider router={user.type == 'SUPERADMIN' ? routerSa : router} />
+  );
 };
 
 export default Routes;
