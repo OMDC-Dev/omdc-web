@@ -46,7 +46,7 @@ const ModalSelector = ({
     );
   }
 
-  if (type == 'SUCCESS') {
+  if (type == 'SUCCESS' || type == 'OK') {
     return (
       <Dialog
         open={visible}
@@ -71,7 +71,7 @@ const ModalSelector = ({
     );
   }
 
-  if (type == 'FAILED') {
+  if (type == 'FAILED' || type == 'ERROR') {
     return (
       <Dialog
         open={visible}

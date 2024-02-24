@@ -11,7 +11,13 @@ const TYPE_DATA = [
   },
 ];
 
-const TypeGroup = ({ value }: { value: (arg0: string) => void }) => {
+const TypeGroup = ({
+  value,
+  defaultValue,
+}: {
+  value: (arg0: string) => void;
+  defaultValue: string;
+}) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -22,6 +28,12 @@ const TypeGroup = ({ value }: { value: (arg0: string) => void }) => {
   React.useEffect(() => {
     value(selectedOption);
   }, [selectedOption]);
+
+  React.useEffect(() => {
+    if (defaultValue) {
+      setSelectedOption(defaultValue);
+    }
+  }, [defaultValue]);
 
   return (
     <div>

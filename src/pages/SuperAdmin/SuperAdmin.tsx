@@ -30,6 +30,7 @@ import { useAuth } from '../../hooks/useAuth';
 import TypeGroup from '../../components/SelectGroup/TypeGroup';
 import DeptGroup from '../../components/SelectGroup/DeptGroup';
 import { generateRandomNumber } from '../../common/utils';
+import UserModal from '../../components/Modal/UserModal';
 
 const TABLE_HEAD = [
   'ID User',
@@ -48,23 +49,17 @@ function SuperAdmin() {
   const [loading, setLoading] = React.useState<boolean>(false);
 
   // === Pengumuman
-  const [name, setName] = React.useState<string>('');
+  const [selectedUser, setSelectedUser] = React.useState<any>();
   const [typeAcc, setTypeAcc] = React.useState<string>('');
   const [dept, setDept] = React.useState<string>('');
-  const [jabatan, setJabatan] = React.useState<string>('');
-  const [password, setPassword] = React.useState<string>('');
   const [selected, setSelected] = React.useState<any>();
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
   const [context, setContext] = React.useState<string>();
-  const notifStore = useNotif();
 
-  // === User
-  const { user } = useAuth();
-
-  // === Navigate
-  const navigate = useNavigate();
+  // === USER MODAL
+  const [showUser, setShowUser] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     getList();
@@ -90,16 +85,9 @@ function SuperAdmin() {
   async function createAccount() {
     changeType('LOADING');
 
-    const genid = `AC${
-      typeAcc == 'ADMIN' ? 'ADM' : 'FIN'
-    }${generateRandomNumber(100, 999)}`;
-
     const body = {
-      iduser: genid,
-      nm_user: name,
-      level_user: jabatan,
+      iduser: selectedUser?.iduser,
       departemen: dept,
-      password: password,
       type: typeAcc,
     };
 
@@ -140,33 +128,22 @@ function SuperAdmin() {
           </h3>
         </div>
         <div className=" p-6.5 flex flex-col gap-y-6">
-          <div className="w-full">
-            <label className="mb-2.5 block text-black dark:text-white">
-              Nama User
+          <div className=" w-full">
+            <label className="mb-3 block text-black dark:text-white">
+              User
             </label>
-            <input
-              type="text"
-              placeholder="Masukan Nama"
-              className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              onChange={(e) => setName(e.target.value)}
-              value={name}
-            />
+            <div
+              onClick={() => setShowUser(!showUser)}
+              className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+            >
+              {selectedUser?.nm_user || 'Pilih User'}
+            </div>
           </div>
 
           <div className="w-full">
-            <TypeGroup value={(val) => setTypeAcc(val)} />
-          </div>
-
-          <div className="w-full">
-            <label className="mb-2.5 block text-black dark:text-white">
-              Jabatan
-            </label>
-            <input
-              type="text"
-              placeholder="Masukan Jabatan"
-              className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              onChange={(e) => setJabatan(e.target.value)}
-              value={jabatan}
+            <TypeGroup
+              defaultValue={typeAcc}
+              value={(val) => setTypeAcc(val)}
             />
           </div>
 
@@ -174,29 +151,9 @@ function SuperAdmin() {
             <DeptGroup value={(val) => setDept(val)} />
           </div>
 
-          <div className="w-full">
-            <label className="mb-2.5 block text-black dark:text-white">
-              Password ( min. 6 karakter )
-            </label>
-            <input
-              type="password"
-              placeholder="Masukan Password"
-              className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-            />
-          </div>
-
           <div className=" w-full">
             <Button
-              disabled={
-                !name ||
-                !typeAcc ||
-                !dept ||
-                !password ||
-                !jabatan ||
-                password.length < 6
-              }
+              disabled={!typeAcc || !dept || !selectedUser}
               onClick={(e: any) => {
                 e.preventDefault();
                 changeType('CONFIRM');
@@ -372,6 +329,16 @@ function SuperAdmin() {
         onConfirm={() =>
           context == 'CREATE' ? createAccount() : deleteAccount()
         }
+        onDone={() => {
+          setTypeAcc('');
+          setDept('');
+          setSelectedUser(null);
+        }}
+      />
+      <UserModal
+        visible={showUser}
+        toggle={() => setShowUser(!showUser)}
+        value={(val: any) => setSelectedUser(val)}
       />
     </DefaultLayout>
   );

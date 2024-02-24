@@ -29,9 +29,19 @@ import {
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 const AdminDetailPengajuan: React.FC = () => {
-  const { toggle, visible, hide, show } = useModal();
+  const {
+    show,
+    hide,
+    toggle,
+    visible,
+    type,
+    changeType,
+    context,
+    changeContext,
+  } = useModal();
 
   const { user } = useAuth();
 
@@ -72,33 +82,6 @@ const AdminDetailPengajuan: React.FC = () => {
   // Data Modal State
   const [showFile, setShowFile] = React.useState<boolean>(false);
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
-
-  // Dialog
-  const [showDialog, setShowDialog] = React.useState<boolean>(false);
-  const [showResultDialog, setShowResultDialog] =
-    React.useState<boolean>(false);
-  const [dialogtype, setDialogType] = React.useState<string>('OK');
-  const [dialogAcctype, setDialogAccType] = React.useState<string>('OK');
-  const [finDialog, setFinDialog] = React.useState<boolean>(false);
-
-  const DIALOG_PROPS =
-    dialogtype == 'OK'
-      ? {
-          title: 'Persetujuan Berhasil!',
-          message: 'Anda telah berhasil menyetujui pengajuan!',
-        }
-      : {
-          title: 'Persetujuan Gagal!',
-          message: 'Persetujuan gagal, mohon coba lagi!',
-        };
-
-  const DIALOG_ACC_TYPE = {
-    title: 'Konfirmasi',
-    message:
-      dialogAcctype == 'ACC'
-        ? 'Aapakah anda yakin untuk menyetujui pengajuan ini?'
-        : 'Apakah anda yakin untuk menolak pengajuan ini',
-  };
 
   // handle status
   const STATUS_WORDING = (
@@ -147,8 +130,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // acceptance finance
   async function acceptance_fin() {
-    setFinDialog(!finDialog);
-    show();
+    changeType('LOADING');
 
     const fnominal = formatRupiah(unformatRupiah(nominal), false);
 
@@ -163,20 +145,15 @@ const AdminDetailPengajuan: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
-      hide();
-      setDialogType('OK');
-      setShowResultDialog(!showResultDialog);
+      changeType('SUCCESS');
     } else {
-      hide();
-      setDialogType('ERROR');
-      setShowResultDialog(!showResultDialog);
+      changeType('FAILED');
     }
   }
 
   // acceptance
   async function acceptance(statusType: any) {
-    setShowDialog(!showDialog);
-    show();
+    changeType('LOADING');
 
     const status = statusType == 'ACC' ? 'APPROVED' : 'REJECTED';
 
@@ -196,13 +173,10 @@ const AdminDetailPengajuan: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
-      hide();
-      setDialogType('OK');
-      setShowResultDialog(!showResultDialog);
+      changeType('SUCCESS');
+      getStatus();
     } else {
-      hide();
-      setDialogType('ERROR');
-      setShowResultDialog(!showResultDialog);
+      changeType('FAILED');
     }
   }
 
@@ -386,7 +360,9 @@ const AdminDetailPengajuan: React.FC = () => {
                     <Button
                       onClick={(e: any) => {
                         e.preventDefault();
-                        setFinDialog(!finDialog);
+                        changeType('CONFIRM');
+                        changeContext('FIN');
+                        show();
                       }}
                     >
                       Konfirmasi Sudah Ditransfer
@@ -399,8 +375,9 @@ const AdminDetailPengajuan: React.FC = () => {
                     <Button
                       onClick={(e: any) => {
                         e.preventDefault();
-                        setDialogAccType('ACC');
-                        setShowDialog(!showDialog);
+                        changeType('CONFIRM');
+                        changeContext('ACC');
+                        show();
                       }}
                     >
                       Setujui Pengajuan
@@ -408,8 +385,9 @@ const AdminDetailPengajuan: React.FC = () => {
                     <Button
                       onClick={(e: any) => {
                         e.preventDefault();
-                        setDialogAccType('RJC');
-                        setShowDialog(!showDialog);
+                        changeType('CONFIRM');
+                        changeContext('RJJ');
+                        show();
                       }}
                       className=" bg-red-400 border-red-400"
                     >
@@ -675,7 +653,9 @@ const AdminDetailPengajuan: React.FC = () => {
                       <Button
                         onClick={(e: any) => {
                           e.preventDefault();
-                          setFinDialog(!finDialog);
+                          changeType('CONFIRM');
+                          changeContext('FIN');
+                          show();
                         }}
                       >
                         Konfirmasi Sudah Ditransfer
@@ -688,8 +668,9 @@ const AdminDetailPengajuan: React.FC = () => {
                       <Button
                         onClick={(e: any) => {
                           e.preventDefault();
-                          setDialogAccType('ACC');
-                          setShowDialog(!showDialog);
+                          changeType('CONFIRM');
+                          changeContext('ACC');
+                          show();
                         }}
                       >
                         Setujui Pengajuan
@@ -697,8 +678,9 @@ const AdminDetailPengajuan: React.FC = () => {
                       <Button
                         onClick={(e: any) => {
                           e.preventDefault();
-                          setDialogAccType('RJC');
-                          setShowDialog(!showDialog);
+                          changeType('CONFIRM');
+                          changeContext('RJJ');
+                          show();
                         }}
                         className=" bg-red-400 border-red-400"
                       >
@@ -730,7 +712,7 @@ const AdminDetailPengajuan: React.FC = () => {
                           >
                             {item?.name}
                             <ListItemSuffix className="flex gap-x-4">
-                              {item.nominal}
+                              {formatRupiah(item.nominal, true)}
                             </ListItemSuffix>
                           </ListItem>
                         );
@@ -831,73 +813,23 @@ const AdminDetailPengajuan: React.FC = () => {
         toggle={() => setShowAdmin(!showAdmin)}
         value={(val: any) => setAdmin(val)}
       />
-      {/* DIALOG */}
-      <Dialog
-        open={showResultDialog}
-        size={'xs'}
-        handler={() => setShowResultDialog(!showResultDialog)}
-        dismiss={{ enabled: false }}
-      >
-        <DialogHeader>{DIALOG_PROPS.title}</DialogHeader>
-        <DialogBody>{DIALOG_PROPS.message}</DialogBody>
-        <DialogFooter>
-          <Button
-            onClick={(e: any) => {
-              e.preventDefault();
-              setShowResultDialog(!showResultDialog);
-              getStatus();
-            }}
-          >
-            Ok
-          </Button>
-        </DialogFooter>
-      </Dialog>
-      {/* DIALOG ACCEPTANCE */}
-      <Dialog open={showDialog} handler={() => setShowDialog(!showDialog)}>
-        <DialogHeader>{DIALOG_ACC_TYPE.title}</DialogHeader>
-        <DialogBody>{DIALOG_ACC_TYPE.message}</DialogBody>
-        <DialogFooter>
-          <MButton
-            variant="text"
-            color="red"
-            onClick={() => setShowDialog(!showDialog)}
-            className="mr-1"
-          >
-            <span>Batalkan</span>
-          </MButton>
-          <MButton
-            variant="gradient"
-            color="green"
-            onClick={() => acceptance(dialogAcctype)}
-          >
-            <span>Konfirmasi</span>
-          </MButton>
-        </DialogFooter>
-      </Dialog>
-      {/* DIALOG FINANCE*/}
-      <Dialog open={finDialog} handler={() => setFinDialog(!finDialog)}>
-        <DialogHeader>Konfirmasi</DialogHeader>
-        <DialogBody>
-          Apakah anda yakin ingin mengkonfirmasi bahwa dana telah di trasnfer?
-        </DialogBody>
-        <DialogFooter>
-          <MButton
-            variant="text"
-            color="red"
-            onClick={() => setFinDialog(false)}
-            className="mr-1"
-          >
-            <span>Batalkan</span>
-          </MButton>
-          <MButton
-            variant="gradient"
-            color="green"
-            onClick={() => acceptance_fin()}
-          >
-            <span>Konfirmasi</span>
-          </MButton>
-        </DialogFooter>
-      </Dialog>
+      <ModalSelector
+        type={type}
+        visible={visible}
+        toggle={toggle}
+        onConfirm={() => {
+          if (context == 'ACC' || context == 'RJJ') {
+            acceptance(context);
+          }
+
+          if (context == 'FIN') {
+            acceptance_fin();
+          }
+        }}
+        onDone={() => {
+          hide();
+        }}
+      />
     </DefaultLayout>
   );
 };

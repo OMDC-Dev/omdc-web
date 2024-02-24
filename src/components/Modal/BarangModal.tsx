@@ -24,6 +24,7 @@ const BarangModal = ({
   function onSaveButtonPress() {
     // set callback value
     value({
+      nm_barang: data?.nm_barang,
       kode_barang: data?.kd_brg,
       requestData: {
         stock: stock,

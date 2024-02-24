@@ -38,7 +38,7 @@ const ListBarangModal = ({
   function onFiltered(key: string) {
     const filtered = list.filter(
       (item: { nm_barang: string; value: string }) => {
-        return item.nm_barang.toLowerCase().includes(key.toLowerCase());
+        return item.nm_barang?.toLowerCase().includes(key?.toLowerCase());
       },
     );
 

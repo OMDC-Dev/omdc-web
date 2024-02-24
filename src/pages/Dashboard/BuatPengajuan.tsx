@@ -29,6 +29,7 @@ import AdminModal from '../../components/Modal/AdminModal';
 import Modal from '../../components/Modal/Modal';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 function TrashIcon() {
   return (
@@ -48,7 +49,7 @@ function TrashIcon() {
 }
 
 const BuatPengajuan: React.FC = () => {
-  const { toggle, visible, hide, show } = useModal();
+  const { show, hide, toggle, visible, type, changeType } = useModal();
   const { user } = useAuth();
 
   // use nav
@@ -79,23 +80,6 @@ const BuatPengajuan: React.FC = () => {
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
   const [showItem, setShowItem] = React.useState<boolean>(false);
-
-  // Dialog
-  const [showDialog, setShowDialog] = React.useState(false);
-  const [dialogtype, setDialogType] = React.useState<string>('OK');
-
-  const DIALOG_PROPS =
-    dialogtype == 'OK'
-      ? {
-          title: 'Pengajuan Berhasil!',
-          message:
-            'Pengajuan telah berhasil dilakukan, mohon menunggu untuk proses approval.',
-        }
-      : {
-          title: 'Pengajuan Gagal!',
-          message:
-            'Pengajuan gagal dilakukan, mohon periksa data dan coba lagi!',
-        };
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
@@ -208,7 +192,7 @@ const BuatPengajuan: React.FC = () => {
 
   // Pengajuan
   async function pengajuanReimbursement() {
-    show();
+    changeType('LOADING');
     // formated date
     const formattedDate = moment(selectDate).format('YYYY-MM-DD');
 
@@ -235,13 +219,9 @@ const BuatPengajuan: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
-      hide();
-      setDialogType('OK');
-      setShowDialog(true);
+      changeType('SUCCESS');
     } else {
-      hide();
-      setDialogType('ERROR');
-      setShowDialog(true);
+      changeType('FAILED');
     }
   }
 
@@ -449,8 +429,7 @@ const BuatPengajuan: React.FC = () => {
                             >
                               {item?.name}
                               <ListItemSuffix className="flex gap-x-4">
-                                {/* {formatRupiah(item.nominal, true)} */}
-                                {item.nominal}
+                                {formatRupiah(item.nominal, true)}
                                 <IconButton
                                   variant="text"
                                   color="blue-gray"
@@ -495,7 +474,8 @@ const BuatPengajuan: React.FC = () => {
                 <Button
                   onClick={(e: any) => {
                     e.preventDefault();
-                    pengajuanReimbursement();
+                    changeType('CONFIRM');
+                    show();
                   }}
                   isLoading
                   disabled={buttonDisabled}
@@ -538,27 +518,16 @@ const BuatPengajuan: React.FC = () => {
         toggle={() => setShowAdmin(!showAdmin)}
         value={(val: any) => setAdmin(val)}
       />
-      {/* DIALOG */}
-      <Dialog
-        open={showDialog}
-        size={'xs'}
-        handler={() => setShowDialog(!showDialog)}
-        dismiss={{ enabled: false }}
-      >
-        <DialogHeader>{DIALOG_PROPS.title}</DialogHeader>
-        <DialogBody>{DIALOG_PROPS.message}</DialogBody>
-        <DialogFooter>
-          <Button
-            onClick={(e: any) => {
-              e.preventDefault();
-              setShowDialog(!showDialog);
-              dialogtype == 'OK' ? navigate('/', { replace: true }) : null;
-            }}
-          >
-            Ok
-          </Button>
-        </DialogFooter>
-      </Dialog>
+      <ModalSelector
+        type={type}
+        visible={visible}
+        toggle={toggle}
+        onConfirm={() => pengajuanReimbursement()}
+        onDone={() => {
+          hide();
+          type == 'SUCCESS' ? navigate('/', { replace: true }) : null;
+        }}
+      />
     </DefaultLayout>
   );
 };

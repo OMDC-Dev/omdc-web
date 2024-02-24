@@ -448,7 +448,7 @@ const DetailPengajuan: React.FC = () => {
                           >
                             {item?.name}
                             <ListItemSuffix className="flex gap-x-4">
-                              {item.nominal}
+                              {formatRupiah(item.nominal, true)}
                             </ListItemSuffix>
                           </ListItem>
                         );

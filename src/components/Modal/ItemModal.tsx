@@ -24,7 +24,7 @@ const ItemModal = ({
     // set callback value
     value({
       name: name,
-      nominal: formatRupiah(nominal, true),
+      nominal: nominal,
     });
 
     // clear state

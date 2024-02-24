@@ -66,6 +66,8 @@ function ListBarang() {
 
   const { show, hide, toggle, visible, type, changeType } = useModal();
 
+  console.log(barangs);
+
   const navigate = useNavigate();
 
   React.useEffect(() => {
