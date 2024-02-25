@@ -1,4 +1,5 @@
-export const BASE_URL = 'http://127.0.0.1:8080/';
+export const BASE_URL =
+  'https://server.omdc.online/'; /*'http://127.0.0.1:8080/' */
 
 // AUTH
 export const LOGIN = 'user/login';
