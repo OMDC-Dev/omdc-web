@@ -23,6 +23,7 @@ import Pengumuman from '../pages/Pengumuman/Pengumuman';
 import SuperAdmin from '../pages/SuperAdmin/SuperAdmin';
 import Departemen from '../pages/SuperAdmin/Departemen';
 import { cekAkses } from '../common/utils';
+import UpdateProfile from '../pages/Authentication/UpdateProfile';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -166,6 +167,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Ubah Password'} />
               <ChangePassword />
+            </>
+          ),
+        },
+        {
+          path: '/update-user',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Ubah Profile'} />
+              <UpdateProfile />
             </>
           ),
         },

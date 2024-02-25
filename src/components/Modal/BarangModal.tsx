@@ -86,7 +86,7 @@ const BarangModal = ({
           ></textarea>
         </div>
         <Button
-          disabled={!stock || !permintaan}
+          disabled={!stock || !permintaan || Number(permintaan) < 1}
           onClick={() => onSaveButtonPress()}
         >
           Simpan

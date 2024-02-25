@@ -3,7 +3,13 @@ import useFetch from '../../hooks/useFetch';
 import { DEPT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 
-const DeptGroup = ({ value }: { value: (arg0: string) => void }) => {
+const DeptGroup = ({
+  value,
+  defaultValue,
+}: {
+  value: (arg0: string) => void;
+  defaultValue?: string;
+}) => {
   const [list, setList] = React.useState<any>([]);
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
@@ -18,6 +24,9 @@ const DeptGroup = ({ value }: { value: (arg0: string) => void }) => {
 
   React.useEffect(() => {
     getList();
+    if (defaultValue) {
+      setSelectedOption(defaultValue);
+    }
   }, []);
 
   async function getList() {

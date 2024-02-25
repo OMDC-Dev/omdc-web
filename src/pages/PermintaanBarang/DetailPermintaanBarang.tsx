@@ -185,7 +185,7 @@ const DetailPermintaanBarang: React.FC = () => {
                       <ListItem
                         key={item + index}
                         ripple={false}
-                        className="py-1 pr-1 pl-4 bg-form-input hover:bg-black"
+                        className="py-2 pr-1 pl-4 bg-form-input hover:bg-black"
                       >
                         <div className=" flex flex-col">
                           <span className=" text-base font-bold text-white mb-2">
@@ -199,6 +199,12 @@ const DetailPermintaanBarang: React.FC = () => {
                           </span>
                           <span className=" text-xs text-blue-gray-300">
                             Keterangan: {item?.requestData?.keterangan || '-'}
+                          </span>
+                          <span className=" mt-4 text-xs text-blue-gray-300">
+                            Status Approve: {item?.status_approve || '-'}
+                          </span>
+                          <span className="text-xs text-blue-gray-300">
+                            Tanggal Approve: {item?.tgl_approve || '-'}
                           </span>
                         </div>
                       </ListItem>
