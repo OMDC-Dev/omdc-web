@@ -17,7 +17,7 @@ import {
   ListItemSuffix,
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
-import { hitungTotalNominal } from '../../common/utils';
+import { compressImage, hitungTotalNominal } from '../../common/utils';
 import BankModal from '../../components/Modal/BankModal';
 import useFetch from '../../hooks/useFetch';
 import { GET_BANK_NAME, REIMBURSEMENT } from '../../api/routes';
@@ -124,13 +124,21 @@ const BuatPengajuan: React.FC = () => {
       type: file.type,
     };
 
-    // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
     if (file.size > maxSize) {
-      alert(
-        'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
-      );
-      event.target.value = null; // Mengosongkan input file
-      return; // Menghentikan eksekusi lebih lanjut
+      console.log('NEED COMPRESS');
+      if (file.type.includes('image')) {
+        compressImage(file, maxSize, handleAttachment);
+        return; // Menghentikan eksekusi lebih lanjut
+      } else {
+        // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
+        alert(
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+        );
+        event.target.value = null; // Mengosongkan input file
+        return;
+      }
+    } else {
+      console.log('AMAN');
     }
 
     reader.readAsDataURL(file);
@@ -278,7 +286,7 @@ const BuatPengajuan: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Approval Admin
+                        Approval ke
                       </label>
                       <div
                         onClick={() => setShowAdmin(!showAdmin)}
@@ -378,7 +386,7 @@ const BuatPengajuan: React.FC = () => {
                     <label className="mb-2.5 block text-black dark:text-white">
                       Nomor Rekening
                     </label>
-                    <div className=" flex gap-x-4">
+                    <div className=" flex flex-col xl:flex-row gap-4">
                       <input
                         type="text"
                         placeholder="Masukan Nomor Rekening"

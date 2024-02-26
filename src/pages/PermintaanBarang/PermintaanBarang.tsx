@@ -21,10 +21,10 @@ import moment from 'moment';
 const TABLE_HEAD = [
   'ID PB',
   'ID User',
+  'Kode Pengiriman',
   'Kode Cabang',
-  'Kode Induk',
-  'Nama Cabang',
-  'Nama Induk',
+  'Kirim ke',
+  'Cabang',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
   'Jam Transaksi',

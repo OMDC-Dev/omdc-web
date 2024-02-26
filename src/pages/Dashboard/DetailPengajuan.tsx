@@ -153,7 +153,7 @@ const DetailPengajuan: React.FC = () => {
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">
-                Status Pengajuan
+                Status Persetujuan
               </h3>
               <Chip
                 variant={'outlined'}
@@ -166,7 +166,7 @@ const DetailPengajuan: React.FC = () => {
                 <div className="mb-1">
                   <div>
                     <label className="mb-3 block text-black dark:text-white">
-                      Status Admin
+                      Status Approval
                     </label>
                     {data?.accepted_by.map((item: any, index: number) => {
                       return (
@@ -309,7 +309,7 @@ const DetailPengajuan: React.FC = () => {
                   <label className="mb-3 block text-black dark:text-white">
                     Lampiran
                   </label>
-                  <div className=" flex gap-x-4">
+                  <div className=" flex flex-col gap-4">
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.file_info?.name}
                     </div>
@@ -325,8 +325,8 @@ const DetailPengajuan: React.FC = () => {
                       }}
                     >
                       {data?.file_info?.type !== 'application/pdf'
-                        ? 'Lihat'
-                        : 'Unduh'}
+                        ? 'Lihat Lampiran'
+                        : 'Unduh Lampiran'}
                     </Button>
                   </div>
                 </div>
@@ -352,7 +352,7 @@ const DetailPengajuan: React.FC = () => {
           <div className="hidden sm:block rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">
-                Status Pengajuan
+                Status Persetujuan
               </h3>
               <Chip
                 variant={'outlined'}
@@ -365,7 +365,7 @@ const DetailPengajuan: React.FC = () => {
                 <div className="mb-1">
                   <div>
                     <label className="mb-3 block text-black dark:text-white">
-                      Status Admin
+                      Status Approval
                     </label>
                     {data?.accepted_by.map((item: any, index: number) => {
                       return (

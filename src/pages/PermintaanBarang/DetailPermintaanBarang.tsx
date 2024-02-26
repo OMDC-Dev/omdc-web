@@ -47,6 +47,23 @@ const DetailPermintaanBarang: React.FC = () => {
     }
   }
 
+  function statusWording(): { text: string; color: colors } {
+    switch (data?.status_approve?.toLowerCase()) {
+      case 'ditolak':
+        return { text: 'Ditolak', color: 'red' };
+        break;
+      case 'disetujui sebagian':
+        return { text: 'Disetujui Sebagian', color: 'light-blue' };
+        break;
+      case 'disetujui':
+        return { text: 'Disetujui', color: 'green' };
+        break;
+      default:
+        return { text: 'Menunggu', color: 'amber' };
+        break;
+    }
+  }
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -58,19 +75,11 @@ const DetailPermintaanBarang: React.FC = () => {
               </h3>
               <Chip
                 variant={'outlined'}
-                color={'light-blue'}
-                value={data?.status_pb || 'Menunggu'}
+                color={statusWording().color}
+                value={statusWording().text}
               />
             </div>
             <div className=" p-6.5 flex flex-col gap-y-6">
-              <div className=" w-full flex justify-between">
-                <label className="mb-3 block text-black dark:text-white">
-                  Status Approval
-                </label>
-                <span className=" text-white font-bold">
-                  {data?.status_approve || 'Menunggu'}
-                </span>
-              </div>
               <div className=" w-full flex justify-between">
                 <label className="mb-3 block text-black dark:text-white">
                   Tanggal Persetujuan
@@ -103,7 +112,7 @@ const DetailPermintaanBarang: React.FC = () => {
                   </div>
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
-                      Nama Induk Cabang
+                      Cabang
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.nm_induk}
@@ -111,7 +120,7 @@ const DetailPermintaanBarang: React.FC = () => {
                   </div>
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
-                      Nama Cabang
+                      Kirim Ke
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.nm_cabang}
@@ -119,7 +128,7 @@ const DetailPermintaanBarang: React.FC = () => {
                   </div>
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
-                      Alamat Cabang
+                      Alamat Pengiriman
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.alamat}
@@ -147,19 +156,11 @@ const DetailPermintaanBarang: React.FC = () => {
               </h3>
               <Chip
                 variant={'outlined'}
-                color={'light-blue'}
-                value={data?.status_pb || 'Menunggu'}
+                color={statusWording().color}
+                value={statusWording().text}
               />
             </div>
             <div className=" p-6.5 flex flex-col gap-y-6">
-              <div className=" w-full flex justify-between">
-                <label className="mb-3 block text-black dark:text-white">
-                  Status Approval
-                </label>
-                <span className=" text-white font-bold">
-                  {data?.status_approve || 'Menunggu'}
-                </span>
-              </div>
               <div className=" w-full flex justify-between">
                 <label className="mb-3 block text-black dark:text-white">
                   Tanggal Persetujuan
@@ -181,6 +182,18 @@ const DetailPermintaanBarang: React.FC = () => {
               <div className=" w-full">
                 <List>
                   {barang?.map((item: any, index: number) => {
+                    // status pb
+                    const statusPB = item?.status_pb?.toLowerCase();
+                    let statusTextColor = '';
+
+                    if (statusPB == 'dibatalkan') {
+                      statusTextColor = 'text-red-500';
+                    } else if (statusPB == 'diproses') {
+                      statusTextColor = 'text-blue-500';
+                    } else if (statusPB == 'diterima') {
+                      statusTextColor = 'text-green-500';
+                    }
+
                     return (
                       <ListItem
                         key={item + index}
@@ -201,7 +214,10 @@ const DetailPermintaanBarang: React.FC = () => {
                             Keterangan: {item?.requestData?.keterangan || '-'}
                           </span>
                           <span className=" mt-4 text-xs text-blue-gray-300">
-                            Status Approve: {item?.status_approve || '-'}
+                            Status Approve:{' '}
+                            <span className={statusTextColor}>
+                              {item?.status_approve || '-'}
+                            </span>
                           </span>
                           <span className="text-xs text-blue-gray-300">
                             Tanggal Approve: {item?.tgl_approve || '-'}

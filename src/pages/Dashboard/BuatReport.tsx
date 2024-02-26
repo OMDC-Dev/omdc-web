@@ -290,7 +290,7 @@ const BuatReport: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Approval Admin
+                        Approval ke
                       </label>
                       <div
                         onClick={() => setShowAdmin(!showAdmin)}

@@ -77,3 +77,49 @@ export const cekAkses = (akses: string) => {
     return kd.findIndex((item: string) => item == '1171') !== -1;
   }
 };
+
+export function compressImage(
+  file: File,
+  maxSize: number,
+  handleAttachment: any,
+) {
+  const image = new Image();
+  const reader = new FileReader();
+
+  reader.readAsDataURL(file);
+
+  reader.onload = () => {
+    image.src = reader.result as string;
+
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      let scaleFactor = 1;
+
+      if (file.size > maxSize) {
+        scaleFactor = maxSize / file.size;
+      }
+
+      canvas.width = image.width * scaleFactor;
+      canvas.height = image.height * scaleFactor;
+
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(
+        (blob) => {
+          const compressedFile = new File([blob!], file.name, {
+            type: 'image/jpeg',
+          });
+
+          handleAttachment({
+            target: {
+              files: [compressedFile],
+            },
+          });
+        },
+        'image/jpeg',
+        0.7,
+      ); // Adjust quality as needed
+    };
+  };
+}
