@@ -1,7 +1,7 @@
 const PROD = 'https://server.omdc.online/';
 const DEV = 'http://127.0.0.1:8080/';
 
-export const BASE_URL = PROD;
+export const BASE_URL = DEV;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -62,3 +62,8 @@ export const DETAIL_REQUEST_BARANG = (id: number) => {
 
 // DEPT
 export const DEPT = 'dept';
+
+// COA
+export const GET_COA = (key = '') => {
+  return `coa?cari=${key}`;
+};

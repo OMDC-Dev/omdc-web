@@ -22,7 +22,6 @@ const BankModal = ({
   // state
   const [banks, setBanks] = React.useState<any>([]);
   const [search, setSearch] = React.useState<string>('');
-  const [filtered, setFiltered] = React.useState<any>([]);
 
   React.useEffect(() => {
     if (!banks.length) {
@@ -43,9 +42,9 @@ const BankModal = ({
     }
   }
 
-  React.useEffect(() => {
-    onFilteredBank(search);
-  }, [search]);
+  // React.useEffect(() => {
+  //   onFilteredBank(search);
+  // }, [search]);
 
   function onFilteredBank(key: string) {
     const filtered = banks.filter(

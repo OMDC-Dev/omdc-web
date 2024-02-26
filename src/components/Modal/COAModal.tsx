@@ -1,38 +1,60 @@
 import React from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Dialog, List, ListItem } from '@material-tailwind/react';
-import DATAS from '../../common/files/coa.json';
+import useFetch from '../../hooks/useFetch';
+import { GET_COA } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
 
 const COAModal = ({
   visible,
   toggle,
-  dismissOnBackdrop,
   value,
 }: {
   visible: boolean;
   toggle: any;
-  dismissOnBackdrop?: boolean;
   value?: any;
 }) => {
   if (!visible) return null;
 
   // state
   const [search, setSearch] = React.useState<string>('');
+  const [banks, setBanks] = React.useState<any[]>([]);
 
   React.useEffect(() => {
-    onFilteredBank(search);
-  }, [search]);
+    if (!banks.length) {
+      getBankList();
+    }
+  }, [visible]);
+
+  async function getBankList() {
+    const { state, data, error } = await useFetch({
+      url: GET_COA('') + '&limit=200',
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setBanks(data?.rows);
+    } else {
+      setBanks([]);
+    }
+  }
+
+  // React.useEffect(() => {
+  //   onFilteredBank(search);
+  // }, [search]);
 
   function onFilteredBank(key: string) {
-    const filtered = DATAS.filter((item) => {
-      return item.label.toLowerCase().includes(key.toLowerCase());
-    });
+    const filtered = banks.filter(
+      (item: { accountname: string; id_coa: string }) => {
+        return item?.accountname?.toLowerCase().includes(key.toLowerCase());
+      },
+    );
 
     return filtered;
   }
 
   function onSaveButtonPress(selected: any) {
-    value(selected.value);
+    value(`${selected?.id_coa} - ${selected?.accountname}`);
     // toggle modal
     toggle();
   }
@@ -57,7 +79,7 @@ const COAModal = ({
           {onFilteredBank(search).map((item: any, index: number) => {
             return (
               <div onClick={() => onSaveButtonPress(item)}>
-                <ListItem className=" text-white">{item.label}</ListItem>
+                <ListItem className=" text-white">{item.accountname}</ListItem>
               </div>
             );
           })}

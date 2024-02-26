@@ -107,10 +107,12 @@ function ListBarang() {
     });
 
     if (state == API_STATES.OK) {
+      setLoading(false);
       setDetailCabang(data);
       const alamat = `${data?.alamat_cabang}\n${data?.kelurahan} - ${data?.kecamatan}\n${data?.kota} - ${data?.provinsi}\n${data?.kd_pos}`;
       setAlamat(alamat);
     } else {
+      setLoading(false);
       setDetailCabang({});
     }
   }
@@ -239,7 +241,7 @@ function ListBarang() {
                 />
               </form>
             </div>
-            <div className="w-full bg-boxdark flex pt-4 gap-x-4">
+            <div className="w-full bg-boxdark flex-col flex sm:flex-row sm:items-center pt-4 gap-4">
               <div
                 onClick={(e: any) => {
                   e.preventDefault();
@@ -383,7 +385,7 @@ function ListBarang() {
                   color="white"
                   className="font-normal"
                 >
-                  Halaman {page} dari {pageInfo.pageCount}
+                  Halaman {page} dari {pageInfo?.pageCount}
                 </Typography>
                 <div className="flex gap-2">
                   <MButton
@@ -398,7 +400,7 @@ function ListBarang() {
                     Previous
                   </MButton>
                   <MButton
-                    disabled={page == pageInfo.pageCount || loading}
+                    disabled={page == pageInfo?.pageCount || loading}
                     variant="outlined"
                     size="sm"
                     onClick={(e) => {

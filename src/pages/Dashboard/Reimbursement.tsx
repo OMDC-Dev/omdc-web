@@ -91,7 +91,7 @@ function Reimbursement() {
     <DefaultLayout>
       <Card className="h-full w-full bg-boxdark">
         <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="flex items-center justify-between gap-8 bg-boxdark">
+          <div className="flex-col flex sm:flex-row sm:items-center  justify-between gap-8 bg-boxdark">
             <div>
               <Typography variant="h5" color="white">
                 Riwayat Pengajuan
@@ -110,7 +110,7 @@ function Reimbursement() {
                     navigate('/reimbursement/ajukan', { replace: false })
                   }
                 >
-                  Buat Pengajuan
+                  Buat Pengajuan Baru
                 </Button>
               ) : null}
             </div>

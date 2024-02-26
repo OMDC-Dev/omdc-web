@@ -146,6 +146,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
     if (state == API_STATES.OK) {
       changeType('SUCCESS');
+      getStatus();
     } else {
       changeType('FAILED');
     }
