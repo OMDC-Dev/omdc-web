@@ -401,7 +401,11 @@ const BuatReport: React.FC = () => {
                         Bank
                       </label>
                       <div
-                        onClick={() => setShowBank(!showBank)}
+                        onClick={() =>
+                          bankDetail?.accountname?.length
+                            ? null
+                            : setShowBank(!showBank)
+                        }
                         className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
                       >
                         {selectedBank?.namaBank || 'Pilih Bank'}
@@ -416,12 +420,18 @@ const BuatReport: React.FC = () => {
                     <div className=" flex gap-x-4">
                       <input
                         type="text"
+                        disabled={bankDetail?.accountname?.length}
                         placeholder="Masukan Nomor Rekening"
                         className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                         value={bankRek}
                         onChange={(e) => setBankRek(e.target.value)}
                       />
-                      <Button onClick={onCekRek}>Cek Nomor</Button>
+                      <Button
+                        disabled={bankDetail?.accountname?.length}
+                        onClick={onCekRek}
+                      >
+                        Cek Nomor
+                      </Button>
                     </div>
                   </div>
 

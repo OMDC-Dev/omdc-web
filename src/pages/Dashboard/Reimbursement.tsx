@@ -21,8 +21,9 @@ import { cekAkses } from '../../common/utils';
 
 const TABLE_HEAD = [
   'Pengajuan',
+  'No. Doc.',
   'Tanggal',
-  'Induk Cabang',
+  'Cabang',
   'Diajukan Oleh',
   'Nama Client / Vendor',
   'COA',
@@ -160,6 +161,18 @@ function Reimbursement() {
                                 className="font-normal"
                               >
                                 {item?.jenis_reimbursement}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.no_doc}
                               </Typography>
                             </div>
                           </div>
