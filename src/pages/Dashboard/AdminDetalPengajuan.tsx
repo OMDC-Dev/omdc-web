@@ -19,7 +19,12 @@ import Modal from '../../components/Modal/Modal';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
 import FileModal from '../../components/Modal/FileModal';
-import { downloadPDF, getDataById, unformatRupiah } from '../../common/utils';
+import {
+  calculateSaldo,
+  downloadPDF,
+  getDataById,
+  unformatRupiah,
+} from '../../common/utils';
 import AdminModal from '../../components/Modal/AdminModal';
 import useFetch from '../../hooks/useFetch';
 import {
@@ -91,7 +96,7 @@ const AdminDetailPengajuan: React.FC = () => {
     switch (status) {
       case 'WAITING':
         return {
-          tx: isFinance ? 'Menunggu Ditransfer' : 'Menunggu Disetujui',
+          tx: isFinance ? 'Menunggu Diproses' : 'Menunggu Disetujui',
           color: 'amber',
         };
         break;
@@ -132,7 +137,7 @@ const AdminDetailPengajuan: React.FC = () => {
   async function acceptance_fin() {
     changeType('LOADING');
 
-    const fnominal = formatRupiah(unformatRupiah(nominal), false);
+    const fnominal = formatRupiah(unformatRupiah(nominal), true);
 
     const body = {
       nominal: fnominal,
@@ -187,7 +192,7 @@ const AdminDetailPengajuan: React.FC = () => {
     if (data?.childId) {
       navigate(`/reimbursement/${data?.childId}`, {
         replace: false,
-        state: { ...state, pushed: true },
+        state: { pushed: true },
       });
     }
   }
@@ -197,7 +202,7 @@ const AdminDetailPengajuan: React.FC = () => {
     if (data?.parentId) {
       navigate(`/reimbursement/${data?.parentId}`, {
         replace: false,
-        state: { ...state, pushed: true },
+        state: { pushed: true },
       });
     }
   }
@@ -278,7 +283,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
                 <div className="w-full mb-4.5">
                   <label className="mb-2.5 block text-black dark:text-white">
-                    Nominal Diajukan{' '}
+                    Nominal Pengajuan{' '}
                     {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' &&
                     ADMIN_TYPE == 'ADMIN'
                       ? '( Ubah nominal bila diperlukan )'
@@ -366,7 +371,9 @@ const AdminDetailPengajuan: React.FC = () => {
                         show();
                       }}
                     >
-                      Konfirmasi Sudah Ditransfer
+                      {data?.bank_detail?.bankname
+                        ? 'Konfirmasi Sudah Ditransfer'
+                        : 'Konfirmasi Selesai'}
                     </Button>
                   </div>
                 ) : null}
@@ -571,7 +578,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
                   <div className="w-full mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Nominal Diajukan{' '}
+                      Nominal Pengajuan{' '}
                       {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' &&
                       ADMIN_TYPE == 'ADMIN'
                         ? '( Ubah nominal bila diperlukan )'
@@ -659,7 +666,9 @@ const AdminDetailPengajuan: React.FC = () => {
                           show();
                         }}
                       >
-                        Konfirmasi Sudah Ditransfer
+                        {data?.bank_detail?.bankname
+                          ? 'Konfirmasi Sudah Ditransfer'
+                          : 'Konfirmasi Selesai'}
                       </Button>
                     </div>
                   ) : null}
@@ -723,7 +732,7 @@ const AdminDetailPengajuan: React.FC = () => {
                 </div>
                 <div className="mb-1">
                   <label className="mb-2.5 block text-black dark:text-white">
-                    Nominal
+                    Total Nominal
                   </label>
                   <input
                     disabled
@@ -734,71 +743,90 @@ const AdminDetailPengajuan: React.FC = () => {
                   />
                 </div>
                 {data?.realisasi ? (
-                  <div className="mt-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nominal Realisasi
-                    </label>
-                    <input
-                      disabled
-                      type="text"
-                      defaultValue={'Rp. ' + data?.realisasi}
-                      placeholder="Enter your full name"
-                      className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
+                  <>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Nominal Realisasi
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        defaultValue={data?.realisasi}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Saldo
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        defaultValue={calculateSaldo(
+                          data?.nominal,
+                          data?.realisasi,
+                        )}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  </>
                 ) : null}
               </div>
             </form>
           </div>
 
           {/* <!-- Sign In Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Data Bank
-              </h3>
-            </div>
-            <form action="#">
-              <div className="p-6.5">
-                <div className="mb-4.5">
-                  <div>
-                    <label className="mb-3 block text-black dark:text-white">
-                      Bank
-                    </label>
-                    <div className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.bank_detail?.bankname || '-'}
+          {data?.bank_detail?.bankname ? (
+            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                <h3 className="font-medium text-black dark:text-white">
+                  Data Bank
+                </h3>
+              </div>
+              <form action="#">
+                <div className="p-6.5">
+                  <div className="mb-4.5">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Bank
+                      </label>
+                      <div className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {data?.bank_detail?.bankname || '-'}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="w-full mb-4.5">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Nomor Rekening
-                  </label>
-                  <input
-                    disabled
-                    type="text"
-                    placeholder="Masukan Nomor Rekening"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    defaultValue={data?.bank_detail?.accountnumber}
-                  />
-                </div>
+                  <div className="w-full mb-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nomor Rekening
+                    </label>
+                    <input
+                      disabled
+                      type="text"
+                      placeholder="Masukan Nomor Rekening"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      defaultValue={data?.bank_detail?.accountnumber}
+                    />
+                  </div>
 
-                <div className="w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Nama Pemilik Rekening
-                  </label>
-                  <input
-                    type="text"
-                    disabled
-                    defaultValue={data?.bank_detail?.accountname}
-                    placeholder="Nama Pemilik Rekening"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
+                  <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nama Pemilik Rekening
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      defaultValue={data?.bank_detail?.accountname}
+                      placeholder="Nama Pemilik Rekening"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </div>
                 </div>
-              </div>
-            </form>
-          </div>
+              </form>
+            </div>
+          ) : null}
         </div>
       </div>
       {/* MODAL CONTAINER */}

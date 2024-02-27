@@ -1,4 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
+import formatRupiah from './formatRupiah';
 
 export function hitungTotalNominal(data: any) {
   let total = 0;
@@ -123,3 +124,19 @@ export function compressImage(
     };
   };
 }
+
+// ===== function to calculate saldo
+export const calculateSaldo = (nominal = '', realisasi = '') => {
+  if (!nominal || !realisasi) {
+    return '-';
+  }
+
+  const intNominal = parseInt(nominal.replace('Rp. ', '').replace(/\./g, ''));
+  const intRealisasi = parseInt(
+    realisasi.replace('Rp. ', '').replace(/\./g, ''),
+  );
+
+  const saldo = intNominal - intRealisasi;
+
+  return 'Rp. ' + formatRupiah(saldo, false);
+};
