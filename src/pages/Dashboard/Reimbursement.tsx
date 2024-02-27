@@ -18,6 +18,7 @@ import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { cekAkses } from '../../common/utils';
+import { exportToExcell } from '../../common/exportToExcell';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -88,6 +89,30 @@ function Reimbursement() {
     }
   }
 
+  function onExportToExcell() {
+    const apiDataClear = rList.map((item) => {
+      const {
+        attachment,
+        file_info,
+        requester,
+        bank_detail,
+        accepted_by,
+        ...rest
+      }: any = item;
+
+      let parseAdmin: any = {};
+
+      accepted_by.forEach((item: any, index: number) => {
+        const key = `Admin ${index}`;
+        parseAdmin[key] = item?.nm_user;
+      });
+
+      return { ...rest, ...parseAdmin };
+    });
+
+    exportToExcell(apiDataClear);
+  }
+
   return (
     <DefaultLayout>
       <Card className="h-full w-full bg-boxdark">
@@ -114,6 +139,14 @@ function Reimbursement() {
                   Buat Pengajuan Baru
                 </Button>
               ) : null}
+              {/* <Button
+                variant="filled"
+                size="sm"
+                color="blue"
+                onClick={() => onExportToExcell()}
+              >
+                Export ke Excel
+              </Button> */}
             </div>
           </div>
         </CardHeader>
