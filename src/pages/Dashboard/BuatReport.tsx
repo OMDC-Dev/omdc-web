@@ -216,7 +216,7 @@ const BuatReport: React.FC = () => {
     const body = {
       type: jenis,
       date: formattedDate,
-      cabang: cabang?.value,
+      cabang: cabang,
       description: desc,
       attachment: result,
       bank_detail: bankDetail || {},
@@ -241,6 +241,12 @@ const BuatReport: React.FC = () => {
       changeType('FAILED');
     }
   }
+
+  React.useEffect(() => {
+    if (state) {
+      setCabang(state?.kode_cabang.split('-')[0].trim());
+    }
+  }, [state]);
 
   return (
     <DefaultLayout>
@@ -301,11 +307,8 @@ const BuatReport: React.FC = () => {
                       <label className="mb-3 block text-black dark:text-white">
                         Cabang
                       </label>
-                      <div
-                        onClick={() => setShowCabang(!showCabang)}
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {cabang?.label || 'Pilih Cabang'}
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {stateData?.kode_cabang}
                       </div>
                     </div>
                   </div>

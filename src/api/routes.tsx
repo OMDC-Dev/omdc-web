@@ -43,6 +43,9 @@ export const FINANCE_PENGAJUAN = 'finance/pengajuan';
 export const FINANCE_ACCEPTANCE = (id: number) => {
   return `finance/acceptance/${id}?status=DONE`;
 };
+export const FINANCE_UPDATE_COA = (id) => {
+  return `finance/update-coa/${id}`;
+};
 
 // REQUEST BARANG
 export const GET_CABANG_BY_INDUK = (id: number) => {
@@ -67,3 +70,6 @@ export const DEPT = 'dept';
 export const GET_COA = (key = '') => {
   return `coa?cari=${key}`;
 };
+
+// SUPLIER
+export const GET_SUPLIER = '/suplier';

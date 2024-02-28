@@ -7,10 +7,6 @@ import useModal from '../../hooks/useModal';
 import ItemModal from '../../components/Modal/ItemModal';
 import {
   Card,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
   IconButton,
   List,
   ListItem,
@@ -30,6 +26,7 @@ import Modal from '../../components/Modal/Modal';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import SuplierModal from '../../components/Modal/SuplierModal';
 
 function TrashIcon() {
   return (
@@ -68,6 +65,7 @@ const BuatPengajuan: React.FC = () => {
   const [selectDate, setSelectDate] = React.useState<Date>();
   const [item, setItem] = React.useState<any>([]);
   const [admin, setAdmin] = React.useState<any>();
+  const [suplier, setSuplier] = React.useState<any>();
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -80,9 +78,12 @@ const BuatPengajuan: React.FC = () => {
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
   const [showItem, setShowItem] = React.useState<boolean>(false);
+  const [showSuplier, setShowSuplier] = React.useState<boolean>(false);
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
+  const IS_PRE_BANK =
+    suplier?.nm_bank && suplier?.no_rekbank && suplier?.nm_pemilik_rek;
 
   // dsabled n=button
   const disabledByType = () => {
@@ -93,7 +94,7 @@ const BuatPengajuan: React.FC = () => {
 
   const isNeedBank = () => {
     if (jenis !== 'PC') {
-      return !bankDetail;
+      return !bankDetail?.accountname;
     }
   };
 
@@ -233,6 +234,23 @@ const BuatPengajuan: React.FC = () => {
     }
   }
 
+  // set name and bank to suplier on payment request
+  React.useEffect(() => {
+    if (suplier) {
+      setBankDetail({});
+      setName(`${suplier?.kdsp} - ${suplier?.nmsp}`);
+    }
+
+    if (IS_PRE_BANK) {
+      setBankDetail({
+        bankcode: '000',
+        bankname: suplier?.nm_bank,
+        accountnumber: suplier?.no_rekbank,
+        accountname: suplier?.nm_pemilik_rek,
+      });
+    }
+  }, [suplier]);
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -313,15 +331,24 @@ const BuatPengajuan: React.FC = () => {
                   {isNeedName ? (
                     <div className="w-full">
                       <label className="mb-2.5 block text-black dark:text-white">
-                        Nama Reimbursement
+                        Nama Client / Vendor
                       </label>
-                      <input
-                        type="text"
-                        placeholder="Masukan Nama Reimbursement"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                      />
+                      {jenis == 'PR' ? (
+                        <div
+                          onClick={() => setShowSuplier(!showSuplier)}
+                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        >
+                          {suplier?.nmsp || 'Pilih Suplier'}
+                        </div>
+                      ) : (
+                        <input
+                          type="text"
+                          placeholder="Masukan Nama Reimbursement"
+                          className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                      )}
                     </div>
                   ) : null}
                 </div>
@@ -373,16 +400,22 @@ const BuatPengajuan: React.FC = () => {
                       <label className="mb-3 block text-black dark:text-white">
                         Bank
                       </label>
-                      <div
-                        onClick={() =>
-                          bankDetail?.accountname?.length
-                            ? null
-                            : setShowBank(!showBank)
-                        }
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {selectedBank?.namaBank || 'Pilih Bank'}
-                      </div>
+                      {IS_PRE_BANK ? (
+                        <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                          {suplier?.nm_bank}
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() =>
+                            bankDetail?.accountname?.length
+                              ? null
+                              : setShowBank(!showBank)
+                          }
+                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        >
+                          {selectedBank?.namaBank || 'Pilih Bank'}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -390,36 +423,48 @@ const BuatPengajuan: React.FC = () => {
                     <label className="mb-2.5 block text-black dark:text-white">
                       Nomor Rekening
                     </label>
-                    <div className=" flex flex-col xl:flex-row gap-4">
-                      <input
-                        type="text"
-                        disabled={bankDetail?.accountname?.length}
-                        placeholder="Masukan Nomor Rekening"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={bankRek}
-                        onChange={(e) => setBankRek(e.target.value)}
-                      />
-                      <Button
-                        disabled={bankDetail?.accountname?.length}
-                        onClick={onCekRek}
-                      >
-                        Cek Nomor
-                      </Button>
-                    </div>
+                    {IS_PRE_BANK ? (
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {suplier?.no_rekbank}
+                      </div>
+                    ) : (
+                      <div className=" flex flex-col xl:flex-row gap-4">
+                        <input
+                          type="text"
+                          disabled={bankDetail?.accountname?.length}
+                          placeholder="Masukan Nomor Rekening"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={bankRek}
+                          onChange={(e) => setBankRek(e.target.value)}
+                        />
+                        <Button
+                          disabled={bankDetail?.accountname?.length}
+                          onClick={onCekRek}
+                        >
+                          Cek Nomor
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
-                  {bankDetail?.accountname ? (
+                  {bankDetail?.accountname || suplier?.nm_pemilik_rek ? (
                     <div className="w-full">
                       <label className="mb-2.5 block text-black dark:text-white">
                         Nama Pemilik Rekening
                       </label>
-                      <input
-                        type="text"
-                        disabled
-                        placeholder="Nama Pemilik Rekening"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={bankDetail?.accountname}
-                      />
+                      {IS_PRE_BANK ? (
+                        <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                          {suplier?.nm_pemilik_rek}
+                        </div>
+                      ) : (
+                        <input
+                          type="text"
+                          disabled
+                          placeholder="Nama Pemilik Rekening"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={bankDetail?.accountname}
+                        />
+                      )}
                     </div>
                   ) : null}
                 </div>
@@ -525,6 +570,11 @@ const BuatPengajuan: React.FC = () => {
         visible={showCoa}
         toggle={() => setShowCoa(!showCoa)}
         value={(val: any) => setCoa(val)}
+      />
+      <SuplierModal
+        visible={showSuplier}
+        toggle={() => setShowSuplier(!showSuplier)}
+        value={(val: any) => setSuplier(val)}
       />
       <CabangModal
         visible={showCabang}

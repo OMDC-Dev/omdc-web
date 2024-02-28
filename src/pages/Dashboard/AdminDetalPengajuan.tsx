@@ -5,10 +5,6 @@ import useModal from '../../hooks/useModal';
 import {
   Card,
   Chip,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
   List,
   ListItem,
   ListItemSuffix,
@@ -29,12 +25,14 @@ import AdminModal from '../../components/Modal/AdminModal';
 import useFetch from '../../hooks/useFetch';
 import {
   FINANCE_ACCEPTANCE,
+  FINANCE_UPDATE_COA,
   REIMBURSEMENT_ACCEPTANCE,
   REIMBURSEMENT_DETAIL,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import COAModal from '../../components/Modal/COAModal';
 
 const AdminDetailPengajuan: React.FC = () => {
   const {
@@ -69,8 +67,12 @@ const AdminDetailPengajuan: React.FC = () => {
   const [data, setData] = React.useState(state);
   const [nominal, setNominal] = React.useState(data?.nominal);
   const [admin, setAdmin] = React.useState<any>('');
-  const [note, setNote] = React.useState<string>('');
+
   const [status, setStatus] = React.useState<any>();
+
+  // COA
+  const [coa, setCoa] = React.useState<string>();
+  const [showCoa, setShowCoa] = React.useState<boolean>(false);
 
   // CONST
   const RID = data?.id;
@@ -83,6 +85,8 @@ const AdminDetailPengajuan: React.FC = () => {
     'iduser',
     'status',
   );
+
+  const [note, setNote] = React.useState<string>('');
 
   // Data Modal State
   const [showFile, setShowFile] = React.useState<boolean>(false);
@@ -141,6 +145,8 @@ const AdminDetailPengajuan: React.FC = () => {
 
     const body = {
       nominal: fnominal,
+      note: note,
+      coa: coa,
     };
 
     const { state, data, error } = await useFetch({
@@ -158,6 +164,7 @@ const AdminDetailPengajuan: React.FC = () => {
   }
 
   // acceptance
+  const STATE_NOTE = data?.note;
   async function acceptance(statusType: any) {
     changeType('LOADING');
 
@@ -165,11 +172,14 @@ const AdminDetailPengajuan: React.FC = () => {
 
     const fnominal = formatRupiah(unformatRupiah(nominal), false);
 
+    const noteStr = `${STATE_NOTE?.length ? STATE_NOTE + `, ${note}` : note}`;
+
     const body = {
       fowarder_id: admin.iduser,
       status: admin ? 'FOWARDED' : status,
       nominal: fnominal,
-      note: note || '',
+      note: noteStr,
+      coa: coa,
     };
 
     const { state, data, error } = await useFetch({
@@ -225,6 +235,75 @@ const AdminDetailPengajuan: React.FC = () => {
       setData(data);
     } else {
       hide();
+    }
+  }
+
+  async function onCOAUpdate() {
+    changeType('LOADING');
+    const { state, data, error } = await useFetch({
+      url: FINANCE_UPDATE_COA(RID),
+      method: 'POST',
+      data: {
+        coa: coa,
+      },
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      getStatus();
+    } else {
+      changeType('FAILED');
+      getStatus();
+    }
+  }
+
+  // Render coa selector
+  function renderCOASelector() {
+    if (ADMIN_TYPE == 'ADMIN') {
+      if (ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
+
+      return (
+        <div className="w-full mb-4.5">
+          <div>
+            <label className="mb-3 block text-black dark:text-white">COA</label>
+            <div
+              onClick={() => setShowCoa(!showCoa)}
+              className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+            >
+              {coa || data?.coa || 'Pilih COA'}
+            </div>
+          </div>
+        </div>
+      );
+    } else {
+      const _status = status?.status_finance;
+      return (
+        <div className="w-full mb-4.5">
+          <div>
+            <label className="mb-3 block text-black dark:text-white">COA</label>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+              <div
+                onClick={() => setShowCoa(!showCoa)}
+                className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+              >
+                {coa || data?.coa || 'Pilih COA'}
+              </div>
+              {_status == 'DONE' ? (
+                <Button
+                  onClick={(e: any) => {
+                    e.preventDefault();
+                    changeContext('COA');
+                    changeType('CONFIRM');
+                    show();
+                  }}
+                >
+                  Update COA
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      );
     }
   }
 
@@ -324,21 +403,41 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 ) : null}
 
-                {ADMIN_TYPE == 'ADMIN' ? (
-                  <div className=" w-full">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Catatan ( Opsional )
-                    </label>
+                {renderCOASelector()}
+
+                <div className=" w-full">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Catatan ( Opsional )
+                  </label>
+                  {ADMIN_TYPE == 'ADMIN' ? (
+                    ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
+                      <textarea
+                        rows={3}
+                        disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                        placeholder="Masukan Catatan"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                      ></textarea>
+                    ) : (
+                      <textarea
+                        rows={3}
+                        disabled={true}
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        defaultValue={data?.note + note}
+                      ></textarea>
+                    )
+                  ) : (
                     <textarea
                       rows={3}
-                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                      disabled={status?.status_finance !== 'WAITING'}
                       placeholder="Masukan Catatan"
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      value={note}
+                      value={note || data?.finance_note}
                       onChange={(e) => setNote(e.target.value)}
                     ></textarea>
-                  </div>
-                ) : null}
+                  )}
+                </div>
 
                 {data?.jenis_reimbursement == 'Cash Advance' &&
                 data?.status_finance == 'DONE' &&
@@ -441,7 +540,7 @@ const AdminDetailPengajuan: React.FC = () => {
                       COA
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.coa}
+                      {status?.coa || data?.coa}
                     </div>
                   </div>
 
@@ -619,21 +718,41 @@ const AdminDetailPengajuan: React.FC = () => {
                     </div>
                   ) : null}
 
-                  {ADMIN_TYPE == 'ADMIN' ? (
-                    <div className=" w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Catatan ( Opsional )
-                      </label>
+                  {renderCOASelector()}
+
+                  <div className=" w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Catatan ( Opsional )
+                    </label>
+                    {ADMIN_TYPE == 'ADMIN' ? (
+                      ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
+                        <textarea
+                          rows={3}
+                          disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                          placeholder="Masukan Catatan"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={note}
+                          onChange={(e) => setNote(e.target.value)}
+                        ></textarea>
+                      ) : (
+                        <textarea
+                          rows={3}
+                          disabled={true}
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          defaultValue={data?.note + note}
+                        ></textarea>
+                      )
+                    ) : (
                       <textarea
                         rows={3}
-                        disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                        disabled={status?.status_finance !== 'WAITING'}
                         placeholder="Masukan Catatan"
                         className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={note}
+                        value={note || data?.finance_note}
                         onChange={(e) => setNote(e.target.value)}
                       ></textarea>
-                    </div>
-                  ) : null}
+                    )}
+                  </div>
 
                   {data?.jenis_reimbursement == 'Cash Advance' &&
                   data?.status_finance == 'DONE' &&
@@ -854,10 +973,19 @@ const AdminDetailPengajuan: React.FC = () => {
           if (context == 'FIN') {
             acceptance_fin();
           }
+
+          if (context == 'COA') {
+            onCOAUpdate();
+          }
         }}
         onDone={() => {
           hide();
         }}
+      />
+      <COAModal
+        visible={showCoa}
+        toggle={() => setShowCoa(!showCoa)}
+        value={(val: any) => setCoa(val)}
       />
     </DefaultLayout>
   );

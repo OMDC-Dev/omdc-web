@@ -27,9 +27,10 @@ import { calculateSaldo, downloadPDF } from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { REIMBURSEMENT_DETAIL } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 const DetailPengajuan: React.FC = () => {
-  const { toggle, visible, hide, show } = useModal();
+  const { toggle, visible, hide, show, changeType, type } = useModal();
 
   // use nav
   const navigate = useNavigate();
@@ -52,22 +53,7 @@ const DetailPengajuan: React.FC = () => {
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
 
-  // Dialog
-  const [showDialog, setShowDialog] = React.useState(false);
-  const [dialogtype, setDialogType] = React.useState<string>('OK');
-
-  const DIALOG_PROPS =
-    dialogtype == 'OK'
-      ? {
-          title: 'Pengajuan Berhasil!',
-          message:
-            'Pengajuan telah berhasil dilakukan, mohon menunggu untuk proses approval.',
-        }
-      : {
-          title: 'Pengajuan Gagal!',
-          message:
-            'Pengajuan gagal dilakukan, mohon periksa data dan coba lagi!',
-        };
+  const RID = data?.id;
 
   // handle status
   const STATUS_WORDING = (
@@ -132,6 +118,7 @@ const DetailPengajuan: React.FC = () => {
   }, [location.key]);
 
   async function getDetails(id: any) {
+    changeType('LOADING');
     show();
     const { state, data, error } = await useFetch({
       url: REIMBURSEMENT_DETAIL(id),
@@ -143,6 +130,21 @@ const DetailPengajuan: React.FC = () => {
       setData(data);
     } else {
       hide();
+    }
+  }
+
+  // DELETE PENGAJUAN
+  async function deletePengajuan() {
+    changeType('LOADING');
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_DETAIL(RID),
+      method: 'DELETE',
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+    } else {
+      changeType('FAILED');
     }
   }
 
@@ -195,18 +197,49 @@ const DetailPengajuan: React.FC = () => {
                       </div>
                     ) : null}
                   </div>
-                  <div className="w-full mt-4.5">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Catatan
-                    </label>
-                    <textarea
-                      rows={3}
-                      disabled
-                      placeholder="Masukan Deskripsi"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      defaultValue={data?.note || '-'}
-                    ></textarea>
-                  </div>
+                  {IS_PUSHED ? null : (
+                    <>
+                      <div className="w-full mt-4.5">
+                        <label className="mb-3 block text-black dark:text-white">
+                          Catatan
+                        </label>
+                        <textarea
+                          rows={3}
+                          disabled
+                          placeholder="Masukan Deskripsi"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          defaultValue={data?.note}
+                        ></textarea>
+                      </div>
+                      <div className="w-full mt-4.5">
+                        <label className="mb-3 block text-black dark:text-white">
+                          Catatan Finance
+                        </label>
+                        <textarea
+                          rows={3}
+                          disabled
+                          placeholder="Masukan Deskripsi"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          defaultValue={data?.finance_note || '-'}
+                        ></textarea>
+                      </div>
+                    </>
+                  )}
+
+                  {data?.status == 'WAITING' ? (
+                    <div className=" mt-4">
+                      <Button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          changeType('CONFIRM');
+                          show();
+                        }}
+                      >
+                        Batalkan Pengajuan
+                      </Button>
+                    </div>
+                  ) : null}
+
                   {data?.jenis_reimbursement == 'Cash Advance' &&
                   data?.status_finance == 'DONE' &&
                   !IS_PUSHED ? (
@@ -394,18 +427,34 @@ const DetailPengajuan: React.FC = () => {
                       </div>
                     ) : null}
                   </div>
-                  <div className="w-full mt-4.5">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Catatan
-                    </label>
-                    <textarea
-                      rows={3}
-                      disabled
-                      placeholder="Masukan Deskripsi"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      defaultValue={data?.description}
-                    ></textarea>
-                  </div>
+                  {IS_PUSHED ? null : (
+                    <>
+                      <div className="w-full mt-4.5">
+                        <label className="mb-3 block text-black dark:text-white">
+                          Catatan
+                        </label>
+                        <textarea
+                          rows={3}
+                          disabled
+                          placeholder="Masukan Deskripsi"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          defaultValue={data?.note}
+                        ></textarea>
+                      </div>
+                      <div className="w-full mt-4.5">
+                        <label className="mb-3 block text-black dark:text-white">
+                          Catatan Finance
+                        </label>
+                        <textarea
+                          rows={3}
+                          disabled
+                          placeholder="Masukan Deskripsi"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          defaultValue={data?.finance_note || '-'}
+                        ></textarea>
+                      </div>
+                    </>
+                  )}
                   {data?.jenis_reimbursement == 'Cash Advance' &&
                   data?.status_finance == 'DONE' &&
                   !IS_PUSHED ? (
@@ -499,6 +548,37 @@ const DetailPengajuan: React.FC = () => {
                     </div>
                   </>
                 ) : null}
+                {data?.pengajuan_ca ? (
+                  <>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Nominal Pengajuan Cash Advance
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        defaultValue={data?.pengajuan_ca}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Saldo
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        defaultValue={calculateSaldo(
+                          data?.pengajuan_ca,
+                          data?.nominal,
+                        )}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  </>
+                ) : null}
               </div>
             </form>
           </div>
@@ -556,15 +636,22 @@ const DetailPengajuan: React.FC = () => {
         </div>
       </div>
       {/* MODAL CONTAINER */}
-      <Modal visible={visible} toggle={toggle} />
+      {/* <Modal visible={visible} toggle={toggle} /> */}
       <FileModal
         type={data?.file_info?.type}
         data={data?.attachment}
         visible={showFile}
         toggle={() => setShowFile(!showFile)}
       />
+      <ModalSelector
+        visible={visible}
+        toggle={toggle}
+        type={type}
+        onConfirm={() => deletePengajuan()}
+        onDone={() => navigate('/', { replace: true })}
+      />
       {/* DIALOG */}
-      <Dialog
+      {/* <Dialog
         open={showDialog}
         size={'xs'}
         handler={() => setShowDialog(!showDialog)}
@@ -583,7 +670,7 @@ const DetailPengajuan: React.FC = () => {
             Ok
           </Button>
         </DialogFooter>
-      </Dialog>
+      </Dialog> */}
     </DefaultLayout>
   );
 };
