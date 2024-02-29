@@ -27,6 +27,7 @@ import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import SuplierModal from '../../components/Modal/SuplierModal';
+import PaymentGroup from '../../components/SelectGroup/PaymentGroup';
 
 function TrashIcon() {
   return (
@@ -66,6 +67,7 @@ const BuatPengajuan: React.FC = () => {
   const [item, setItem] = React.useState<any>([]);
   const [admin, setAdmin] = React.useState<any>();
   const [suplier, setSuplier] = React.useState<any>();
+  const [payment, setPayment] = React.useState<any>();
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -93,7 +95,7 @@ const BuatPengajuan: React.FC = () => {
   };
 
   const isNeedBank = () => {
-    if (jenis !== 'PC') {
+    if (jenis !== 'PC' && payment && payment !== 'CASH') {
       return !bankDetail?.accountname;
     }
   };
@@ -108,6 +110,7 @@ const BuatPengajuan: React.FC = () => {
     !result ||
     !selectDate ||
     !admin ||
+    !payment ||
     isNeedBank() ||
     !item.length ||
     disabledByType();
@@ -219,6 +222,7 @@ const BuatPengajuan: React.FC = () => {
       file: fileInfo,
       approved_by: admin?.iduser,
       parentId: '',
+      payment_type: payment,
     };
 
     const { state, data, error } = await useFetch({
@@ -353,6 +357,10 @@ const BuatPengajuan: React.FC = () => {
                   ) : null}
                 </div>
 
+                <div className="w-full my-4.5">
+                  <PaymentGroup value={(val) => setPayment(val)} />
+                </div>
+
                 <div className="mb-4.5">
                   <div>
                     <label className="mb-3 block text-black dark:text-white">
@@ -386,7 +394,7 @@ const BuatPengajuan: React.FC = () => {
 
         <div className="flex flex-col gap-9">
           {/* <!-- Sign In Form --> */}
-          {jenis !== 'PC' ? (
+          {jenis !== 'PC' && payment && payment == 'TRANSFER' ? (
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
                 <h3 className="font-medium text-black dark:text-white">
