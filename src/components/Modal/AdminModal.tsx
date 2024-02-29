@@ -9,11 +9,13 @@ const AdminModal = ({
   visible,
   toggle,
   dismissOnBackdrop,
+  requesterId,
   value,
 }: {
   visible: boolean;
   toggle: any;
   dismissOnBackdrop?: boolean;
+  requesterId?: string;
   value?: any;
 }) => {
   if (!visible) return null;
@@ -29,8 +31,10 @@ const AdminModal = ({
   }, [visible]);
 
   async function getList() {
+    console.log(requesterId);
+
     const { state, data, error } = await useFetch({
-      url: SUPERUSER + '?limit=100',
+      url: SUPERUSER + `?limit=100&exceptId=${requesterId}`,
       method: 'GET',
     });
 

@@ -391,7 +391,7 @@ const AdminDetailPengajuan: React.FC = () => {
                   <div className="w-full mb-4.5">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Teruskan Approval Admin ( Opsional )
+                        Forward ( Opsional )
                       </label>
                       <div
                         onClick={() => setShowAdmin(!showAdmin)}
@@ -968,6 +968,7 @@ const AdminDetailPengajuan: React.FC = () => {
       />
       <AdminModal
         visible={showAdmin}
+        requesterId={data?.requester_id}
         toggle={() => setShowAdmin(!showAdmin)}
         value={(val: any) => setAdmin(val)}
       />
