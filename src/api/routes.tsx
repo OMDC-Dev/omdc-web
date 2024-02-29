@@ -43,7 +43,7 @@ export const FINANCE_PENGAJUAN = 'finance/pengajuan';
 export const FINANCE_ACCEPTANCE = (id: number) => {
   return `finance/acceptance/${id}?status=DONE`;
 };
-export const FINANCE_UPDATE_COA = (id) => {
+export const FINANCE_UPDATE_COA = (id: any) => {
   return `finance/update-coa/${id}`;
 };
 

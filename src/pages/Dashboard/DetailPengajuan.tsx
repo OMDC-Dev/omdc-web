@@ -148,6 +148,10 @@ const DetailPengajuan: React.FC = () => {
     }
   }
 
+  console.log('REALISASI', data?.realisasi);
+  console.log('CA', data?.pengajuan_ca);
+  console.log('NOMINAL', data?.nominal);
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -512,7 +516,7 @@ const DetailPengajuan: React.FC = () => {
                   <input
                     disabled
                     type="text"
-                    defaultValue={data?.nominal}
+                    value={data?.nominal}
                     placeholder="Enter your full name"
                     className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                   />
@@ -526,7 +530,7 @@ const DetailPengajuan: React.FC = () => {
                       <input
                         disabled
                         type="text"
-                        defaultValue={data?.realisasi}
+                        value={data?.realisasi}
                         placeholder="Enter your full name"
                         className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
@@ -538,10 +542,7 @@ const DetailPengajuan: React.FC = () => {
                       <input
                         disabled
                         type="text"
-                        defaultValue={calculateSaldo(
-                          data?.nominal,
-                          data?.realisasi,
-                        )}
+                        value={calculateSaldo(data?.nominal, data?.realisasi)}
                         placeholder="Enter your full name"
                         className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
@@ -557,7 +558,7 @@ const DetailPengajuan: React.FC = () => {
                       <input
                         disabled
                         type="text"
-                        defaultValue={data?.pengajuan_ca}
+                        value={data?.pengajuan_ca}
                         placeholder="Enter your full name"
                         className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
@@ -569,7 +570,7 @@ const DetailPengajuan: React.FC = () => {
                       <input
                         disabled
                         type="text"
-                        defaultValue={calculateSaldo(
+                        value={calculateSaldo(
                           data?.pengajuan_ca,
                           data?.nominal,
                         )}
