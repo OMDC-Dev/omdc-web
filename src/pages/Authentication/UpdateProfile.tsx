@@ -61,7 +61,7 @@ const UpdateProfile: React.FC = () => {
 
   return (
     <>
-      <div className=" xl:grid xl:place-items-center h-full sm:h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className=" xl:grid xl:place-items-center h-full sm:h-[100dvh] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div>
           <div className=" grid min-h-screen w-full place-items-center">
             <div>

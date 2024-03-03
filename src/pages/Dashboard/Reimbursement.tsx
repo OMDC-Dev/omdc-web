@@ -17,6 +17,8 @@ import { REIMBURSEMENT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import 'moment/locale/id'; // without this line it didn't work
+moment.locale('id');
 import { cekAkses } from '../../common/utils';
 import { exportToExcell } from '../../common/exportToExcell';
 

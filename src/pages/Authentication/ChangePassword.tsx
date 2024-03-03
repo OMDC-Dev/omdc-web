@@ -96,7 +96,7 @@ const ChangePassword: React.FC = () => {
   }
 
   return (
-    <div className=" bg-boxdark h-screen flex flex-col justify-center">
+    <div className=" bg-boxdark h-[100dvh] flex flex-col justify-center">
       <div className=" xl:grid xl:place-items-center  rounded-sm bg-boxdark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className=" grid min-h-screen w-full place-items-center">

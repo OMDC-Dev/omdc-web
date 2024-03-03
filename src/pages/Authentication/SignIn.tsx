@@ -71,7 +71,7 @@ const SignIn: React.FC = () => {
   }
 
   return (
-    <div className=" bg-boxdark h-screen flex flex-col justify-center">
+    <div className=" bg-boxdark h-[100dvh] flex flex-col justify-center">
       <div className=" xl:grid xl:place-items-center  rounded-sm bg-boxdark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">

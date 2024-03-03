@@ -95,7 +95,7 @@ const BuatReport: React.FC = () => {
   };
 
   const disabledByBank = () => {
-    if (needBank) {
+    if (payment == 'TRANSFER') {
       return !bankDetail;
     }
   };
@@ -111,6 +111,7 @@ const BuatReport: React.FC = () => {
     !selectDate ||
     !admin ||
     !item.length ||
+    !payment ||
     disabledByBank() ||
     disabledByType();
 
@@ -249,7 +250,6 @@ const BuatReport: React.FC = () => {
     if (state) {
       setCabang(state?.kode_cabang.split('-')[0].trim());
       setCoa(state?.coa);
-      setPayment(state?.payment_type);
     }
   }, [state]);
 
@@ -393,80 +393,78 @@ const BuatReport: React.FC = () => {
 
         <div className="flex flex-col gap-9">
           {/* <!-- Sign In Form --> */}
-          {needBank ? (
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Data Pembayaran
-                </h3>
-              </div>
-              <form action="#">
-                <div className="p-6.5">
-                  <div className="w-full mb-4.5">
-                    <PaymentGroup value={(val) => setPayment(val)} />
-                  </div>
-                  {payment && payment == 'TRANSFER' ? (
-                    <>
-                      <div className="mb-4.5">
-                        <div>
-                          <label className="mb-3 block text-black dark:text-white">
-                            Bank
-                          </label>
-                          <div
-                            onClick={() =>
-                              bankDetail?.accountname?.length
-                                ? null
-                                : setShowBank(!showBank)
-                            }
-                            className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                          >
-                            {selectedBank?.namaBank || 'Pilih Bank'}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="w-full mb-4.5">
-                        <label className="mb-2.5 block text-black dark:text-white">
-                          Nomor Rekening
-                        </label>
-                        <div className=" flex gap-x-4">
-                          <input
-                            type="text"
-                            disabled={bankDetail?.accountname?.length}
-                            placeholder="Masukan Nomor Rekening"
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                            value={bankRek}
-                            onChange={(e) => setBankRek(e.target.value)}
-                          />
-                          <Button
-                            disabled={bankDetail?.accountname?.length}
-                            onClick={onCekRek}
-                          >
-                            Cek Nomor
-                          </Button>
-                        </div>
-                      </div>
-
-                      {bankDetail?.accountname ? (
-                        <div className="w-full">
-                          <label className="mb-2.5 block text-black dark:text-white">
-                            Nama Pemilik Rekening
-                          </label>
-                          <input
-                            type="text"
-                            disabled
-                            placeholder="Nama Pemilik Rekening"
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                            value={bankDetail?.accountname}
-                          />
-                        </div>
-                      ) : null}
-                    </>
-                  ) : null}
-                </div>
-              </form>
+          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+              <h3 className="font-medium text-black dark:text-white">
+                Data Pembayaran
+              </h3>
             </div>
-          ) : null}
+            <form action="#">
+              <div className="p-6.5">
+                <div className="w-full mb-4.5">
+                  <PaymentGroup value={(val) => setPayment(val)} />
+                </div>
+                {payment && payment == 'TRANSFER' ? (
+                  <>
+                    <div className="mb-4.5">
+                      <div>
+                        <label className="mb-3 block text-black dark:text-white">
+                          Bank
+                        </label>
+                        <div
+                          onClick={() =>
+                            bankDetail?.accountname?.length
+                              ? null
+                              : setShowBank(!showBank)
+                          }
+                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        >
+                          {selectedBank?.namaBank || 'Pilih Bank'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full mb-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Nomor Rekening
+                      </label>
+                      <div className=" flex gap-x-4">
+                        <input
+                          type="text"
+                          disabled={bankDetail?.accountname?.length}
+                          placeholder="Masukan Nomor Rekening"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={bankRek}
+                          onChange={(e) => setBankRek(e.target.value)}
+                        />
+                        <Button
+                          disabled={bankDetail?.accountname?.length}
+                          onClick={onCekRek}
+                        >
+                          Cek Nomor
+                        </Button>
+                      </div>
+                    </div>
+
+                    {bankDetail?.accountname ? (
+                      <div className="w-full">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          Nama Pemilik Rekening
+                        </label>
+                        <input
+                          type="text"
+                          disabled
+                          placeholder="Nama Pemilik Rekening"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={bankDetail?.accountname}
+                        />
+                      </div>
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
+            </form>
+          </div>
 
           {/* <!-- Sign Up Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">

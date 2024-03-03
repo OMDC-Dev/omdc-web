@@ -78,6 +78,7 @@ function RiwayatDiajukan() {
     if (state == API_STATES.OK) {
       setRList(data?.rows);
       setPageInfo(data?.pageInfo);
+      console.log(data?.pageInfo);
     } else {
       setRList([]);
       console.log(error);
