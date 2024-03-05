@@ -86,7 +86,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink className={' flex items-center gap-x-4'} to="/">
           <img className=" h-10 w-10" src={Logo} alt="Logo" />
-          <span className=" text-title-sm font-bold">OMDC V.0.7.7</span>
+          <span className=" text-title-sm font-bold">OMDC V.0.7.8</span>
         </NavLink>
 
         <button

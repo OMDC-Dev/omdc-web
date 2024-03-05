@@ -43,6 +43,7 @@ const TABLE_HEAD_FINANCE = [
   'Nominal',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
+  'Keterangan Status',
   'Status',
   'Status Finance',
   '',
@@ -85,13 +86,19 @@ function RiwayatDiajukan() {
     }
   }
 
-  function statusChip(status: string) {
+  function statusChip(status: string, finance: string) {
     switch (status) {
       case 'WAITING':
         return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
         break;
       case 'APPROVED':
-        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
+        return (
+          <Chip
+            variant={'outlined'}
+            color="green"
+            value={finance == 'DONE' ? 'Selesai' : 'Disetujui'}
+          />
+        );
         break;
       case 'REJECTED':
         return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
@@ -102,6 +109,26 @@ function RiwayatDiajukan() {
       default:
         return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
         break;
+    }
+  }
+
+  function keteranganStatus(item: any) {
+    if (
+      item.jenis_reimbursement !== 'Cash Advance' ||
+      item.status_finance !== 'DONE' ||
+      item.status !== 'APPROVED'
+    ) {
+      return '-';
+    }
+
+    if (
+      item.realisasi?.length > 1 &&
+      item.childId &&
+      item.status_finance_child == 'DONE'
+    ) {
+      return 'Sudah Dikembalikan';
+    } else {
+      return item.childId ? 'Belum dikembalikan' : 'Perlu laporan realisasi';
     }
   }
 
@@ -215,18 +242,26 @@ function RiwayatDiajukan() {
                             {moment(item?.createdAt).format('lll') || '-'}
                           </Typography>
                         </td>
+                        {ADMIN_TYPE == 'FINANCE' ? (
+                          <td className={classes}>
+                            {/* <Typography variant="small" className="font-normal">
+                              {item?.status_finance}
+                            </Typography> */}
+                            {keteranganStatus(item)}
+                          </td>
+                        ) : null}
                         <td className={classes}>
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
-                          {statusChip(item?.status)}
+                          {statusChip(item?.status, item?.status_finance)}
                         </td>
                         {ADMIN_TYPE == 'FINANCE' ? (
                           <td className={classes}>
                             {/* <Typography variant="small" className="font-normal">
                               {item?.status_finance}
                             </Typography> */}
-                            {statusChip(item?.status_finance)}
+                            {statusChip(item?.status_finance, '')}
                           </td>
                         ) : null}
                         <td className={classes}>

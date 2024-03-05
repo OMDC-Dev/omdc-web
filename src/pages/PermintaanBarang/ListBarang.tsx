@@ -20,8 +20,6 @@ import {
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
-import formatRupiah from '../../common/formatRupiah';
 import Button from '../../components/Button';
 import BarangModal from '../../components/Modal/BarangModal';
 import CabangModal from '../../components/Modal/CabangModal';
@@ -36,7 +34,6 @@ const TABLE_HEAD = [
   'Grup Barang',
   'Kategori Barang',
   'Nama Satuan',
-  'Harga Barang',
   'Nama Perusahaan',
   'Tanggal Dibuat',
   '',
@@ -342,11 +339,6 @@ function ListBarang() {
                           <td className={classes}>
                             <Typography variant="small" className="font-normal">
                               {item?.nm_kemasan}
-                            </Typography>
-                          </td>
-                          <td className={classes}>
-                            <Typography variant="small" className="font-normal">
-                              {formatRupiah(item?.hrga_satuan, true)}
                             </Typography>
                           </td>
                           <td className={classes}>

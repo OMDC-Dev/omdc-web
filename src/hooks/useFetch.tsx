@@ -9,7 +9,7 @@ type TApiResponse = {
 };
 
 async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
-  const userToken = localStorage.getItem('token');
+  const userToken = await localStorage.getItem('token');
 
   let headers: any = {};
 
