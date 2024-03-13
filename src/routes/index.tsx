@@ -24,6 +24,7 @@ import SuperAdmin from '../pages/SuperAdmin/SuperAdmin';
 import Departemen from '../pages/SuperAdmin/Departemen';
 import { cekAkses } from '../common/utils';
 import UpdateProfile from '../pages/Authentication/UpdateProfile';
+import AboutUs from '../pages/Other/AboutUs';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -146,6 +147,15 @@ const Routes = () => {
         <>
           <PageTitle title={TITLE + 'Login'} />
           <SignInProfile />
+        </>
+      ),
+    },
+    {
+      path: '/about',
+      element: (
+        <>
+          <PageTitle title={TITLE + 'About Us'} />
+          <AboutUs />
         </>
       ),
     },
