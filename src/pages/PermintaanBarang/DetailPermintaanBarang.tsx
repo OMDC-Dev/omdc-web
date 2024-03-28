@@ -198,10 +198,10 @@ const DetailPermintaanBarang: React.FC = () => {
                       <ListItem
                         key={item + index}
                         ripple={false}
-                        className="py-2 pr-1 pl-4 bg-form-input hover:bg-black"
+                        className="py-2 pr-1 pl-4 "
                       >
                         <div className=" flex flex-col">
-                          <span className=" text-base font-bold text-white mb-2">
+                          <span className=" text-base font-bold text-black mb-2">
                             {item?.nm_barang}
                           </span>
                           <span className=" text-xs text-blue-gray-300">
