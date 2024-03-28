@@ -84,11 +84,11 @@ function PermintaanBarang() {
 
   return (
     <DefaultLayout>
-      <Card className="h-full w-full bg-boxdark">
+      <Card className="h-full w-full">
         <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="flex-col flex sm:flex-row sm:items-center justify-between gap-8 bg-boxdark">
+          <div className="flex-col flex sm:flex-row sm:items-center justify-between gap-8">
             <div>
-              <Typography variant="h5" color="white">
+              <Typography variant="h5" color="black">
                 Riwayat Permintaan Barang
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
@@ -109,7 +109,7 @@ function PermintaanBarang() {
         </CardHeader>
         {!list?.length ? (
           <CardBody>
-            <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm">
+            <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm">
               Belum ada pengajuan
             </div>
           </CardBody>
@@ -122,11 +122,12 @@ function PermintaanBarang() {
                     {TABLE_HEAD.map((head) => (
                       <th
                         key={head}
-                        className="border-y border-blue-gray-800 bg-strokedark p-4"
+                        className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                       >
                         <Typography
                           variant="small"
-                          className="font-normal leading-none opacity-70 text-whiten"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
                         >
                           {head}
                         </Typography>
@@ -139,7 +140,7 @@ function PermintaanBarang() {
                     const isLast = index === list?.length - 1;
                     const classes = isLast
                       ? 'p-4'
-                      : 'p-4 border-b border-blue-gray-800';
+                      : 'p-4 border-b border-blue-gray-50';
 
                     return (
                       <tr key={item?.id}>
@@ -231,7 +232,7 @@ function PermintaanBarang() {
               </table>
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-              <Typography variant="small" color="white" className="font-normal">
+              <Typography variant="small" color="black" className="font-normal">
                 Halaman {page} dari {pageInfo?.pageCount}
               </Typography>
               <div className="flex gap-2">
@@ -239,6 +240,7 @@ function PermintaanBarang() {
                   disabled={page < 2 || loading}
                   variant="outlined"
                   size="sm"
+                  color="blue"
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(page - 1);
@@ -250,6 +252,7 @@ function PermintaanBarang() {
                   disabled={page == pageInfo.pageCount || loading}
                   variant="outlined"
                   size="sm"
+                  color="blue"
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(page + 1);

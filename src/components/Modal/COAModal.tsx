@@ -79,7 +79,7 @@ const COAModal = ({
           {onFilteredBank(search).map((item: any, index: number) => {
             return (
               <div onClick={() => onSaveButtonPress(item)}>
-                <ListItem className=" text-white">{item.accountname}</ListItem>
+                <ListItem className=" text-black">{item.accountname}</ListItem>
               </div>
             );
           })}

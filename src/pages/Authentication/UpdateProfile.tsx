@@ -67,18 +67,14 @@ const UpdateProfile: React.FC = () => {
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img
-                    className="hidden dark:block h-20 w-20"
-                    src={Logo}
-                    alt="Logo"
-                  />
+                  <img className="block h-20 w-20" src={Logo} alt="Logo" />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
                   Ubah Profile
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-white p-6 shadow-lg">
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">

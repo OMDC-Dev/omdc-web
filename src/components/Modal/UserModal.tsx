@@ -74,7 +74,7 @@ const UserModal = ({
             users.map((item: any) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem className=" text-white">{item?.nm_user}</ListItem>
+                  <ListItem className=" text-black">{item?.nm_user}</ListItem>
                 </div>
               );
             })

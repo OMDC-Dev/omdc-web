@@ -65,24 +65,20 @@ const SignInProfile: React.FC = () => {
 
   return (
     <>
-      <div className=" xl:grid xl:place-items-center h-full sm:h-[100dvh] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className=" xl:grid xl:place-items-center h-full sm:h-[100dvh] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedar">
         <div>
           <div className=" grid min-h-screen w-full place-items-center">
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img
-                    className="hidden dark:block h-20 w-20"
-                    src={Logo}
-                    alt="Logo"
-                  />
+                  <img className="block h-20 w-20" src={Logo} alt="Logo" />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
                   Lengkapi Profile
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-white p-6 shadow-lg">
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">

@@ -84,7 +84,7 @@ const AdminModal = ({
             onFilteredBank(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem className=" text-white">{item?.nm_user}</ListItem>
+                  <ListItem className=" text-black">{item?.nm_user}</ListItem>
                 </div>
               );
             })}

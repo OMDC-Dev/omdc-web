@@ -78,7 +78,7 @@ const SuplierModal = ({
             onFilteredBank(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem className=" text-white">{item?.nmsp}</ListItem>
+                  <ListItem className=" text-black">{item?.nmsp}</ListItem>
                 </div>
               );
             })}

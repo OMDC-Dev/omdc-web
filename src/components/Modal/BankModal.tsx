@@ -83,7 +83,7 @@ const BankModal = ({
             onFilteredBank(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem className=" text-white">{item?.namaBank}</ListItem>
+                  <ListItem className=" text-black">{item?.namaBank}</ListItem>
                 </div>
               );
             })}

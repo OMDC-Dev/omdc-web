@@ -210,11 +210,11 @@ function ListBarang() {
           </div>
         </div>
 
-        <Card className="h-full w-full bg-boxdark">
+        <Card className="h-full w-full">
           <CardHeader floated={false} shadow={false} className="rounded-none">
-            <div className="flex items-center justify-between gap-8 bg-boxdark">
+            <div className="flex items-center justify-between gap-8">
               <div>
-                <Typography variant="h5" color="white">
+                <Typography variant="h5" color="black">
                   Daftar Barang
                 </Typography>
                 <Typography color="gray" className="mt-1 font-normal">
@@ -222,7 +222,7 @@ function ListBarang() {
                 </Typography>
               </div>
             </div>
-            <div className="w-full bg-boxdark">
+            <div className="w-full ">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -238,7 +238,7 @@ function ListBarang() {
                 />
               </form>
             </div>
-            <div className="w-full bg-boxdark flex-col flex sm:flex-row sm:items-center pt-4 gap-4">
+            <div className="w-full  flex-col flex sm:flex-row sm:items-center pt-4 gap-4">
               <div
                 onClick={(e: any) => {
                   e.preventDefault();
@@ -263,7 +263,7 @@ function ListBarang() {
           </CardHeader>
           {!list.length ? (
             <CardBody>
-              <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm text-center">
+              <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm text-center">
                 {keyword
                   ? 'Tidak ditemukan barang yang sesuai, mohon periksa kembali!'
                   : 'Mulai cari untuk memunculkan list barang'}
@@ -278,11 +278,12 @@ function ListBarang() {
                       {TABLE_HEAD.map((head) => (
                         <th
                           key={head}
-                          className="border-y border-blue-gray-800 bg-strokedark p-4"
+                          className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                         >
                           <Typography
                             variant="small"
-                            className="font-normal leading-none opacity-70 text-whiten"
+                            color="blue-gray"
+                            className="font-normal leading-none opacity-70"
                           >
                             {head}
                           </Typography>
@@ -295,7 +296,7 @@ function ListBarang() {
                       const isLast = index === list.length - 1;
                       const classes = isLast
                         ? 'p-4'
-                        : 'p-4 border-b border-blue-gray-800';
+                        : 'p-4 border-b border-blue-gray-50';
 
                       return (
                         <tr key={item?.kd_brg}>
@@ -374,7 +375,7 @@ function ListBarang() {
               <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
                 <Typography
                   variant="small"
-                  color="white"
+                  color="black"
                   className="font-normal"
                 >
                   Halaman {page} dari {pageInfo?.pageCount}
@@ -384,6 +385,7 @@ function ListBarang() {
                     disabled={page < 2 || loading}
                     variant="outlined"
                     size="sm"
+                    color="blue"
                     onClick={(e) => {
                       e.preventDefault();
                       setPage(page - 1);
@@ -395,6 +397,7 @@ function ListBarang() {
                     disabled={page == pageInfo?.pageCount || loading}
                     variant="outlined"
                     size="sm"
+                    color="blue"
                     onClick={(e) => {
                       e.preventDefault();
                       setPage(page + 1);

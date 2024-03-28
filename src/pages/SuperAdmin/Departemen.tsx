@@ -128,11 +128,11 @@ function Departemen() {
         </div>
       </div>
 
-      <Card className="h-full w-full bg-boxdark">
+      <Card className="h-full w-full ">
         <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="flex items-center justify-between gap-8 bg-boxdark">
+          <div className="flex items-center justify-between gap-8 ">
             <div>
-              <Typography variant="h5" color="white">
+              <Typography variant="h5" color="black">
                 Akun Admin dan Finance
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
@@ -156,11 +156,12 @@ function Departemen() {
                     {TABLE_HEAD.map((head) => (
                       <th
                         key={head}
-                        className="border-y border-blue-gray-800 bg-strokedark p-4"
+                        className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                       >
                         <Typography
                           variant="small"
-                          className="font-normal leading-none opacity-70 text-whiten"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
                         >
                           {head}
                         </Typography>
@@ -173,7 +174,7 @@ function Departemen() {
                     const isLast = index === list?.length - 1;
                     const classes = isLast
                       ? 'p-4'
-                      : 'p-4 border-b border-blue-gray-800';
+                      : 'p-4 border-b border-blue-gray-50';
 
                     return (
                       <tr key={item?.id}>

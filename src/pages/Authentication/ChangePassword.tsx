@@ -96,25 +96,21 @@ const ChangePassword: React.FC = () => {
   }
 
   return (
-    <div className=" bg-boxdark h-[100dvh] flex flex-col justify-center">
-      <div className=" xl:grid xl:place-items-center  rounded-sm bg-boxdark dark:bg-boxdark">
+    <div className=" bg-white h-[100dvh] flex flex-col justify-center">
+      <div className=" xl:grid xl:place-items-center  rounded-sm bg-white">
         <div className="flex flex-wrap items-center">
           <div className=" grid min-h-screen w-full place-items-center">
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img
-                    className="hidden dark:block h-20 w-20"
-                    src={Logo}
-                    alt="Logo"
-                  />
+                  <img className="block h-20 w-20" src={Logo} alt="Logo" />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
                   Ubah Password
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-white p-6 shadow-lg">
                 <form>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">

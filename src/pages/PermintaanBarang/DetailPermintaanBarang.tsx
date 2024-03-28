@@ -165,7 +165,7 @@ const DetailPermintaanBarang: React.FC = () => {
                 <label className="mb-3 block text-black dark:text-white">
                   Tanggal Persetujuan
                 </label>
-                <span className=" text-white font-bold">
+                <span className=" text-black font-bold">
                   {data?.tgl_approve || '-'}
                 </span>
               </div>

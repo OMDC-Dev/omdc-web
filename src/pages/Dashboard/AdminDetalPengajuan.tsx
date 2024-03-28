@@ -332,7 +332,7 @@ const AdminDetailPengajuan: React.FC = () => {
                     {status?.accepted_by?.map((item: any, index: number) => {
                       return (
                         <div className=" py-4 flex justify-between">
-                          <span className=" text-white font-bold">
+                          <span className=" text-black font-bold">
                             {item.nm_user}
                           </span>
                           <Chip
@@ -345,7 +345,7 @@ const AdminDetailPengajuan: React.FC = () => {
                     })}
                     {status?.status_finance !== 'IDLE' ? (
                       <div className=" py-4 flex justify-between">
-                        <span className=" text-white font-bold">Finance</span>
+                        <span className=" text-black font-bold">Finance</span>
                         <Chip
                           variant={'ghost'}
                           color={
@@ -657,7 +657,7 @@ const AdminDetailPengajuan: React.FC = () => {
                       {status?.accepted_by?.map((item: any, index: number) => {
                         return (
                           <div className=" py-4 flex justify-between">
-                            <span className=" text-white font-bold">
+                            <span className=" text-black font-bold">
                               {item.nm_user}
                             </span>
                             <Chip
@@ -670,7 +670,7 @@ const AdminDetailPengajuan: React.FC = () => {
                       })}
                       {status?.status_finance !== 'IDLE' ? (
                         <div className=" py-4 flex justify-between">
-                          <span className=" text-white font-bold">Finance</span>
+                          <span className=" text-black font-bold">Finance</span>
                           <Chip
                             variant={'ghost'}
                             color={
