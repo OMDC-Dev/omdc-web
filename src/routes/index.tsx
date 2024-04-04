@@ -25,6 +25,8 @@ import Departemen from '../pages/SuperAdmin/Departemen';
 import { cekAkses } from '../common/utils';
 import UpdateProfile from '../pages/Authentication/UpdateProfile';
 import AboutUs from '../pages/Other/AboutUs';
+import SuperReimbursement from '../pages/SuperAdmin/Reimbursement';
+import DetailReimbursement from '../pages/SuperAdmin/DetailReimbursement';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -273,6 +275,24 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'SuperAdmin'} />
               <SuperAdmin />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <SuperReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Detail Pengajuan'} />
+              <DetailReimbursement />
             </>
           ),
         },

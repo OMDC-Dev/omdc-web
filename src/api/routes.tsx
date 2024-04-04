@@ -35,6 +35,7 @@ export const GET_BANK_NAME = (code: string, number: string) => {
 
 // SUPERUSER
 export const SUPERUSER = 'superuser';
+export const SUPERUSER_REIMBURSEMENT = 'superuser/reimbursement';
 export const PENGAJUAN = 'superuser/pengajuan';
 export const SUPERUSER_GET_USER = 'superuser/userlist';
 export const DELETE_SUPERUSER = (id: string) => {
