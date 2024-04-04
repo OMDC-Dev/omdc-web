@@ -5,6 +5,7 @@ import { Dialog, List, ListItem } from '@material-tailwind/react';
 import useFetch from '../../hooks/useFetch';
 import { GET_BANK } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
+import BANKS from '../../common/files/bank.json';
 
 const BankModal = ({
   visible,
@@ -30,16 +31,17 @@ const BankModal = ({
   }, [visible]);
 
   async function getBankList() {
-    const { state, data, error } = await useFetch({
-      url: GET_BANK,
-      method: 'GET',
-    });
+    // const { state, data, error } = await useFetch({
+    //   url: GET_BANK,
+    //   method: 'GET',
+    // });
 
-    if (state == API_STATES.OK) {
-      setBanks(data);
-    } else {
-      setBanks([]);
-    }
+    // if (state == API_STATES.OK) {
+    //   setBanks(data);
+    // } else {
+    //   setBanks([]);
+    // }
+    setBanks(BANKS);
   }
 
   // React.useEffect(() => {

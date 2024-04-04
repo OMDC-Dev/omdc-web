@@ -28,6 +28,7 @@ import { useNavigate } from 'react-router-dom';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import SuplierModal from '../../components/Modal/SuplierModal';
 import PaymentGroup from '../../components/SelectGroup/PaymentGroup';
+import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
 
 function TrashIcon() {
   return (
@@ -68,6 +69,7 @@ const BuatPengajuan: React.FC = () => {
   const [admin, setAdmin] = React.useState<any>();
   const [suplier, setSuplier] = React.useState<any>();
   const [payment, setPayment] = React.useState<any>();
+  const [tipePembayaran, setTipePembayaran] = React.useState<any>();
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -113,6 +115,7 @@ const BuatPengajuan: React.FC = () => {
     !payment ||
     isNeedBank() ||
     !item.length ||
+    !tipePembayaran ||
     disabledByType();
 
   // handle attachment
@@ -223,6 +226,7 @@ const BuatPengajuan: React.FC = () => {
       approved_by: admin?.iduser,
       parentId: '',
       payment_type: payment,
+      tipePembayaran: tipePembayaran,
     };
 
     const { state, data, error } = await useFetch({
@@ -271,6 +275,12 @@ const BuatPengajuan: React.FC = () => {
                 <div className="mb-4.5 flex flex-col gap-6">
                   <div className="w-full">
                     <JenisGroup value={(val) => setJenis(val)} />
+                  </div>
+
+                  <div className="w-full">
+                    <TipePembayaranGroup
+                      value={(val) => setTipePembayaran(val)}
+                    />
                   </div>
 
                   <div className="w-full">

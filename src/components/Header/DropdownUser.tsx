@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserIcon, VariableIcon } from '@heroicons/react/24/outline';
 
 import { useAuth } from '../../hooks/useAuth';
+import useFetch from '../../hooks/useFetch';
+import { LOGOUT } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -42,9 +45,17 @@ const DropdownUser = () => {
   });
 
   // on logout
-  function onLogout() {
-    setToken();
-    navigate('/', { replace: true });
+  async function onLogout() {
+    const { state, data, error } = await useFetch({
+      url: LOGOUT,
+      method: 'POST',
+    });
+    if (state == API_STATES.OK) {
+      setToken();
+      navigate('/', { replace: true });
+    } else {
+      alert('Ada sesuatu yang tidak beres, mohon coba lagi!');
+    }
   }
 
   return (

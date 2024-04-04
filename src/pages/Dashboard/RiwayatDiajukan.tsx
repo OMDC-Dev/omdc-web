@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DocumentTextIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardHeader,
@@ -21,6 +21,8 @@ import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'Pengajuan',
+  'No. Dok',
+  'Tipe Pembayaran',
   'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
@@ -35,6 +37,8 @@ const TABLE_HEAD = [
 
 const TABLE_HEAD_FINANCE = [
   'Pengajuan',
+  'No. Dok',
+  'Tipe Pembayaran',
   'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
@@ -55,6 +59,7 @@ function RiwayatDiajukan() {
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
 
   const { user } = useAuth();
 
@@ -70,9 +75,9 @@ function RiwayatDiajukan() {
     getReimbursementList();
   }, [page]);
 
-  async function getReimbursementList() {
+  async function getReimbursementList(clear?: boolean) {
     const { state, data, error } = await useFetch({
-      url: URL + `?limit=${limit}&page=${page}`,
+      url: URL + `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
       method: 'GET',
     });
 
@@ -146,7 +151,38 @@ function RiwayatDiajukan() {
               </Typography>
             </div>
           </div>
+          <div className="relative w-full">
+            <form
+              className="w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                getReimbursementList();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Cari No. dokumen, coa, kode cabang..."
+                className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && ( // Tampilkan tombol X jika nilai input tidak kosong
+                <button
+                  type="button"
+                  className="absolute h-11 inset-y-0 top-4 right-0 px-3 flex items-center "
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSearch('');
+                    getReimbursementList(true);
+                  }}
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              )}
+            </form>
+          </div>
         </CardHeader>
+
         {!rList?.length ? (
           <CardBody>
             <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm">
@@ -192,6 +228,30 @@ function RiwayatDiajukan() {
                                 className="font-normal"
                               >
                                 {item?.jenis_reimbursement}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.no_doc}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.tipePembayaran}
                               </Typography>
                             </div>
                           </div>

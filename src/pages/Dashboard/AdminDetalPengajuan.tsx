@@ -33,6 +33,7 @@ import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import COAModal from '../../components/Modal/COAModal';
+import BankModal from '../../components/Modal/BankModal';
 
 const AdminDetailPengajuan: React.FC = () => {
   const {
@@ -73,6 +74,10 @@ const AdminDetailPengajuan: React.FC = () => {
   // COA
   const [coa, setCoa] = React.useState<string>();
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
+
+  // Bank Modal State
+  const [showBank, setShowBank] = React.useState<boolean>(false);
+  const [selectedBank, setSelectedBank] = React.useState<any>();
 
   // CONST
   const RID = data?.id;
@@ -147,6 +152,7 @@ const AdminDetailPengajuan: React.FC = () => {
       nominal: fnominal,
       note: note,
       coa: coa,
+      bank: selectedBank?.namaBank,
     };
 
     const { state, data, error } = await useFetch({
@@ -438,6 +444,27 @@ const AdminDetailPengajuan: React.FC = () => {
                     ></textarea>
                   )}
                 </div>
+                {data?.payment_type == 'TRANSFER' ? (
+                  <div className="mb-full mt-2 mb-12">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Bank Pengirim ( Finance )
+                      </label>
+                      <div
+                        onClick={() =>
+                          data?.status_finance == 'WAITING'
+                            ? setShowBank(!showBank)
+                            : null
+                        }
+                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                      >
+                        {data?.finance_bank ||
+                          selectedBank?.namaBank ||
+                          'Pilih Bank'}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 
                 {data?.jenis_reimbursement == 'Cash Advance' &&
                 data?.status_finance == 'DONE' &&
@@ -463,6 +490,10 @@ const AdminDetailPengajuan: React.FC = () => {
                 status?.status_finance == 'WAITING' ? (
                   <div className=" mt-4.5">
                     <Button
+                      disabled={
+                        data?.payment_type == 'TRANSFER' &&
+                        !selectedBank?.namaBank
+                      }
                       onClick={(e: any) => {
                         e.preventDefault();
                         changeType('CONFIRM');
@@ -533,6 +564,15 @@ const AdminDetailPengajuan: React.FC = () => {
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.jenis_reimbursement}
+                    </div>
+                  </div>
+
+                  <div className="w-full">
+                    <label className="mb-3 block text-black dark:text-white">
+                      Tipe Pembayaran
+                    </label>
+                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                      {data?.tipePembayaran}
                     </div>
                   </div>
 
@@ -764,6 +804,28 @@ const AdminDetailPengajuan: React.FC = () => {
                     )}
                   </div>
 
+                  {data?.payment_type == 'TRANSFER' ? (
+                    <div className="mb-full mt-2 mb-12">
+                      <div>
+                        <label className="mb-3 block text-black dark:text-white">
+                          Bank Pengirim ( Finance )
+                        </label>
+                        <div
+                          onClick={() =>
+                            data?.status_finance == 'WAITING'
+                              ? setShowBank(!showBank)
+                              : null
+                          }
+                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        >
+                          {data?.finance_bank ||
+                            selectedBank?.namaBank ||
+                            'Pilih Bank'}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
                   {data?.jenis_reimbursement == 'Cash Advance' &&
                   data?.status_finance == 'DONE' &&
                   data?.childId &&
@@ -788,6 +850,10 @@ const AdminDetailPengajuan: React.FC = () => {
                   status?.status_finance == 'WAITING' ? (
                     <div className=" mt-4.5">
                       <Button
+                        disabled={
+                          data?.payment_type == 'TRANSFER' &&
+                          !selectedBank?.namaBank
+                        }
                         onClick={(e: any) => {
                           e.preventDefault();
                           changeType('CONFIRM');
@@ -1041,6 +1107,13 @@ const AdminDetailPengajuan: React.FC = () => {
         visible={showCoa}
         toggle={() => setShowCoa(!showCoa)}
         value={(val: any) => setCoa(val)}
+      />
+      <BankModal
+        visible={showBank}
+        toggle={() => setShowBank(!showBank)}
+        value={(val: any) => {
+          setSelectedBank(val);
+        }}
       />
     </DefaultLayout>
   );

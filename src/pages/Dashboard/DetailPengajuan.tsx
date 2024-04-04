@@ -289,6 +289,15 @@ const DetailPengajuan: React.FC = () => {
 
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
+                      Tipe Pembayaran
+                    </label>
+                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                      {data?.tipePembayaran}
+                    </div>
+                  </div>
+
+                  <div className="w-full">
+                    <label className="mb-3 block text-black dark:text-white">
                       Jenis Reimbursement
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
@@ -627,7 +636,7 @@ const DetailPengajuan: React.FC = () => {
                     />
                   </div>
 
-                  <div className="w-full">
+                  <div className="w-full mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
                       Nama Pemilik Rekening
                     </label>
@@ -639,6 +648,21 @@ const DetailPengajuan: React.FC = () => {
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                     />
                   </div>
+
+                  {data?.finance_bank ? (
+                    <div className="w-full">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Dikirim oleh finance dari
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        defaultValue={data?.finance_bank}
+                        placeholder="Nama Pemilik Rekening"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </form>
             </div>
