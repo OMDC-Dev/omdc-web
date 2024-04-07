@@ -1,60 +1,39 @@
 import React, { useState } from 'react';
-import useFetch from '../../hooks/useFetch';
-import { DEPT } from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
 
-const DeptGroup = ({ value, onChange }: { value: any; onChange: any }) => {
-  const [list, setList] = React.useState<any>([]);
-  // const [selectedOption, setSelectedOption] = useState<string>('');
-  // const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
+const TYPE_DATA = [
+  {
+    label: 'Aktif',
+    value: 'AKTIF',
+  },
+  {
+    label: 'Tidak Aktif',
+    value: 'TIDAK AKTIF',
+  },
+];
 
-  // const changeTextColor = () => {
-  //   setIsOptionSelected(true);
-  // };
-
-  // React.useEffect(() => {
-  //   value(selectedOption);
-  // }, [selectedOption]);
-
-  React.useEffect(() => {
-    getList();
-  }, []);
-
-  async function getList() {
-    const { state, data, error } = await useFetch({
-      url: DEPT + `?limit=100`,
-      method: 'GET',
-    });
-
-    if (state == API_STATES.OK) {
-      setList(data.rows);
-    } else {
-      setList([]);
-    }
-  }
-
+const StatusGroup = ({ value, onChange }: { value: any; onChange?: any }) => {
   return (
     <div>
       <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
-        Departemen
+        Status COA
       </label>
 
       <div className="relative z-20">
         <select
           value={value}
           onChange={onChange}
-          className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input`}
+          className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input `}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
-            Pilih Departemen
+            Pilih status
           </option>
-          {list.map((item: any) => {
+          {TYPE_DATA.map((item, index) => {
             return (
               <option
-                value={item?.label}
+                value={item.value}
                 className="text-body dark:text-bodydark"
               >
-                {item?.label}
+                {item.label}
               </option>
             );
           })}
@@ -83,4 +62,4 @@ const DeptGroup = ({ value, onChange }: { value: any; onChange: any }) => {
   );
 };
 
-export default DeptGroup;
+export default StatusGroup;

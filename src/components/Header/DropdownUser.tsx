@@ -53,8 +53,14 @@ const DropdownUser = () => {
     if (state == API_STATES.OK) {
       setToken();
       navigate('/', { replace: true });
+    } else if (
+      error == 'User Unauthenticated!' ||
+      error == 'User Token Invalid!'
+    ) {
+      setToken();
+      navigate('/', { replace: true });
     } else {
-      alert('Ada sesuatu yang tidak beres, mohon coba lagi!');
+      alert(`Ada sesuatu yang tidak beres, mohon coba lagi.`);
     }
   }
 

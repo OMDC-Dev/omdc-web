@@ -1,33 +1,23 @@
-import React from 'react';
-import DefaultLayout from '../../layout/DefaultLayout';
-import Button from '../../components/Button';
-import useModal from '../../hooks/useModal';
 import {
   Card,
   Chip,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
   List,
   ListItem,
   ListItemSuffix,
 } from '@material-tailwind/react';
-import formatRupiah from '../../common/formatRupiah';
-import Modal from '../../components/Modal/Modal';
-import {
-  redirect,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
-import FileModal from '../../components/Modal/FileModal';
-import { calculateSaldo, downloadPDF } from '../../common/utils';
-import useFetch from '../../hooks/useFetch';
+import React from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { REIMBURSEMENT_DETAIL } from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
+import formatRupiah from '../../common/formatRupiah';
+import { calculateSaldo, downloadPDF } from '../../common/utils';
+import Button from '../../components/Button';
+import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import { API_STATES } from '../../constants/ApiEnum';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const DetailPengajuan: React.FC = () => {
   const { toggle, visible, hide, show, changeType, type } = useModal();

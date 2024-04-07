@@ -9,57 +9,38 @@ import {
   CardFooter,
   IconButton,
   Tooltip,
-  Chip,
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import {
-  DELETE_PENGUMUMAN,
-  DELETE_SUPERUSER,
-  GET_NOTIFICATION,
-  SUPERUSER,
-} from '../../api/routes';
+import { COA, GET_COA } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
 import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import useNotif from '../../store/useNotif';
-import { useAuth } from '../../hooks/useAuth';
-import TypeGroup from '../../components/SelectGroup/TypeGroup';
-import DeptGroup from '../../components/SelectGroup/DeptGroup';
-import { generateRandomNumber } from '../../common/utils';
-import UserModal from '../../components/Modal/UserModal';
+import StatusGroup from '../../components/SelectGroup/StatusGroup';
+import { useNavigate } from 'react-router-dom';
 
-const TABLE_HEAD = [
-  'ID User',
-  'Nama User',
-  'Departemen',
-  'Level User',
-  'Tipe User',
-  '',
-];
+const TABLE_HEAD = ['ID COA', 'Nama COA', 'Deskripsi', 'Status', '', ''];
 
-function SuperAdmin() {
+function SuperCOA() {
   const [list, setList] = React.useState<any>([]);
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  // === Pengumuman
-  const [selectedUser, setSelectedUser] = React.useState<any>();
-  const [typeAcc, setTypeAcc] = React.useState<string>('');
-  const [dept, setDept] = React.useState<string>('');
+  // === COA INPUT
+  const [idCOA, setIdCOA] = React.useState<any>();
+  const [accName, setAccName] = React.useState<any>();
+  const [desc, setDesc] = React.useState<any>();
+  const [statusCOA, setStatusCOA] = React.useState<any>('');
   const [selected, setSelected] = React.useState<any>();
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
   const [context, setContext] = React.useState<string>();
 
-  // === USER MODAL
-  const [showUser, setShowUser] = React.useState<boolean>(false);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     getList();
@@ -68,7 +49,7 @@ function SuperAdmin() {
   async function getList() {
     setLoading(true);
     const { state, data, error } = await useFetch({
-      url: SUPERUSER + `?page=${page}&limit=${limit}&get=1`,
+      url: GET_COA('') + `&page=${page}&limit=${limit}&get=1`,
       method: 'GET',
     });
 
@@ -86,21 +67,19 @@ function SuperAdmin() {
     changeType('LOADING');
 
     const body = {
-      iduser: selectedUser?.iduser,
-      departemen: dept,
-      type: typeAcc,
+      accountname: accName,
+      description: desc,
+      status: statusCOA,
     };
 
     const { state, data, error } = await useFetch({
-      url: SUPERUSER,
+      url: COA + `/${idCOA}`,
       method: 'POST',
       data: body,
     });
 
     if (state == API_STATES.OK) {
       changeType('SUCCESS');
-      setDept('');
-      setTypeAcc('');
     } else {
       changeType('FAILED');
     }
@@ -110,7 +89,7 @@ function SuperAdmin() {
     changeType('LOADING');
 
     const { state, data, error } = await useFetch({
-      url: DELETE_SUPERUSER(selected),
+      url: COA + `/${selected.id_coa}`,
       method: 'DELETE',
     });
 
@@ -121,46 +100,64 @@ function SuperAdmin() {
     }
   }
 
-  console.log(selectedUser, dept, typeAcc);
-
   return (
     <DefaultLayout>
       <div className="rounded-md border mb-6 border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
           <h3 className="font-medium text-black dark:text-white">
-            Tambah Admin atau Finance Baru
+            Tambah COA Baru
           </h3>
         </div>
         <div className=" p-6.5 flex flex-col gap-y-6">
-          <div className=" w-full">
-            <label className="mb-3 block text-black dark:text-white">
-              User
-            </label>
-            <div
-              onClick={() => setShowUser(!showUser)}
-              className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-            >
-              {selectedUser?.nm_user || 'Pilih User'}
-            </div>
-          </div>
-
           <div className="w-full">
-            <TypeGroup
-              value={typeAcc}
-              onChange={(e: any) => setTypeAcc(e.target.value)}
+            <label className="mb-2.5 block text-black dark:text-white">
+              ID COA
+            </label>
+            <input
+              type="text"
+              placeholder="Masukan ID COA"
+              className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              onChange={(e) => setIdCOA(e.target.value)}
+              value={idCOA}
             />
           </div>
 
           <div className="w-full">
-            <DeptGroup
-              value={dept}
-              onChange={(e: any) => setDept(e.target.value)}
+            <label className="mb-2.5 block text-black dark:text-white">
+              Nama COA
+            </label>
+            <input
+              type="text"
+              placeholder="Masukan Nama COA"
+              className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              onChange={(e) => setAccName(e.target.value)}
+              value={accName}
+            />
+          </div>
+
+          <div className="w-full">
+            <label className="mb-2.5 block text-black dark:text-white">
+              Deskripsi
+            </label>
+            <input
+              type="text"
+              placeholder="Masukan Deskripsi"
+              className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              onChange={(e) => setDesc(e.target.value)}
+              value={desc}
+            />
+          </div>
+
+          <div className="w-full">
+            <StatusGroup
+              value={statusCOA}
+              onChange={(e: any) => setStatusCOA(e.target.value)}
             />
           </div>
 
           <div className=" w-full">
             <Button
-              disabled={!typeAcc || !dept || !selectedUser}
+              disabled={!idCOA || !accName || !desc || !statusCOA}
               onClick={(e: any) => {
                 e.preventDefault();
                 changeType('CONFIRM');
@@ -168,7 +165,7 @@ function SuperAdmin() {
                 toggle();
               }}
             >
-              Buat Akun
+              Buat COA
             </Button>
           </div>
         </div>
@@ -179,10 +176,7 @@ function SuperAdmin() {
           <div className="flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Akun Admin dan Finance
-              </Typography>
-              <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua akun admin dan finance.
+                COA
               </Typography>
             </div>
           </div>
@@ -223,7 +217,7 @@ function SuperAdmin() {
                       : 'p-4 border-b border-blue-gray-50';
 
                     return (
-                      <tr key={item?.iduser}>
+                      <tr key={item?.id_coa}>
                         <td className={classes}>
                           <div className="flex items-center gap-3 ">
                             <div className="flex flex-col">
@@ -231,7 +225,7 @@ function SuperAdmin() {
                                 variant="small"
                                 className="font-normal"
                               >
-                                {item?.iduser}
+                                {item?.id_coa}
                               </Typography>
                             </div>
                           </div>
@@ -242,7 +236,7 @@ function SuperAdmin() {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.nm_user}
+                              {item?.accountname}
                             </Typography>
                           </div>
                         </td>
@@ -252,7 +246,7 @@ function SuperAdmin() {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.departemen}
+                              {item?.description}
                             </Typography>
                           </div>
                         </td>
@@ -262,19 +256,26 @@ function SuperAdmin() {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.level_user}
+                              {item?.status}
                             </Typography>
                           </div>
                         </td>
                         <td className={classes}>
-                          <div className="w-max">
-                            <Typography
-                              variant="small"
-                              className="font-normal "
+                          <Tooltip content="Edit">
+                            <IconButton
+                              variant="text"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setSelected(item);
+                                navigate(`/coa/${item?.id_coa}`, {
+                                  replace: false,
+                                  state: item,
+                                });
+                              }}
                             >
-                              {item?.type}
-                            </Typography>
-                          </div>
+                              <DocumentTextIcon className="h-4 w-4" />
+                            </IconButton>
+                          </Tooltip>
                         </td>
                         <td className={classes}>
                           <Tooltip content="Hapus">
@@ -282,7 +283,7 @@ function SuperAdmin() {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                setSelected(item.iduser);
+                                setSelected(item);
                                 changeType('CONFIRM');
                                 setContext('DELETE');
                                 toggle();
@@ -340,18 +341,14 @@ function SuperAdmin() {
           context == 'CREATE' ? createAccount() : deleteAccount()
         }
         onDone={() => {
-          setTypeAcc('');
-          setDept('');
-          setSelectedUser(null);
+          setIdCOA('');
+          setAccName('');
+          setDesc('');
+          setStatusCOA('');
         }}
-      />
-      <UserModal
-        visible={showUser}
-        toggle={() => setShowUser(!showUser)}
-        value={(val: any) => setSelectedUser(val)}
       />
     </DefaultLayout>
   );
 }
 
-export default SuperAdmin;
+export default SuperCOA;

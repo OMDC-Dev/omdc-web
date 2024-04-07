@@ -38,6 +38,7 @@ export const SUPERUSER = 'superuser';
 export const SUPERUSER_REIMBURSEMENT = 'superuser/reimbursement';
 export const PENGAJUAN = 'superuser/pengajuan';
 export const SUPERUSER_GET_USER = 'superuser/userlist';
+export const SUPERUSER_BARANG = 'superuser/barang';
 export const DELETE_SUPERUSER = (id: string) => {
   return `superuser/delete/${id}`;
 };
@@ -72,6 +73,8 @@ export const DEPT = 'dept';
 export const GET_COA = (key = '') => {
   return `coa?cari=${key}`;
 };
+
+export const COA = 'coa';
 
 // SUPLIER
 export const GET_SUPLIER = '/suplier';

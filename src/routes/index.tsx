@@ -27,6 +27,9 @@ import UpdateProfile from '../pages/Authentication/UpdateProfile';
 import AboutUs from '../pages/Other/AboutUs';
 import SuperReimbursement from '../pages/SuperAdmin/Reimbursement';
 import DetailReimbursement from '../pages/SuperAdmin/DetailReimbursement';
+import SuperCOA from '../pages/SuperAdmin/COA';
+import SuperCOAUpdate from '../pages/SuperAdmin/COAUpdate';
+import PermintaanBarangAdmin from '../pages/PermintaanBarang/PermintaanBarangAdmin';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -302,6 +305,42 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Departemen'} />
               <Departemen />
+            </>
+          ),
+        },
+        {
+          path: '/coa',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <SuperCOA />
+            </>
+          ),
+        },
+        {
+          path: '/coa/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <SuperCOAUpdate />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <PermintaanBarangAdmin />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <DetailPermintaanBarang />
             </>
           ),
         },

@@ -118,9 +118,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   <NavLink
                     to="/"
                     className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                      !pathname.includes('/departemen') ||
-                      (!pathname.includes('/reimbursement') &&
-                        'bg-graydark dark:bg-meta-4')
+                      pathname == '/' && 'bg-graydark dark:bg-meta-4'
                     }`}
                   >
                     <IconBarang />
@@ -149,6 +147,29 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   >
                     <IconBarang />
                     Departemen
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/coa"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/coa') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    COA
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/request-barang"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/request-barang') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Permintaan Barang
                   </NavLink>
                 </li>
               </ul>
