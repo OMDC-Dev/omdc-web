@@ -21,6 +21,7 @@ import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
 import { cekAkses } from '../../common/utils';
 import { exportToExcell } from '../../common/exportToExcell';
+import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -51,6 +52,10 @@ function Reimbursement() {
 
   // reimbursement akses
   const hasReimbursementAkses = cekAkses('#1');
+
+  const { user } = useAuth();
+
+  console.log('USER DATA', user);
 
   React.useEffect(() => {
     getReimbursementList();
@@ -120,30 +125,6 @@ function Reimbursement() {
     } else {
       return item.childId ? 'Belum dikembalikan' : 'Perlu laporan realisasi';
     }
-  }
-
-  function onExportToExcell() {
-    const apiDataClear = rList.map((item) => {
-      const {
-        attachment,
-        file_info,
-        requester,
-        bank_detail,
-        accepted_by,
-        ...rest
-      }: any = item;
-
-      let parseAdmin: any = {};
-
-      accepted_by.forEach((item: any, index: number) => {
-        const key = `Admin ${index}`;
-        parseAdmin[key] = item?.nm_user;
-      });
-
-      return { ...rest, ...parseAdmin };
-    });
-
-    exportToExcell(apiDataClear);
   }
 
   return (

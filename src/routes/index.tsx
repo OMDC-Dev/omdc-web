@@ -30,6 +30,7 @@ import DetailReimbursement from '../pages/SuperAdmin/DetailReimbursement';
 import SuperCOA from '../pages/SuperAdmin/COA';
 import SuperCOAUpdate from '../pages/SuperAdmin/COAUpdate';
 import PermintaanBarangAdmin from '../pages/PermintaanBarang/PermintaanBarangAdmin';
+import ReportReimbursement from '../pages/Dashboard/ReportReimbursement';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -65,6 +66,24 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Reimbursement'} />
               <Reimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/report-reimbursement',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Reimbursement'} />
+              <SuperReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/report-reimbursement/create',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Report Reimbursement'} />
+              <ReportReimbursement />
             </>
           ),
         },
@@ -287,6 +306,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'SuperAdmin'} />
               <SuperReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/report-reimbursement/create',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Report Reimbursement'} />
+              <ReportReimbursement />
             </>
           ),
         },

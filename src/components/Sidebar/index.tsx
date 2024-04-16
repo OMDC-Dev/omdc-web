@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import IconBarang from '../../images/sidebar/IconBarang';
 import IconSidebar from '../../images/sidebar/IconSidebar';
 import IconArrow from '../../images/sidebar/IconArrow';
@@ -39,6 +39,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   // check akses
   const hasRequestBarangAkses = cekAkses('#2');
   const hasPengumumanAkses = cekAkses('#3');
+  const hasExportExcell = cekAkses('#4');
 
   // close on click outside
   useEffect(() => {
@@ -85,7 +86,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink className={' flex items-center gap-x-4'} to="/">
-          <img className=" h-10 w-10" src={Logo} alt="Logo" />
+          <img className=" h-10 w-10 object-contain" src={Logo} alt="Logo" />
           <span className=" text-title-sm font-bold text-white">
             OMDC v0.8.7
           </span>
@@ -232,6 +233,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 Riwayat Pengajuan
                               </NavLink>
                             </li>
+                            {hasExportExcell ? (
+                              <li>
+                                <NavLink
+                                  to="/report-reimbursement"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Report Reimbursement
+                                </NavLink>
+                              </li>
+                            ) : null}
                             {/* ------ BUAT PENGAJUAN --------- */}
                             {IS_ADMIN ? (
                               <li>

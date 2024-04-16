@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import HeroAuth from '../../images/hero/AuthHero';
 import useFetch from '../../hooks/useFetch';
 import { LOGIN } from '../../api/routes';
@@ -76,7 +76,11 @@ const SignIn: React.FC = () => {
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
               <Link className="mb-5.5 inline-block" to="/">
-                <img className="block h-20 w-20" src={Logo} alt="Logo" />
+                <img
+                  className="block h-20 w-20 object-contain"
+                  src={Logo}
+                  alt="Logo"
+                />
               </Link>
 
               <p className="2xl:px-20">Aplikasi untuk kemudahan bertransaksi</p>
@@ -145,7 +149,11 @@ const SignIn: React.FC = () => {
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img className="block h-20 w-20" src={Logo} alt="Logo" />
+                  <img
+                    className="block h-20 w-20 object-contain"
+                    src={Logo}
+                    alt="Logo"
+                  />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
                   Masuk ke OMDC App

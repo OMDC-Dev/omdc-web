@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useAuth } from '../hooks/useAuth';
 import formatRupiah from './formatRupiah';
 
@@ -61,6 +62,7 @@ export const cekAkses = (akses: string) => {
    * REIMBURSEMENT -> 1170 -> #1
    * PERMINTAAN BARANG -> 1157 -> #2
    * PENGUMUMAN -> 1171 -> #3
+   * EXPORT EXCELL -> 1175 -> #4
    */
   const { user } = useAuth();
 
@@ -76,6 +78,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#3') {
     return kd.findIndex((item: string) => item == '1171') !== -1;
+  }
+
+  if (akses == '#4') {
+    return kd.findIndex((item: string) => item == '1175') !== -1;
   }
 };
 
@@ -140,3 +146,14 @@ export const calculateSaldo = (nominal = '', realisasi = '') => {
 
   return 'Rp. ' + formatRupiah(saldo, false);
 };
+
+export function hitungSelisihHari(tanggalAwal: Date, tanggalAkhir: Date) {
+  // Menggunakan moment untuk membuat objek tanggal dari string atau tipe data tanggal JavaScript
+  const awal = moment(tanggalAwal);
+  const akhir = moment(tanggalAkhir);
+
+  // Menghitung selisih dalam hari
+  const selisih = akhir.diff(awal, 'days');
+
+  return selisih;
+}

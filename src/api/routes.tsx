@@ -42,6 +42,16 @@ export const SUPERUSER_BARANG = 'superuser/barang';
 export const DELETE_SUPERUSER = (id: string) => {
   return `superuser/delete/${id}`;
 };
+export const SUPERUSER_REPORT_EXPORT = (
+  startDate: string,
+  endDate: string,
+  cabang?: string,
+  bank?: string,
+) => {
+  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}`;
+};
+
+// FINANCE
 export const FINANCE_PENGAJUAN = 'finance/pengajuan';
 export const FINANCE_ACCEPTANCE = (id: number) => {
   return `finance/acceptance/${id}?status=DONE`;

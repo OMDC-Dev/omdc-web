@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import useFetch from '../../hooks/useFetch';
 import { LOGIN, USER_COMPLETE } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -71,7 +71,11 @@ const SignInProfile: React.FC = () => {
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img className="block h-20 w-20" src={Logo} alt="Logo" />
+                  <img
+                    className="block h-20 w-20 object-contain"
+                    src={Logo}
+                    alt="Logo"
+                  />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
                   Lengkapi Profile
@@ -98,7 +102,10 @@ const SignInProfile: React.FC = () => {
                   </div>
 
                   <div className="mb-6">
-                    <DeptGroup value={(val) => setDept(val)} />
+                    <DeptGroup
+                      onChange={(e: any) => setDept(e.target.value)}
+                      value={dept}
+                    />
                   </div>
                 </form>
                 <div className="mb-4">

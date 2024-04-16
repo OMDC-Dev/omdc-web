@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
@@ -103,7 +103,11 @@ const ChangePassword: React.FC = () => {
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
-                  <img className="block h-20 w-20" src={Logo} alt="Logo" />
+                  <img
+                    className="block h-20 w-20 object-contain"
+                    src={Logo}
+                    alt="Logo"
+                  />
                 </div>
                 <h2 className="text-xl font-medium text-black dark:text-white">
                   Ubah Password

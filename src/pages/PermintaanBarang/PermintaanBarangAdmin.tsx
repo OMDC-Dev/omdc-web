@@ -25,8 +25,6 @@ import moment from 'moment';
 const TABLE_HEAD = [
   'ID PB',
   'ID User',
-  'Kode Pengiriman',
-  'Kode Cabang',
   'Kirim ke',
   'Cabang',
   'Tanggal Disetujui',
@@ -156,16 +154,6 @@ function PermintaanBarangAdmin() {
                               {item?.iduser}
                             </Typography>
                           </div>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.kd_cabang}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.kd_induk}
-                          </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant="small" className="font-normal">

@@ -49,9 +49,6 @@ function SuperReimbursement() {
 
   const navigate = useNavigate();
 
-  // reimbursement akses
-  const hasReimbursementAkses = cekAkses('#1');
-
   React.useEffect(() => {
     getReimbursementList();
   }, [page]);
@@ -122,30 +119,6 @@ function SuperReimbursement() {
     }
   }
 
-  function onExportToExcell() {
-    const apiDataClear = rList.map((item) => {
-      const {
-        attachment,
-        file_info,
-        requester,
-        bank_detail,
-        accepted_by,
-        ...rest
-      }: any = item;
-
-      let parseAdmin: any = {};
-
-      accepted_by.forEach((item: any, index: number) => {
-        const key = `Admin ${index}`;
-        parseAdmin[key] = item?.nm_user;
-      });
-
-      return { ...rest, ...parseAdmin };
-    });
-
-    exportToExcell(apiDataClear);
-  }
-
   return (
     <DefaultLayout>
       <Card className="h-full w-full">
@@ -160,18 +133,18 @@ function SuperReimbursement() {
               </Typography>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              {hasReimbursementAkses ? (
-                <Button
-                  variant="filled"
-                  size="sm"
-                  color="blue"
-                  onClick={() =>
-                    navigate('/reimbursement/ajukan', { replace: false })
-                  }
-                >
-                  Buat Pengajuan Baru
-                </Button>
-              ) : null}
+              <Button
+                variant="filled"
+                size="sm"
+                color="blue"
+                onClick={() =>
+                  navigate('/report-reimbursement/create', {
+                    replace: false,
+                  })
+                }
+              >
+                Buat Report
+              </Button>
               {/* <Button
                 variant="filled"
                 size="sm"
