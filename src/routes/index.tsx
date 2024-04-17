@@ -31,6 +31,7 @@ import SuperCOA from '../pages/SuperAdmin/COA';
 import SuperCOAUpdate from '../pages/SuperAdmin/COAUpdate';
 import PermintaanBarangAdmin from '../pages/PermintaanBarang/PermintaanBarangAdmin';
 import ReportReimbursement from '../pages/Dashboard/ReportReimbursement';
+import SuperIcon from '../pages/SuperAdmin/Icon';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -369,6 +370,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Permintaan Barang'} />
               <DetailPermintaanBarang />
+            </>
+          ),
+        },
+        {
+          path: '/icon',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Icon'} />
+              <SuperIcon />
             </>
           ),
         },

@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../../images/logo/logo-tp.png';
 import useFetch from '../../hooks/useFetch';
-import { LOGIN, USER_COMPLETE } from '../../api/routes';
+import { GET_ICON, LOGIN, USER_COMPLETE } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/Button';
@@ -63,6 +63,25 @@ const SignInProfile: React.FC = () => {
     }
   }
 
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
+  }
+
   return (
     <>
       <div className=" xl:grid xl:place-items-center h-full sm:h-[100dvh] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedar">
@@ -73,7 +92,7 @@ const SignInProfile: React.FC = () => {
                 <div className=" mb-4">
                   <img
                     className="block h-20 w-20 object-contain"
-                    src={Logo}
+                    src={`data:image/png;base64,${icon.icon}`}
                     alt="Logo"
                   />
                 </div>

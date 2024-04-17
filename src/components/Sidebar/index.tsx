@@ -12,6 +12,9 @@ import {
   RectangleGroupIcon,
   BellAlertIcon,
 } from '@heroicons/react/24/outline';
+import useFetch from '../../hooks/useFetch';
+import { GET_ICON } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
 
 // Icon
 
@@ -31,6 +34,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const [sidebarExpanded, setSidebarExpanded] = useState(
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
   );
+
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
 
   const { user } = useAuth();
   const IS_ADMIN = user?.isAdmin;
@@ -76,6 +81,23 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     }
   }, [sidebarExpanded]);
 
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
+  }
+
   return (
     <aside
       ref={sidebar}
@@ -86,7 +108,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink className={' flex items-center gap-x-4'} to="/">
-          <img className=" h-10 w-10 object-contain" src={Logo} alt="Logo" />
+          <img
+            className=" h-10 w-10 object-contain"
+            src={`data:image/png;base64,${icon.icon}`}
+            alt="Logo"
+          />
           <span className=" text-title-sm font-bold text-white">
             OMDC v0.8.7
           </span>
@@ -171,6 +197,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   >
                     <IconBarang />
                     Permintaan Barang
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/icon"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/icon') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Ganti Icon
                   </NavLink>
                 </li>
               </ul>

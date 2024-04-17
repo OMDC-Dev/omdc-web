@@ -88,3 +88,7 @@ export const COA = 'coa';
 
 // SUPLIER
 export const GET_SUPLIER = '/suplier';
+
+// ICON
+export const GET_ICON = '/icon';
+export const UPDATE_ICON = '/updateIcon';

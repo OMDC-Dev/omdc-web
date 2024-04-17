@@ -12,7 +12,7 @@ import {
   DialogHeader,
 } from '@material-tailwind/react';
 import useFetch from '../../hooks/useFetch';
-import { UPDATE_PASSWORD } from '../../api/routes';
+import { GET_ICON, LOGOUT, UPDATE_PASSWORD } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 
 const ChangePassword: React.FC = () => {
@@ -90,9 +90,42 @@ const ChangePassword: React.FC = () => {
   }
 
   // on logout
-  function onLogout() {
-    setToken();
-    navigate('/', { replace: true });
+  async function onLogout() {
+    const { state, data, error } = await useFetch({
+      url: LOGOUT,
+      method: 'POST',
+    });
+    if (state == API_STATES.OK) {
+      setToken();
+      navigate('/', { replace: true });
+    } else if (
+      error == 'User Unauthenticated!' ||
+      error == 'User Token Invalid!'
+    ) {
+      setToken();
+      navigate('/', { replace: true });
+    } else {
+      alert(`Ada sesuatu yang tidak beres, mohon coba lagi.`);
+    }
+  }
+
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
   }
 
   return (
@@ -105,7 +138,7 @@ const ChangePassword: React.FC = () => {
                 <div className=" mb-4">
                   <img
                     className="block h-20 w-20 object-contain"
-                    src={Logo}
+                    src={`data:image/png;base64,${icon.icon}`}
                     alt="Logo"
                   />
                 </div>
