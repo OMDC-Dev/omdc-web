@@ -15,6 +15,7 @@ import {
 import useFetch from '../../hooks/useFetch';
 import { GET_ICON } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
+import useLogo from '../../store/useLogo';
 
 // Icon
 
@@ -36,6 +37,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   );
 
   const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  const { logo, setLogo } = useLogo();
 
   const { user } = useAuth();
   const IS_ADMIN = user?.isAdmin;
@@ -93,6 +96,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
     if (state == API_STATES.OK) {
       setIcon(data);
+      setLogo(data.icon);
     } else {
       setIcon(null);
     }
@@ -110,11 +114,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <NavLink className={' flex items-center gap-x-4'} to="/">
           <img
             className=" h-10 w-10 object-contain"
-            src={`data:image/png;base64,${icon.icon}`}
+            src={`data:image/png;base64,${logo}`}
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.8.7
+            OMDC v0.8.9
           </span>
         </NavLink>
 

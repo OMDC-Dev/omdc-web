@@ -10,14 +10,18 @@ import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import Modal from '../../components/Modal/Modal';
 import ADMIN_DATA from '../../common/files/admin.json';
+import useLogo from '../../store/useLogo';
 
 const SignIn: React.FC = () => {
   const [userId, setUserId] = React.useState<string>('');
   const [password, setPassword] = React.useState<string>('');
   const [errorMessage, setErrorMessage] = React.useState<string | any>('');
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
   const { toggle, visible, hide, show } = useModal();
   const { setToken, setUser } = useAuth();
   const navigate = useNavigate();
+
+  const { setLogo } = useLogo();
 
   function onUserIdChange(event: any) {
     setUserId(event.target.value);
@@ -69,8 +73,6 @@ const SignIn: React.FC = () => {
     }
   }
 
-  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
-
   React.useEffect(() => {
     getIcon();
   }, []);
@@ -83,6 +85,7 @@ const SignIn: React.FC = () => {
 
     if (state == API_STATES.OK) {
       setIcon(data);
+      setLogo(data.icon);
     } else {
       setIcon(null);
     }

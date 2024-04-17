@@ -9,11 +9,14 @@ import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import Modal from '../../components/Modal/Modal';
 import DeptGroup from '../../components/SelectGroup/DeptGroup';
+import useLogo from '../../store/useLogo';
 
 const SignInProfile: React.FC = () => {
   const [errorMessage, setErrorMessage] = React.useState<string | any>('');
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
   const { toggle, visible, hide, show } = useModal();
   const { setToken, setUser } = useAuth();
+  const { setLogo } = useLogo();
 
   // state
   const [nomorWa, setNomorWa] = React.useState<string>('');
@@ -53,6 +56,7 @@ const SignInProfile: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
+      setLogo(icon.icon);
       setToken(USER_S.userToken);
       setUser(USER_S);
       hide();
@@ -62,8 +66,6 @@ const SignInProfile: React.FC = () => {
       setErrorMessage(error.error);
     }
   }
-
-  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
 
   React.useEffect(() => {
     getIcon();

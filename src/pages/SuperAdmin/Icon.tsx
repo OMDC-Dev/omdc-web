@@ -7,6 +7,7 @@ import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import { compressImage } from '../../common/utils';
+import useLogo from '../../store/useLogo';
 
 function SuperIcon() {
   const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
@@ -15,6 +16,7 @@ function SuperIcon() {
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
   const [context, setContext] = React.useState<string>();
+  const { setLogo } = useLogo();
 
   React.useEffect(() => {
     getIcon();
@@ -48,6 +50,7 @@ function SuperIcon() {
     if (state == API_STATES.OK) {
       setLoading(false);
       toggle();
+      setLogo(icon.icon);
       alert(
         'Icon berhasil dirubah silahkan reload untuk menerapkan perubahan!',
       );
