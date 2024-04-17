@@ -44,11 +44,11 @@ function ReportReimbursement() {
       return;
     }
 
-    if (diff > 3) {
-      alert('Periode maksimal adalah 3 hari.');
-      toggle();
-      return;
-    }
+    // if (diff > 3) {
+    //   alert('Periode maksimal adalah 3 hari.');
+    //   toggle();
+    //   return;
+    // }
 
     const startDate = moment(tanggalStart, true)
       .startOf('day')

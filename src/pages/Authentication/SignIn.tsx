@@ -100,12 +100,10 @@ const SignIn: React.FC = () => {
               <Link className="mb-5.5 inline-block" to="/">
                 <img
                   className="block h-20 w-20 object-contain"
-                  src={`data:image/png;base64,${icon.icon}`}
+                  src={`data:image/png;base64,${icon?.icon}`}
                   alt="Logo"
                 />
               </Link>
-
-              <p className="2xl:px-20">Aplikasi untuk kemudahan bertransaksi</p>
 
               <span className="mt-15 inline-block">
                 <HeroAuth />
@@ -116,7 +114,7 @@ const SignIn: React.FC = () => {
           <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2 hidden xl:block ">
             <div className="w-full p-4 hidden sm:block md:p-24 sm:p-32 xl:p-20.5">
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
-                Masuk ke OMDC App
+                Login
               </h2>
 
               <form>
@@ -172,14 +170,11 @@ const SignIn: React.FC = () => {
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
                   <img
-                    className="block h-20 w-20 object-contain"
-                    src={`data:image/png;base64,${icon.icon}`}
+                    className="block h-40 w-40 object-contain"
+                    src={`data:image/png;base64,${icon?.icon}`}
                     alt="Logo"
                   />
                 </div>
-                <h2 className="text-xl font-medium text-black dark:text-white">
-                  Masuk ke OMDC App
-                </h2>
               </div>
 
               <div className="w-96 rounded-md bg-white p-6 shadow-lg">
