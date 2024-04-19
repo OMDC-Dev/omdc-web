@@ -157,3 +157,11 @@ export function hitungSelisihHari(tanggalAwal: Date, tanggalAkhir: Date) {
 
   return selisih;
 }
+
+export function formatAmount(amountString: string) {
+  // Hapus 'Rp.', spasi, dan koma dari string
+  const cleanedString = amountString.replace(/Rp\.|\s|,/g, '');
+  // Parse string menjadi bilangan bulat
+  const amount = parseInt(cleanedString, 10);
+  return amount;
+}

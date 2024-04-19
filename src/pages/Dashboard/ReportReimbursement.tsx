@@ -9,7 +9,7 @@ import CabangModal from '../../components/Modal/CabangModal';
 import BankModal from '../../components/Modal/BankModal';
 import DatePicker from '../../components/Forms/DatePicker/DatePicker';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import { hitungSelisihHari } from '../../common/utils';
+import { formatAmount, hitungSelisihHari } from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -83,7 +83,15 @@ function ReportReimbursement() {
     const endDate = moment(tanggalEnd, true).endOf('day').format('YYYY-MM-DD');
 
     const normalizeData = data.map((itemCol) => {
-      const { item, bank_detail, accepted_by, ...rest }: any = itemCol;
+      const {
+        id,
+        item,
+        bank_detail,
+        accepted_by,
+        finance_by,
+        nominal,
+        ...rest
+      }: any = itemCol;
 
       const parsedItem = item
         .map(
@@ -91,24 +99,29 @@ function ReportReimbursement() {
         )
         .join(', ');
 
-      const parsedBankDetail = bank_detail
+      const parsedBankDetail = bank_detail.bankname
         ? `${bank_detail.bankname}, Data: ${bank_detail.accountname} - ${bank_detail.accountnumber}`
-        : '';
+        : '-';
 
       const parsedAcceptedBy = accepted_by
         .map((item: any) => `${item.nm_user} (${item.status})`)
         .join(', ');
+
+      const parsedFinanceBy = finance_by.nm_user;
+
+      const formatedNominal = formatAmount(nominal);
 
       return {
         ...rest,
         item: parsedItem,
         bank_detail: parsedBankDetail,
         accepted_by: parsedAcceptedBy,
+        finance_by: parsedFinanceBy,
+        nominal: formatedNominal,
       };
     });
 
     const customHeaders = [
-      'ID Reimbursement',
       'Nomor Dokumen',
       'Jenis Reimbursement',
       'Tanggal Reimbursement',
@@ -118,10 +131,8 @@ function ReportReimbursement() {
       'Nama Suplier',
       'COA',
       'Deskripsi',
-      'Nominal Pengajuan',
       'Status Pengajuan',
       'Status Persetujuan Finance',
-      'Nama Finance',
       'Metode Pembayaran',
       'Tanggal Disetujui',
       'Realisasi',
@@ -131,6 +142,8 @@ function ReportReimbursement() {
       'Daftar Item',
       'Detail Bank User',
       'Daftar Penyetuju',
+      'Nama Finance',
+      'Nominal Pengajuan',
     ];
 
     const title = `Report${startDate}-${endDate}`;
