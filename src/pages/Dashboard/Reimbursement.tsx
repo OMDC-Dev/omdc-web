@@ -26,7 +26,7 @@ import { useAuth } from '../../hooks/useAuth';
 const TABLE_HEAD = [
   'Pengajuan',
   'No. Doc.',
-  'Tipe Pembayaran',
+  'Kategori Permintaan',
   'Tanggal',
   'Cabang',
   'Diajukan Oleh',

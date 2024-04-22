@@ -9,7 +9,11 @@ import CabangModal from '../../components/Modal/CabangModal';
 import BankModal from '../../components/Modal/BankModal';
 import DatePicker from '../../components/Forms/DatePicker/DatePicker';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import { formatAmount, hitungSelisihHari } from '../../common/utils';
+import {
+  formatAmount,
+  formatCurrencyToNumber,
+  hitungSelisihHari,
+} from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -109,7 +113,7 @@ function ReportReimbursement() {
 
       const parsedFinanceBy = finance_by.nm_user;
 
-      const formatedNominal = formatAmount(nominal);
+      const formatedNominal = formatCurrencyToNumber(nominal);
 
       return {
         ...rest,
@@ -123,8 +127,8 @@ function ReportReimbursement() {
 
     const customHeaders = [
       'Nomor Dokumen',
-      'Jenis Reimbursement',
-      'Tanggal Reimbursement',
+      'Jenis Request of Payment',
+      'Tanggal Request of Payment',
       'Cabang',
       'ID User',
       'Nama User',
@@ -136,7 +140,7 @@ function ReportReimbursement() {
       'Metode Pembayaran',
       'Tanggal Disetujui',
       'Realisasi',
-      'Tipe Pembayaran',
+      'Kategori Permintaan',
       'Bank Finance',
       'Tanggal Dibuat',
       'Daftar Item',

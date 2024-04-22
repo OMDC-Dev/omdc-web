@@ -22,7 +22,7 @@ import { useAuth } from '../../hooks/useAuth';
 const TABLE_HEAD = [
   'Pengajuan',
   'No. Dok',
-  'Tipe Pembayaran',
+  'Kategori Permintaan',
   'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
@@ -38,7 +38,7 @@ const TABLE_HEAD = [
 const TABLE_HEAD_FINANCE = [
   'Pengajuan',
   'No. Dok',
-  'Tipe Pembayaran',
+  'Kategori Permintaan',
   'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',

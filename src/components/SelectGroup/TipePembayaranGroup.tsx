@@ -16,7 +16,7 @@ const TipePembayaranGroup = ({ value }: { value: (arg0: string) => void }) => {
   return (
     <div>
       <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
-        Tipe Pembayaran
+        Kategori Permintaan
       </label>
 
       <div className="relative z-20">
@@ -31,7 +31,7 @@ const TipePembayaranGroup = ({ value }: { value: (arg0: string) => void }) => {
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
-            Pilih Tipe
+            Pilih Kategori
           </option>
           {DATAS.map((item, index) => {
             return (

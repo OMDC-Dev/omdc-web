@@ -25,7 +25,7 @@ import { exportToExcell } from '../../common/exportToExcell';
 const TABLE_HEAD = [
   'Pengajuan',
   'No. Doc.',
-  'Tipe Pembayaran',
+  'Kategori Permintaan',
   'Tanggal',
   'Cabang',
   'Diajukan Oleh',

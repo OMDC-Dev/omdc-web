@@ -117,9 +117,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             src={`data:image/png;base64,${logo}`}
             alt="Logo"
           />
-          <span className=" text-title-sm font-bold text-white">
-            OMDC v0.8.9-1
-          </span>
+          <span className=" text-title-sm font-bold text-white">OMDC v0.9</span>
         </NavLink>
 
         <button
@@ -165,7 +163,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     }`}
                   >
                     <IconBarang />
-                    Reimbursement
+                    Request of Payment
                   </NavLink>
                 </li>
                 <li>
@@ -253,7 +251,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }}
                         >
                           <BanknotesIcon className=" h-5 w-5" />
-                          Reimbursement
+                          Request of Payment
                           <IconArrow open={open} />
                         </NavLink>
                         {/* <!-- Dropdown Menu Start --> */}
@@ -283,7 +281,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     (isActive && '!text-white')
                                   }
                                 >
-                                  Report Reimbursement
+                                  Report R.O.P
                                 </NavLink>
                               </li>
                             ) : null}

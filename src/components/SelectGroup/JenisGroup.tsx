@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import DATAS from '../../common/files/type.json';
+import { cekAkses } from '../../common/utils';
 
 const JenisGroup = ({ value }: { value: (arg0: string) => void }) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
+  const [list, setList] = React.useState<any>([]);
+
+  const hasPaymentRequest = cekAkses('#5');
 
   const changeTextColor = () => {
     setIsOptionSelected(true);
@@ -13,10 +17,22 @@ const JenisGroup = ({ value }: { value: (arg0: string) => void }) => {
     value(selectedOption);
   }, [selectedOption]);
 
+  React.useEffect(() => {
+    if (!hasPaymentRequest) {
+      const newData = DATAS.filter((item) => {
+        return item.value !== 'PR';
+      });
+
+      setList(newData);
+    } else {
+      setList(DATAS);
+    }
+  }, []);
+
   return (
     <div>
       <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
-        Jenis Reimbursement
+        Jenis Request of Payment
       </label>
 
       <div className="relative z-20">
@@ -33,7 +49,7 @@ const JenisGroup = ({ value }: { value: (arg0: string) => void }) => {
           <option value="" disabled className="text-body dark:text-bodydark">
             Pilih Jenis
           </option>
-          {DATAS.map((item, index) => {
+          {list.map((item: any, index: number) => {
             return (
               <option
                 value={item.value}

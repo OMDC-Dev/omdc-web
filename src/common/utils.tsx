@@ -63,6 +63,7 @@ export const cekAkses = (akses: string) => {
    * PERMINTAAN BARANG -> 1157 -> #2
    * PENGUMUMAN -> 1171 -> #3
    * EXPORT EXCELL -> 1175 -> #4
+   * PAYMENT REQUEST -> 1176 -> #5
    */
   const { user } = useAuth();
 
@@ -82,6 +83,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#4') {
     return kd.findIndex((item: string) => item == '1175') !== -1;
+  }
+
+  if (akses == '#5') {
+    return kd.findIndex((item: string) => item == '1176') !== -1;
   }
 };
 
@@ -164,4 +169,10 @@ export function formatAmount(amountString: string) {
   // Parse string menjadi bilangan bulat
   const amount = parseInt(cleanedString, 10);
   return amount;
+}
+
+export function formatCurrencyToNumber(currencyString: string) {
+  // Hapus karakter non-digit dari string dan konversi menjadi angka
+  const number = parseInt(currencyString.replace(/\D/g, ''), 10);
+  return number;
 }
