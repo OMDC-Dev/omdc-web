@@ -9,6 +9,10 @@ const TYPE_DATA = [
     label: 'Finance',
     value: 'FINANCE',
   },
+  {
+    label: 'Reviewer',
+    value: 'REVIEWER',
+  },
 ];
 
 const TypeGroup = ({ value, onChange }: { value: any; onChange?: any }) => {

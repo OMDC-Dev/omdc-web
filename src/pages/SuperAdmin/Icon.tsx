@@ -50,7 +50,7 @@ function SuperIcon() {
     if (state == API_STATES.OK) {
       setLoading(false);
       toggle();
-      setLogo(icon.icon);
+      setLogo(icon?.icon);
       alert(
         'Icon berhasil dirubah silahkan reload untuk menerapkan perubahan!',
       );
@@ -112,7 +112,7 @@ function SuperIcon() {
             </label>
             <img
               className="h-32 w-32 object-contain m-4"
-              src={`data:image/png;base64,${icon.icon}`}
+              src={`data:image/png;base64,${icon?.icon}`}
               alt="icon-web"
             />
             <input
@@ -131,7 +131,7 @@ function SuperIcon() {
             </label>
             <img
               className="h-32 w-32 object-contain m-4"
-              src={`data:image/png;base64,${icon.iconMobile}`}
+              src={`data:image/png;base64,${icon?.iconMobile}`}
               alt="icon-web"
             />
             <input

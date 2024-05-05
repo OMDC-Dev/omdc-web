@@ -28,8 +28,6 @@ const SignInProfile: React.FC = () => {
 
   const USER_S = state;
 
-  console.log(USER_S);
-
   function onNomorWaChange(event: any) {
     setNomorWa(event.target.value);
   }
@@ -47,18 +45,20 @@ const SignInProfile: React.FC = () => {
     };
 
     const { state, data, error } = await useFetch({
-      url: USER_COMPLETE,
+      url: USER_COMPLETE + `/${USER_S.iduser}`,
       method: 'POST',
       data: body,
-      headers: {
-        Authorization: `Bearer ${USER_S.userToken}`,
-      },
     });
 
     if (state == API_STATES.OK) {
       setLogo(icon.icon);
-      setToken(USER_S.userToken);
-      setUser(USER_S);
+      setToken(data.userToken);
+      setUser({
+        ...USER_S,
+        userToken: data.userToken,
+        nomorwa: nomorWa,
+        departemen: dept,
+      });
       hide();
       navigate('/', { replace: true });
     } else {

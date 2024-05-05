@@ -40,7 +40,7 @@ const UpdateProfile: React.FC = () => {
     };
 
     const { state, data, error } = await useFetch({
-      url: USER_COMPLETE,
+      url: USER_COMPLETE + `/${USER_S.iduser}`,
       method: 'POST',
       data: body,
       headers: {
