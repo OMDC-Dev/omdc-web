@@ -286,7 +286,7 @@ const BuatPengajuan: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        COA
+                        COA / Grup Biaya
                       </label>
                       <div
                         onClick={() => setShowCoa(!showCoa)}

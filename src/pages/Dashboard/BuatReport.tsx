@@ -26,6 +26,7 @@ import moment from 'moment';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import PaymentGroup from '../../components/SelectGroup/PaymentGroup';
+import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
 
 function TrashIcon() {
   return (
@@ -70,6 +71,7 @@ const BuatReport: React.FC = () => {
   const [item, setItem] = React.useState<any>([]);
   const [admin, setAdmin] = React.useState<any>();
   const [payment, setPayment] = React.useState<any>();
+  const [tipePembayaran, setTipePembayaran] = React.useState<any>();
 
   // Bank Modal State
   const [needBank, setNeedBank] = React.useState(false);
@@ -112,6 +114,7 @@ const BuatReport: React.FC = () => {
     !admin ||
     !item.length ||
     !payment ||
+    !tipePembayaran ||
     disabledByBank() ||
     disabledByType();
 
@@ -231,6 +234,7 @@ const BuatReport: React.FC = () => {
       approved_by: admin?.iduser,
       parentId: stateData?.id || '',
       payment_type: payment,
+      tipePembayaran: tipePembayaran,
     };
 
     const { state, data, error } = await useFetch({
@@ -281,6 +285,12 @@ const BuatReport: React.FC = () => {
                   </div>
 
                   <div className="w-full">
+                    <TipePembayaranGroup
+                      value={(val) => setTipePembayaran(val)}
+                    />
+                  </div>
+
+                  <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
                         No. Doc Cash Advance
@@ -294,7 +304,7 @@ const BuatReport: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        COA
+                        COA / Grup Biaya
                       </label>
                       <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                         {stateData?.coa}
