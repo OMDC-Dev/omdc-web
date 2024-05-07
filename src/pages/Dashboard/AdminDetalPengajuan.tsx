@@ -142,6 +142,8 @@ const AdminDetailPengajuan: React.FC = () => {
     }
   }
 
+  console.log('STATUS', status);
+
   // acceptance finance
   async function acceptance_fin() {
     changeType('LOADING');
@@ -313,6 +315,46 @@ const AdminDetailPengajuan: React.FC = () => {
     }
   }
 
+  // === render note
+  function renderNote() {
+    if (ADMIN_TYPE !== 'REVIEWER' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING')
+      return;
+    if (ADMIN_TYPE == 'REVIEWER' && status.reviewStatus !== 'IDLE') return;
+
+    return (
+      <div className=" w-full">
+        <label className="mb-2.5 block text-black dark:text-white">
+          Catatan ( Opsional )
+        </label>
+        <textarea
+          rows={3}
+          placeholder="Masukan Catatan"
+          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+      </div>
+    );
+  }
+
+  function renderNoteList() {
+    return status.notes.map((item: any, index: number) => {
+      return (
+        <div className=" w-full">
+          <label className="mb-2.5 block text-black dark:text-white">
+            {item.title}
+          </label>
+          <textarea
+            rows={3}
+            disabled={true}
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            defaultValue={`${item.title}\n${item.msg}`}
+          />
+        </div>
+      );
+    });
+  }
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -410,41 +452,10 @@ const AdminDetailPengajuan: React.FC = () => {
                 ) : null}
 
                 {renderCOASelector()}
+                {renderNoteList()}
+                {renderNote()}
 
-                <div className=" w-full">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Catatan ( Opsional )
-                  </label>
-                  {ADMIN_TYPE == 'ADMIN' ? (
-                    ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
-                      <textarea
-                        rows={3}
-                        disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
-                        placeholder="Masukan Catatan"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                      ></textarea>
-                    ) : (
-                      <textarea
-                        rows={3}
-                        disabled={true}
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        defaultValue={data?.note + note}
-                      ></textarea>
-                    )
-                  ) : (
-                    <textarea
-                      rows={3}
-                      disabled={status?.status_finance !== 'WAITING'}
-                      placeholder="Masukan Catatan"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      value={note || data?.finance_note}
-                      onChange={(e) => setNote(e.target.value)}
-                    ></textarea>
-                  )}
-                </div>
-                {data?.payment_type == 'TRANSFER' ? (
+                {data?.payment_type == 'TRANSFER' && ADMIN_TYPE == 'FINANCE' ? (
                   <div className="mb-full mt-2 mb-12">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
@@ -509,7 +520,8 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 ) : null}
 
-                {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
+                {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ||
+                status.reviewStatus == 'IDLE' ? (
                   <div className=" flex flex-col gap-y-4 mt-4.5">
                     <Button
                       onClick={(e: any) => {

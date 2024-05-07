@@ -19,6 +19,8 @@ async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
     headers.Authorization = `Bearer ${userToken}`;
   }
 
+  console.log(`Hitinnn -> ${props.url}`);
+
   return axios({
     ...props,
     baseURL: BASE_URL,

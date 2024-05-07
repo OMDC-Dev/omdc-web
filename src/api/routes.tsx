@@ -92,3 +92,8 @@ export const GET_SUPLIER = '/suplier';
 // ICON
 export const GET_ICON = '/icon';
 export const UPDATE_ICON = '/updateIcon';
+
+// Reviwer
+export const GET_UNREVIEW_REIMBURSEMENT = 'reviewer/reimbursement';
+export const ACCEPT_REVIEW_REIMBURSEMENT = (id: number) =>
+  `reviewer/accept/${id}`;

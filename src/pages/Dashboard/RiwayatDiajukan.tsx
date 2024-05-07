@@ -13,7 +13,11 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { FINANCE_PENGAJUAN, PENGAJUAN } from '../../api/routes';
+import {
+  FINANCE_PENGAJUAN,
+  GET_UNREVIEW_REIMBURSEMENT,
+  PENGAJUAN,
+} from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
@@ -65,9 +69,10 @@ function RiwayatDiajukan() {
 
   const ADMIN_TYPE = user?.type;
 
-  const URL = ADMIN_TYPE == 'ADMIN' ? PENGAJUAN : FINANCE_PENGAJUAN;
-
-  const TABLE = ADMIN_TYPE == 'ADMIN' ? TABLE_HEAD : TABLE_HEAD_FINANCE;
+  const TABLE =
+    ADMIN_TYPE == 'ADMIN' || ADMIN_TYPE == 'REVIEWER'
+      ? TABLE_HEAD
+      : TABLE_HEAD_FINANCE;
 
   const navigate = useNavigate();
 
@@ -76,12 +81,23 @@ function RiwayatDiajukan() {
   }, [page]);
 
   async function getReimbursementList(clear?: boolean) {
+    let URL = '';
+    if (ADMIN_TYPE == 'ADMIN') {
+      URL = PENGAJUAN;
+    } else if (ADMIN_TYPE == 'FINANCE') {
+      URL = FINANCE_PENGAJUAN;
+    } else {
+      URL = GET_UNREVIEW_REIMBURSEMENT;
+    }
+
     const { state, data, error } = await useFetch({
       url: URL + `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
       method: 'GET',
     });
 
     if (state == API_STATES.OK) {
+      console.log('DATAS', data.rows);
+
       setRList(data?.rows);
       setPageInfo(data?.pageInfo);
       console.log(data?.pageInfo);
