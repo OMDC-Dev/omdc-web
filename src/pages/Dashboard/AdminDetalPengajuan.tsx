@@ -273,12 +273,45 @@ const AdminDetailPengajuan: React.FC = () => {
       return (
         <div className="w-full mb-4.5">
           <div>
-            <label className="mb-3 block text-black dark:text-white">COA</label>
+            <label className="mb-3 block text-black dark:text-white">
+              COA / Grup Biaya
+            </label>
             <div
               onClick={() => setShowCoa(!showCoa)}
               className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
             >
               {coa || data?.coa || 'Pilih COA'}
+            </div>
+          </div>
+        </div>
+      );
+    } else if (ADMIN_TYPE == 'REVIEWER') {
+      const _status = status?.reviewStatus;
+      return (
+        <div className="w-full mb-4.5">
+          <div>
+            <label className="mb-3 block text-black dark:text-white">
+              COA / Grup Biaya
+            </label>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+              <div
+                onClick={() => setShowCoa(!showCoa)}
+                className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+              >
+                {coa || data?.coa || 'Pilih COA'}
+              </div>
+              {_status == 'IDLE' ? (
+                <Button
+                  onClick={(e: any) => {
+                    e.preventDefault();
+                    changeContext('COA');
+                    changeType('CONFIRM');
+                    show();
+                  }}
+                >
+                  Update COA
+                </Button>
+              ) : null}
             </div>
           </div>
         </div>
@@ -319,7 +352,7 @@ const AdminDetailPengajuan: React.FC = () => {
   function renderNote() {
     if (ADMIN_TYPE !== 'REVIEWER' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING')
       return;
-    if (ADMIN_TYPE == 'REVIEWER' && status.reviewStatus !== 'IDLE') return;
+    if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
 
     return (
       <div className=" w-full">
@@ -338,7 +371,7 @@ const AdminDetailPengajuan: React.FC = () => {
   }
 
   function renderNoteList() {
-    return status.notes.map((item: any, index: number) => {
+    return status?.notes?.map((item: any, index: number) => {
       return (
         <div className=" w-full">
           <label className="mb-2.5 block text-black dark:text-white">
@@ -353,6 +386,76 @@ const AdminDetailPengajuan: React.FC = () => {
         </div>
       );
     });
+  }
+
+  // ===== render acc reject button
+  function renderAccRejectButton() {
+    if (ADMIN_TYPE == 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
+    if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
+    if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'IDLE') return;
+
+    let title = '';
+    if (ADMIN_TYPE == 'FINANCE') {
+      title =
+        data?.bank_detail?.bankname && data?.payment_type == 'TRANSFER'
+          ? 'Konfirmasi Dana Ditransfer'
+          : 'Konfirmasi Dana Diterima';
+    } else {
+      title = 'Setujui Pengajuan';
+    }
+
+    return (
+      <div className=" flex flex-col gap-y-4 mt-4.5">
+        <Button
+          onClick={(e: any) => {
+            e.preventDefault();
+            changeType('CONFIRM');
+            changeContext('ACC');
+            show();
+          }}
+        >
+          {title}
+        </Button>
+        <Button
+          onClick={(e: any) => {
+            e.preventDefault();
+            changeType('CONFIRM');
+            changeContext('RJJ');
+            show();
+          }}
+          className=" bg-red-400 border-red-400"
+        >
+          Tolak Pengajuan
+        </Button>
+      </div>
+    );
+  }
+
+  // ========== render admin selector
+  function renderAdminSelector() {
+    if (ADMIN_TYPE == 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
+    if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
+    if (ADMIN_TYPE == 'FINANCE') return;
+
+    return (
+      <div className="w-full mb-4.5">
+        <div>
+          <label className="mb-3 block text-black dark:text-white">
+            {ADMIN_TYPE == 'ADMIN' ? 'Forward ( Opsional )' : 'Ganti Penyetuju'}
+          </label>
+          <div
+            onClick={() => setShowAdmin(!showAdmin)}
+            className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+          >
+            {admin?.nm_user
+              ? admin?.nm_user
+              : ADMIN_TYPE == 'REVIEWER'
+              ? status?.accepted_by[0]?.nm_user
+              : 'Pilih Admin'}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -435,22 +538,7 @@ const AdminDetailPengajuan: React.FC = () => {
                   />
                 </div>
 
-                {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
-                  <div className="w-full mb-4.5">
-                    <div>
-                      <label className="mb-3 block text-black dark:text-white">
-                        Forward ( Opsional )
-                      </label>
-                      <div
-                        onClick={() => setShowAdmin(!showAdmin)}
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {admin?.nm_user || 'Pilih Admin'}
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-
+                {renderAdminSelector()}
                 {renderCOASelector()}
                 {renderNoteList()}
                 {renderNote()}
@@ -520,32 +608,7 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 ) : null}
 
-                {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ||
-                status.reviewStatus == 'IDLE' ? (
-                  <div className=" flex flex-col gap-y-4 mt-4.5">
-                    <Button
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        changeType('CONFIRM');
-                        changeContext('ACC');
-                        show();
-                      }}
-                    >
-                      Setujui Pengajuan
-                    </Button>
-                    <Button
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        changeType('CONFIRM');
-                        changeContext('RJJ');
-                        show();
-                      }}
-                      className=" bg-red-400 border-red-400"
-                    >
-                      Tolak Pengajuan
-                    </Button>
-                  </div>
-                ) : null}
+                {renderAccRejectButton()}
               </div>
             </div>
           </div>
