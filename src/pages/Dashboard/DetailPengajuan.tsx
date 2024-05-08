@@ -8,7 +8,7 @@ import {
 import { colors } from '@material-tailwind/react/types/generic';
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { REIMBURSEMENT_DETAIL } from '../../api/routes';
+import { FINANCE_UPDATE_COA, REIMBURSEMENT_DETAIL } from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
 import { calculateSaldo, downloadPDF } from '../../common/utils';
 import Button from '../../components/Button';
@@ -18,9 +18,19 @@ import { API_STATES } from '../../constants/ApiEnum';
 import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
+import COAModal from '../../components/Modal/COAModal';
 
 const DetailPengajuan: React.FC = () => {
-  const { toggle, visible, hide, show, changeType, type } = useModal();
+  const {
+    toggle,
+    visible,
+    hide,
+    show,
+    changeType,
+    type,
+    changeContext,
+    context,
+  } = useModal();
 
   // use nav
   const navigate = useNavigate();
@@ -29,6 +39,7 @@ const DetailPengajuan: React.FC = () => {
 
   const state = location.state;
 
+  const IS_REPORT = state?.isReport;
   const IS_PUSHED = state?.pushed;
 
   React.useEffect(() => {
@@ -39,6 +50,11 @@ const DetailPengajuan: React.FC = () => {
 
   // data state
   const [data, setData] = React.useState(state || []);
+
+  // COA
+  const [coa, setCoa] = React.useState<string>();
+  const [showCoa, setShowCoa] = React.useState<boolean>(false);
+  const [coaChange, setCoaChange] = React.useState(false);
 
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
@@ -138,125 +154,172 @@ const DetailPengajuan: React.FC = () => {
     }
   }
 
-  console.log('REALISASI', data?.realisasi);
-  console.log('CA', data?.pengajuan_ca);
-  console.log('NOMINAL', data?.nominal);
+  async function onCOAUpdate() {
+    changeType('LOADING');
+    const { state, data, error } = await useFetch({
+      url: FINANCE_UPDATE_COA(RID),
+      method: 'POST',
+      data: {
+        coa: coa,
+      },
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      setCoaChange(false);
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  console.log('DATA NOTE', data);
+
+  function renderNoteList() {
+    return data?.notes?.map((item: any, index: number) => {
+      return (
+        <div className=" w-full mb-4.5">
+          <label className="mb-2.5 block text-black dark:text-white">
+            {item.title}
+          </label>
+          <textarea
+            rows={3}
+            disabled={true}
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+            defaultValue={item.msg}
+          />
+        </div>
+      );
+    });
+  }
+
+  // Render coa selector
+  function renderCOASelector() {
+    if (!IS_REPORT) return;
+
+    return (
+      <div className="w-full mb-4.5">
+        <div>
+          <label className="mb-3 block text-black dark:text-white">
+            COA / Grup Biaya
+          </label>
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+            <div
+              onClick={() => setShowCoa(!showCoa)}
+              className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+            >
+              {coa || data?.coa || 'Pilih COA'}
+            </div>
+            <Button
+              disabled={!coaChange}
+              onClick={(e: any) => {
+                e.preventDefault();
+                changeContext('COA');
+                changeType('CONFIRM');
+                show();
+              }}
+            >
+              Update COA
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ======================== GAP RENDER STATUS PERSETUJUAN
+  function renderStatusPersetujuan() {
+    return (
+      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+        <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+          <h3 className="font-medium text-black dark:text-white">
+            Status Persetujuan
+          </h3>
+          <Chip
+            variant={'outlined'}
+            color={STATUS_WORDING(data?.status).color}
+            value={STATUS_WORDING(data?.status).tx}
+          />
+        </div>
+        <form action="#">
+          <div className="p-6.5">
+            <div className="mb-1">
+              <div>
+                <label className="mb-3 block text-black dark:text-white">
+                  Status Approval
+                </label>
+                {data?.accepted_by?.map((item: any, index: number) => {
+                  return (
+                    <div className=" py-4 flex justify-between">
+                      <span className=" text-black font-bold">
+                        {item.nm_user}
+                      </span>
+                      <Chip
+                        variant={'ghost'}
+                        color={STATUS_WORDING(item?.status).color}
+                        value={STATUS_WORDING(item?.status).tx}
+                      />
+                    </div>
+                  );
+                })}
+                {data?.status_finance !== 'IDLE' ? (
+                  <div className=" py-4 flex justify-between">
+                    <span className=" text-black font-bold">Finance</span>
+                    <Chip
+                      variant={'ghost'}
+                      color={STATUS_WORDING(data?.status_finance, true).color}
+                      value={STATUS_WORDING(data?.status_finance, true).tx}
+                    />
+                  </div>
+                ) : null}
+              </div>
+              {renderCOASelector()}
+              {renderNoteList()}
+
+              {data?.status == 'WAITING' ? (
+                <div className=" mt-4">
+                  <Button
+                    onClick={(e: any) => {
+                      e.preventDefault();
+                      changeType('CONFIRM');
+                      show();
+                    }}
+                  >
+                    Batalkan Pengajuan
+                  </Button>
+                </div>
+              ) : null}
+
+              {data?.jenis_reimbursement == 'Cash Advance' &&
+              data?.status_finance == 'DONE' &&
+              !IS_PUSHED ? (
+                <div className="w-full mt-4.5">
+                  <Button onClick={onReportButtonPressed}>
+                    {data?.childId ? 'Lihat' : 'Buat'} Report Realisasi
+                  </Button>
+                </div>
+              ) : null}
+              {data?.jenis_reimbursement == 'Cash Advance Report' &&
+              data?.parentId &&
+              !IS_PUSHED ? (
+                <div className="w-full mt-4.5">
+                  <Button onClick={onSeeButtonPressed}>
+                    Lihat Pengajuan Cash Advance
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  // ========================================================
 
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
-        <div className=" sm:hidden">
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Status Persetujuan
-              </h3>
-              <Chip
-                variant={'outlined'}
-                color={STATUS_WORDING(data?.status).color}
-                value={STATUS_WORDING(data?.status).tx}
-              />
-            </div>
-            <form action="#">
-              <div className="p-6.5">
-                <div className="mb-1">
-                  <div>
-                    <label className="mb-3 block text-black dark:text-white">
-                      Status Approval
-                    </label>
-                    {data?.accepted_by?.map((item: any, index: number) => {
-                      return (
-                        <div className=" py-4 flex justify-between">
-                          <span className=" text-black font-bold">
-                            {item.nm_user}
-                          </span>
-                          <Chip
-                            variant={'ghost'}
-                            color={STATUS_WORDING(item?.status).color}
-                            value={STATUS_WORDING(item?.status).tx}
-                          />
-                        </div>
-                      );
-                    })}
-                    {data?.status_finance !== 'IDLE' ? (
-                      <div className=" py-4 flex justify-between">
-                        <span className=" text-black font-bold">Finance</span>
-                        <Chip
-                          variant={'ghost'}
-                          color={
-                            STATUS_WORDING(data?.status_finance, true).color
-                          }
-                          value={STATUS_WORDING(data?.status_finance, true).tx}
-                        />
-                      </div>
-                    ) : null}
-                  </div>
-                  {IS_PUSHED ? null : (
-                    <>
-                      <div className="w-full mt-4.5">
-                        <label className="mb-3 block text-black dark:text-white">
-                          Catatan
-                        </label>
-                        <textarea
-                          rows={3}
-                          disabled
-                          placeholder="Masukan Deskripsi"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          defaultValue={data?.note}
-                        ></textarea>
-                      </div>
-                      <div className="w-full mt-4.5">
-                        <label className="mb-3 block text-black dark:text-white">
-                          Catatan Finance
-                        </label>
-                        <textarea
-                          rows={3}
-                          disabled
-                          placeholder="Masukan Deskripsi"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          defaultValue={data?.finance_note || '-'}
-                        ></textarea>
-                      </div>
-                    </>
-                  )}
-
-                  {data?.status == 'WAITING' ? (
-                    <div className=" mt-4">
-                      <Button
-                        onClick={(e: any) => {
-                          e.preventDefault();
-                          changeType('CONFIRM');
-                          show();
-                        }}
-                      >
-                        Batalkan Pengajuan
-                      </Button>
-                    </div>
-                  ) : null}
-
-                  {data?.jenis_reimbursement == 'Cash Advance' &&
-                  data?.status_finance == 'DONE' &&
-                  !IS_PUSHED ? (
-                    <div className="w-full mt-4.5">
-                      <Button onClick={onReportButtonPressed}>
-                        {data?.childId ? 'Lihat' : 'Buat'} Report Realisasi
-                      </Button>
-                    </div>
-                  ) : null}
-                  {data?.jenis_reimbursement == 'Cash Advance Report' &&
-                  data?.parentId &&
-                  !IS_PUSHED ? (
-                    <div className="w-full mt-4.5">
-                      <Button onClick={onSeeButtonPressed}>
-                        Lihat Pengajuan Cash Advance
-                      </Button>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+        <div className=" sm:hidden">{renderStatusPersetujuan()}</div>
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -297,7 +360,7 @@ const DetailPengajuan: React.FC = () => {
 
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
-                      COA
+                      COA / Grup Biaya
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.coa}
@@ -394,101 +457,7 @@ const DetailPengajuan: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-9">
-          <div className="hidden sm:block rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Status Persetujuan
-              </h3>
-              <Chip
-                variant={'outlined'}
-                color={STATUS_WORDING(data?.status).color}
-                value={STATUS_WORDING(data?.status).tx}
-              />
-            </div>
-            <form action="#">
-              <div className="p-6.5">
-                <div className="mb-1">
-                  <div>
-                    <label className="mb-3 block text-black dark:text-white">
-                      Status Approval
-                    </label>
-                    {data?.accepted_by?.map((item: any, index: number) => {
-                      return (
-                        <div className=" py-4 flex justify-between">
-                          <span className=" text-black font-bold">
-                            {item.nm_user}
-                          </span>
-                          <Chip
-                            variant={'ghost'}
-                            color={STATUS_WORDING(item?.status).color}
-                            value={STATUS_WORDING(item?.status).tx}
-                          />
-                        </div>
-                      );
-                    })}
-                    {data?.status_finance !== 'IDLE' ? (
-                      <div className=" py-4 flex justify-between">
-                        <span className=" text-black font-bold">Finance</span>
-                        <Chip
-                          variant={'ghost'}
-                          color={
-                            STATUS_WORDING(data?.status_finance, true).color
-                          }
-                          value={STATUS_WORDING(data?.status_finance, true).tx}
-                        />
-                      </div>
-                    ) : null}
-                  </div>
-                  {IS_PUSHED ? null : (
-                    <>
-                      <div className="w-full mt-4.5">
-                        <label className="mb-3 block text-black dark:text-white">
-                          Catatan
-                        </label>
-                        <textarea
-                          rows={3}
-                          disabled
-                          placeholder="Masukan Deskripsi"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          defaultValue={data?.note}
-                        ></textarea>
-                      </div>
-                      <div className="w-full mt-4.5">
-                        <label className="mb-3 block text-black dark:text-white">
-                          Catatan Finance
-                        </label>
-                        <textarea
-                          rows={3}
-                          disabled
-                          placeholder="Masukan Deskripsi"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          defaultValue={data?.finance_note || '-'}
-                        ></textarea>
-                      </div>
-                    </>
-                  )}
-                  {data?.jenis_reimbursement == 'Cash Advance' &&
-                  data?.status_finance == 'DONE' &&
-                  !IS_PUSHED ? (
-                    <div className="w-full mt-4.5">
-                      <Button onClick={onReportButtonPressed}>
-                        {data?.childId ? 'Lihat' : 'Buat'} Report Realisasi
-                      </Button>
-                    </div>
-                  ) : null}
-                  {data?.jenis_reimbursement == 'Cash Advance Report' &&
-                  data?.parentId &&
-                  !IS_PUSHED ? (
-                    <div className="w-full mt-4.5">
-                      <Button onClick={onSeeButtonPressed}>
-                        Lihat Pengajuan Cash Advance
-                      </Button>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </form>
-          </div>
+          <div className=" hidden sm:block">{renderStatusPersetujuan()}</div>
 
           {/* <!-- Sign Up Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -671,30 +640,19 @@ const DetailPengajuan: React.FC = () => {
         visible={visible}
         toggle={toggle}
         type={type}
-        onConfirm={() => deletePengajuan()}
-        onDone={() => navigate('/', { replace: true })}
+        onConfirm={() => (context == 'COA' ? onCOAUpdate() : deletePengajuan())}
+        onDone={() =>
+          context !== 'COA' ? navigate('/', { replace: true }) : null
+        }
       />
-      {/* DIALOG */}
-      {/* <Dialog
-        open={showDialog}
-        size={'xs'}
-        handler={() => setShowDialog(!showDialog)}
-        dismiss={{ enabled: false }}
-      >
-        <DialogHeader>{DIALOG_PROPS.title}</DialogHeader>
-        <DialogBody>{DIALOG_PROPS.message}</DialogBody>
-        <DialogFooter>
-          <Button
-            onClick={(e: any) => {
-              e.preventDefault();
-              setShowDialog(!showDialog);
-              dialogtype == 'OK' ? navigate('/', { replace: true }) : null;
-            }}
-          >
-            Ok
-          </Button>
-        </DialogFooter>
-      </Dialog> */}
+      <COAModal
+        visible={showCoa}
+        toggle={() => setShowCoa(!showCoa)}
+        value={(val: any) => {
+          setCoa(val);
+          setCoaChange(true);
+        }}
+      />
     </DefaultLayout>
   );
 };

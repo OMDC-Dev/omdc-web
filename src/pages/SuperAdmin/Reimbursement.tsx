@@ -326,7 +326,7 @@ function SuperReimbursement() {
                                 e.preventDefault();
                                 navigate(`/reimbursement/${item?.id}`, {
                                   replace: false,
-                                  state: item,
+                                  state: { ...item, isReport: true },
                                 });
                               }}
                             >

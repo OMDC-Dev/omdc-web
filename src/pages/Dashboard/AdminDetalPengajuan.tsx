@@ -24,6 +24,7 @@ import {
 import AdminModal from '../../components/Modal/AdminModal';
 import useFetch from '../../hooks/useFetch';
 import {
+  ACCEPT_REVIEW_REIMBURSEMENT,
   FINANCE_ACCEPTANCE,
   FINANCE_UPDATE_COA,
   REIMBURSEMENT_ACCEPTANCE,
@@ -103,6 +104,12 @@ const AdminDetailPengajuan: React.FC = () => {
     isFinance?: boolean,
   ): { tx: string; color: colors } => {
     switch (status) {
+      case 'IDLE':
+        return {
+          tx: 'Menunggu Direview',
+          color: 'amber',
+        };
+        break;
       case 'WAITING':
         return {
           tx: isFinance ? 'Menunggu Diproses' : 'Menunggu Disetujui',
@@ -113,7 +120,7 @@ const AdminDetailPengajuan: React.FC = () => {
         return { tx: 'Disetujui', color: 'green' };
         break;
       case 'REJECTED':
-        return { tx: 'DItolak', color: 'red' };
+        return { tx: 'Ditolak', color: 'red' };
         break;
       case 'DONE':
         return { tx: 'Selesai', color: 'green' };
@@ -145,8 +152,9 @@ const AdminDetailPengajuan: React.FC = () => {
   console.log('STATUS', status);
 
   // acceptance finance
-  async function acceptance_fin() {
+  async function acceptance_fin(statusType: string) {
     changeType('LOADING');
+    const status = statusType == 'FIN_ACC' ? 'DONE' : 'REJECTED';
 
     const fnominal = formatRupiah(unformatRupiah(nominal), true);
 
@@ -158,7 +166,7 @@ const AdminDetailPengajuan: React.FC = () => {
     };
 
     const { state, data, error } = await useFetch({
-      url: FINANCE_ACCEPTANCE(RID),
+      url: FINANCE_ACCEPTANCE(RID, status),
       method: 'POST',
       data: body,
     });
@@ -172,26 +180,50 @@ const AdminDetailPengajuan: React.FC = () => {
   }
 
   // acceptance
-  const STATE_NOTE = data?.note;
   async function acceptance(statusType: any) {
     changeType('LOADING');
 
-    const status = statusType == 'ACC' ? 'APPROVED' : 'REJECTED';
+    const status = statusType == 'ADM_ACC' ? 'APPROVED' : 'REJECTED';
 
     const fnominal = formatRupiah(unformatRupiah(nominal), false);
-
-    const noteStr = `${STATE_NOTE?.length ? STATE_NOTE + `, ${note}` : note}`;
 
     const body = {
       fowarder_id: admin.iduser,
       status: admin ? 'FOWARDED' : status,
       nominal: fnominal,
-      note: noteStr,
+      note: note,
       coa: coa,
     };
 
     const { state, data, error } = await useFetch({
       url: REIMBURSEMENT_ACCEPTANCE(RID),
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      getStatus();
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  // set status finance
+  async function acceptance_reviewer(statusType: string) {
+    changeType('LOADING');
+
+    const tStatus = statusType == 'REV_ACC' ? 'APPROVED' : 'REJECTED';
+
+    const body = {
+      note: note,
+      coa: coa,
+      adminId: admin?.iduser || status?.accepted_by[0]?.iduser,
+      status: tStatus,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: ACCEPT_REVIEW_REIMBURSEMENT(RID),
       method: 'POST',
       data: body,
     });
@@ -269,7 +301,6 @@ const AdminDetailPengajuan: React.FC = () => {
   function renderCOASelector() {
     if (ADMIN_TYPE == 'ADMIN') {
       if (ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
-
       return (
         <div className="w-full mb-4.5">
           <div>
@@ -287,6 +318,7 @@ const AdminDetailPengajuan: React.FC = () => {
       );
     } else if (ADMIN_TYPE == 'REVIEWER') {
       const _status = status?.reviewStatus;
+      if (_status !== 'IDLE') return;
       return (
         <div className="w-full mb-4.5">
           <div>
@@ -318,6 +350,9 @@ const AdminDetailPengajuan: React.FC = () => {
       );
     } else {
       const _status = status?.status_finance;
+      if (_status == 'DONE') return;
+      if (_status == 'REJECTED') return;
+
       return (
         <div className="w-full mb-4.5">
           <div>
@@ -350,9 +385,9 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // === render note
   function renderNote() {
-    if (ADMIN_TYPE !== 'REVIEWER' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING')
-      return;
+    if (ADMIN_TYPE === 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
     if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
+    if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'WAITING') return;
 
     return (
       <div className=" w-full">
@@ -373,7 +408,7 @@ const AdminDetailPengajuan: React.FC = () => {
   function renderNoteList() {
     return status?.notes?.map((item: any, index: number) => {
       return (
-        <div className=" w-full">
+        <div className=" w-full mb-4.5">
           <label className="mb-2.5 block text-black dark:text-white">
             {item.title}
           </label>
@@ -381,7 +416,7 @@ const AdminDetailPengajuan: React.FC = () => {
             rows={3}
             disabled={true}
             className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            defaultValue={`${item.title}\n${item.msg}`}
+            defaultValue={item.msg}
           />
         </div>
       );
@@ -392,7 +427,7 @@ const AdminDetailPengajuan: React.FC = () => {
   function renderAccRejectButton() {
     if (ADMIN_TYPE == 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
     if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
-    if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'IDLE') return;
+    if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'WAITING') return;
 
     let title = '';
     if (ADMIN_TYPE == 'FINANCE') {
@@ -404,23 +439,47 @@ const AdminDetailPengajuan: React.FC = () => {
       title = 'Setujui Pengajuan';
     }
 
+    let context_acc;
+    let context_rej;
+
+    if (ADMIN_TYPE == 'ADMIN') {
+      context_acc = 'ADM_ACC';
+      context_rej = 'ADM_REJ';
+    } else if (ADMIN_TYPE == 'FINANCE') {
+      context_acc = 'FIN_ACC';
+      context_rej = 'FIN_REJ';
+    } else {
+      context_acc = 'REV_ACC';
+      context_rej = 'REV_REJ';
+    }
+
     return (
       <div className=" flex flex-col gap-y-4 mt-4.5">
         <Button
+          disabled={
+            ADMIN_TYPE == 'FINANCE' &&
+            data?.payment_type == 'TRANSFER' &&
+            !selectedBank?.namaBank
+          }
           onClick={(e: any) => {
             e.preventDefault();
             changeType('CONFIRM');
-            changeContext('ACC');
+            changeContext(context_acc);
             show();
           }}
         >
           {title}
         </Button>
         <Button
+          disabled={
+            ADMIN_TYPE == 'FINANCE' &&
+            data?.payment_type == 'TRANSFER' &&
+            !selectedBank?.namaBank
+          }
           onClick={(e: any) => {
             e.preventDefault();
             changeType('CONFIRM');
-            changeContext('RJJ');
+            changeContext(context_rej);
             show();
           }}
           className=" bg-red-400 border-red-400"
@@ -458,161 +517,189 @@ const AdminDetailPengajuan: React.FC = () => {
     );
   }
 
+  // function render reviewer status process
+  function renderReviewerStatus() {
+    const reviewStatus = status?.reviewStatus;
+
+    return (
+      <div className=" py-4 flex justify-between">
+        <span className=" text-black font-bold">Reviewer</span>
+        <Chip
+          variant={'ghost'}
+          color={STATUS_WORDING(reviewStatus, true).color}
+          value={STATUS_WORDING(reviewStatus, true).tx}
+        />
+      </div>
+    );
+  }
+
+  // render finance process status
+  function renderFinanceProcessStatus() {
+    const statusFinance = status?.status_finance;
+
+    if (statusFinance == 'IDLE') return;
+
+    return (
+      <div className=" py-4 flex justify-between">
+        <span className=" text-black font-bold">Finance</span>
+        <Chip
+          variant={'ghost'}
+          color={STATUS_WORDING(statusFinance, true).color}
+          value={STATUS_WORDING(statusFinance, true).tx}
+        />
+      </div>
+    );
+  }
+
+  // ================= GAP
+
+  function renderStatusPersetujuan() {
+    return (
+      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+        <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+          <h3 className="font-medium text-black dark:text-white">
+            Status Persetujuan
+          </h3>
+          <Chip
+            variant={'outlined'}
+            color={STATUS_WORDING(status?.status).color}
+            value={STATUS_WORDING(status?.status).tx}
+          />
+        </div>
+        <div>
+          <div className="p-6.5">
+            <div className="mb-4.5 border-b pb-4 border-blue-gray-800">
+              <div>
+                <label className="mb-3 block text-black dark:text-white">
+                  Status Approval
+                </label>
+                {renderReviewerStatus()}
+                {status?.accepted_by?.map((item: any, index: number) => {
+                  return (
+                    <div className=" py-4 flex justify-between">
+                      <span className=" text-black font-bold">
+                        {item.nm_user}
+                      </span>
+                      <Chip
+                        variant={'ghost'}
+                        color={STATUS_WORDING(item?.status).color}
+                        value={STATUS_WORDING(item?.status).tx}
+                      />
+                    </div>
+                  );
+                })}
+                {renderFinanceProcessStatus()}
+              </div>
+            </div>
+
+            <div className="w-full mb-4.5">
+              <label className="mb-2.5 block text-black dark:text-white">
+                Nominal Pengajuan{' '}
+                {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' && ADMIN_TYPE == 'ADMIN'
+                  ? '( Ubah nominal bila diperlukan )'
+                  : ''}
+              </label>
+              <input
+                type="text"
+                disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
+                defaultValue={data?.nominal}
+                placeholder="Masukan Nominal"
+                className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={nominal}
+                onChange={(e) => setNominal(e.target.value)}
+                onFocus={() => {
+                  const unfr = unformatRupiah(data?.nominal);
+                  setNominal(unfr);
+                }}
+                onBlur={() => {
+                  const frm = formatRupiah(nominal, true);
+                  setNominal(frm);
+                }}
+              />
+            </div>
+
+            {renderAdminSelector()}
+            {renderCOASelector()}
+            {renderNoteList()}
+            {renderNote()}
+
+            {data?.payment_type == 'TRANSFER' && ADMIN_TYPE == 'FINANCE' ? (
+              <div className="mb-full mt-2 mb-12">
+                <div>
+                  <label className="mb-3 block text-black dark:text-white">
+                    Bank Pengirim ( Finance )
+                  </label>
+                  <div
+                    onClick={() =>
+                      data?.status_finance == 'WAITING'
+                        ? setShowBank(!showBank)
+                        : null
+                    }
+                    className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                  >
+                    {data?.finance_bank ||
+                      selectedBank?.namaBank ||
+                      'Pilih Bank'}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {data?.jenis_reimbursement == 'Cash Advance' &&
+            data?.status_finance == 'DONE' &&
+            data?.childId &&
+            !IS_PUSHED ? (
+              <div className="w-full mt-4.5">
+                <Button onClick={onReportButtonPressed}>
+                  Lihat Report Realisasi
+                </Button>
+              </div>
+            ) : null}
+            {data?.jenis_reimbursement == 'Cash Advance Report' &&
+            data?.parentId &&
+            !IS_PUSHED ? (
+              <div className="w-full mt-4.5">
+                <Button onClick={onSeeButtonPressed}>
+                  Lihat Pengajuan Cash Advance
+                </Button>
+              </div>
+            ) : null}
+
+            {/* {ADMIN_TYPE == 'FINANCE' && status?.status_finance == 'WAITING' ? (
+              <div className=" mt-4.5">
+                <Button
+                  disabled={
+                    data?.payment_type == 'TRANSFER' && !selectedBank?.namaBank
+                  }
+                  onClick={(e: any) => {
+                    e.preventDefault();
+                    changeType('CONFIRM');
+                    changeContext('FIN');
+                    show();
+                  }}
+                >
+                  {data?.bank_detail?.bankname &&
+                  data?.payment_type == 'TRANSFER'
+                    ? 'Konfirmasi Sudah Ditransfer'
+                    : 'Konfirmasi Selesai'}
+                </Button>
+              </div>
+            ) : null} */}
+
+            {renderAccRejectButton()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // =================== GAP
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
-        <div className=" sm:hidden">
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Status Persetujuan
-              </h3>
-              <Chip
-                variant={'outlined'}
-                color={STATUS_WORDING(status?.status).color}
-                value={STATUS_WORDING(status?.status).tx}
-              />
-            </div>
-            <div>
-              <div className="p-6.5">
-                <div className="mb-4.5 border-b pb-4 border-blue-gray-800">
-                  <div>
-                    <label className="mb-3 block text-black dark:text-white">
-                      Status Approval
-                    </label>
-                    {status?.accepted_by?.map((item: any, index: number) => {
-                      return (
-                        <div className=" py-4 flex justify-between">
-                          <span className=" text-black font-bold">
-                            {item.nm_user}
-                          </span>
-                          <Chip
-                            variant={'ghost'}
-                            color={STATUS_WORDING(item?.status).color}
-                            value={STATUS_WORDING(item?.status).tx}
-                          />
-                        </div>
-                      );
-                    })}
-                    {status?.status_finance !== 'IDLE' ? (
-                      <div className=" py-4 flex justify-between">
-                        <span className=" text-black font-bold">Finance</span>
-                        <Chip
-                          variant={'ghost'}
-                          color={
-                            STATUS_WORDING(status?.status_finance, true).color
-                          }
-                          value={
-                            STATUS_WORDING(status?.status_finance, true).tx
-                          }
-                        />
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
+        <div className=" sm:hidden">{renderStatusPersetujuan()}</div>
 
-                <div className="w-full mb-4.5">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Nominal Pengajuan{' '}
-                    {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' &&
-                    ADMIN_TYPE == 'ADMIN'
-                      ? '( Ubah nominal bila diperlukan )'
-                      : ''}
-                  </label>
-                  <input
-                    type="text"
-                    disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
-                    defaultValue={data?.nominal}
-                    placeholder="Masukan Nominal"
-                    className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    value={nominal}
-                    onChange={(e) => setNominal(e.target.value)}
-                    onFocus={() => {
-                      const unfr = unformatRupiah(data?.nominal);
-                      setNominal(unfr);
-                    }}
-                    onBlur={() => {
-                      const frm = formatRupiah(nominal, true);
-                      setNominal(frm);
-                    }}
-                  />
-                </div>
-
-                {renderAdminSelector()}
-                {renderCOASelector()}
-                {renderNoteList()}
-                {renderNote()}
-
-                {data?.payment_type == 'TRANSFER' && ADMIN_TYPE == 'FINANCE' ? (
-                  <div className="mb-full mt-2 mb-12">
-                    <div>
-                      <label className="mb-3 block text-black dark:text-white">
-                        Bank Pengirim ( Finance )
-                      </label>
-                      <div
-                        onClick={() =>
-                          data?.status_finance == 'WAITING'
-                            ? setShowBank(!showBank)
-                            : null
-                        }
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {data?.finance_bank ||
-                          selectedBank?.namaBank ||
-                          'Pilih Bank'}
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-
-                {data?.jenis_reimbursement == 'Cash Advance' &&
-                data?.status_finance == 'DONE' &&
-                data?.childId &&
-                !IS_PUSHED ? (
-                  <div className="w-full mt-4.5">
-                    <Button onClick={onReportButtonPressed}>
-                      Lihat Report Realisasi
-                    </Button>
-                  </div>
-                ) : null}
-                {data?.jenis_reimbursement == 'Cash Advance Report' &&
-                data?.parentId &&
-                !IS_PUSHED ? (
-                  <div className="w-full mt-4.5">
-                    <Button onClick={onSeeButtonPressed}>
-                      Lihat Pengajuan Cash Advance
-                    </Button>
-                  </div>
-                ) : null}
-
-                {ADMIN_TYPE == 'FINANCE' &&
-                status?.status_finance == 'WAITING' ? (
-                  <div className=" mt-4.5">
-                    <Button
-                      disabled={
-                        data?.payment_type == 'TRANSFER' &&
-                        !selectedBank?.namaBank
-                      }
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        changeType('CONFIRM');
-                        changeContext('FIN');
-                        show();
-                      }}
-                    >
-                      {data?.bank_detail?.bankname &&
-                      data?.payment_type == 'TRANSFER'
-                        ? 'Konfirmasi Sudah Ditransfer'
-                        : 'Konfirmasi Selesai'}
-                    </Button>
-                  </div>
-                ) : null}
-
-                {renderAccRejectButton()}
-              </div>
-            </div>
-          </div>
-        </div>
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -750,229 +837,7 @@ const AdminDetailPengajuan: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-9">
-          <div className="hidden sm:block rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Status Persetujuan
-                </h3>
-                <Chip
-                  variant={'outlined'}
-                  color={STATUS_WORDING(status?.status).color}
-                  value={STATUS_WORDING(status?.status).tx}
-                />
-              </div>
-              <form action="#">
-                <div className="p-6.5">
-                  <div className="mb-4.5 border-b pb-4 border-blue-gray-800">
-                    <div>
-                      <label className="mb-3 block text-black dark:text-white">
-                        Status Approval
-                      </label>
-                      {status?.accepted_by?.map((item: any, index: number) => {
-                        return (
-                          <div className=" py-4 flex justify-between">
-                            <span className=" text-black font-bold">
-                              {item.nm_user}
-                            </span>
-                            <Chip
-                              variant={'ghost'}
-                              color={STATUS_WORDING(item?.status).color}
-                              value={STATUS_WORDING(item?.status).tx}
-                            />
-                          </div>
-                        );
-                      })}
-                      {status?.status_finance !== 'IDLE' ? (
-                        <div className=" py-4 flex justify-between">
-                          <span className=" text-black font-bold">Finance</span>
-                          <Chip
-                            variant={'ghost'}
-                            color={
-                              STATUS_WORDING(status?.status_finance, true).color
-                            }
-                            value={
-                              STATUS_WORDING(status?.status_finance, true).tx
-                            }
-                          />
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="w-full mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nominal Pengajuan{' '}
-                      {ACCEPTANCE_STATUS_BY_ID !== 'WAITING' &&
-                      ADMIN_TYPE == 'ADMIN'
-                        ? '( Ubah nominal bila diperlukan )'
-                        : ''}
-                    </label>
-                    <input
-                      type="text"
-                      disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
-                      defaultValue={data?.nominal}
-                      placeholder="Masukan Nominal"
-                      className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      value={nominal}
-                      onChange={(e) => setNominal(e.target.value)}
-                      onFocus={() => {
-                        const unfr = unformatRupiah(data?.nominal);
-                        setNominal(unfr);
-                      }}
-                      onBlur={() => {
-                        const frm = formatRupiah(nominal, true);
-                        setNominal(frm);
-                      }}
-                    />
-                  </div>
-
-                  {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
-                    <div className="w-full mb-4.5">
-                      <div>
-                        <label className="mb-3 block text-black dark:text-white">
-                          Teruskan Approval Admin ( Opsional )
-                        </label>
-                        <div
-                          onClick={() => setShowAdmin(!showAdmin)}
-                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        >
-                          {admin?.nm_user || 'Pilih Admin'}
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {renderCOASelector()}
-
-                  <div className=" w-full">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Catatan ( Opsional )
-                    </label>
-                    {ADMIN_TYPE == 'ADMIN' ? (
-                      ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
-                        <textarea
-                          rows={3}
-                          disabled={ACCEPTANCE_STATUS_BY_ID !== 'WAITING'}
-                          placeholder="Masukan Catatan"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          value={note}
-                          onChange={(e) => setNote(e.target.value)}
-                        ></textarea>
-                      ) : (
-                        <textarea
-                          rows={3}
-                          disabled={true}
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          defaultValue={data?.note + note}
-                        ></textarea>
-                      )
-                    ) : (
-                      <textarea
-                        rows={3}
-                        disabled={status?.status_finance !== 'WAITING'}
-                        placeholder="Masukan Catatan"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={note || data?.finance_note}
-                        onChange={(e) => setNote(e.target.value)}
-                      ></textarea>
-                    )}
-                  </div>
-
-                  {data?.payment_type == 'TRANSFER' ? (
-                    <div className="mb-full mt-2 mb-12">
-                      <div>
-                        <label className="mb-3 block text-black dark:text-white">
-                          Bank Pengirim ( Finance )
-                        </label>
-                        <div
-                          onClick={() =>
-                            data?.status_finance == 'WAITING'
-                              ? setShowBank(!showBank)
-                              : null
-                          }
-                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        >
-                          {data?.finance_bank ||
-                            selectedBank?.namaBank ||
-                            'Pilih Bank'}
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {data?.jenis_reimbursement == 'Cash Advance' &&
-                  data?.status_finance == 'DONE' &&
-                  data?.childId &&
-                  !IS_PUSHED ? (
-                    <div className="w-full mt-4.5">
-                      <Button onClick={onReportButtonPressed}>
-                        Lihat Report Realisasi
-                      </Button>
-                    </div>
-                  ) : null}
-                  {data?.jenis_reimbursement == 'Cash Advance Report' &&
-                  data?.parentId &&
-                  !IS_PUSHED ? (
-                    <div className="w-full mt-4.5">
-                      <Button onClick={onSeeButtonPressed}>
-                        Lihat Pengajuan Cash Advance
-                      </Button>
-                    </div>
-                  ) : null}
-
-                  {ADMIN_TYPE == 'FINANCE' &&
-                  status?.status_finance == 'WAITING' ? (
-                    <div className=" mt-4.5">
-                      <Button
-                        disabled={
-                          data?.payment_type == 'TRANSFER' &&
-                          !selectedBank?.namaBank
-                        }
-                        onClick={(e: any) => {
-                          e.preventDefault();
-                          changeType('CONFIRM');
-                          changeContext('FIN');
-                          show();
-                        }}
-                      >
-                        {data?.bank_detail?.bankname
-                          ? 'Konfirmasi Sudah Ditransfer'
-                          : 'Konfirmasi Selesai'}
-                      </Button>
-                    </div>
-                  ) : null}
-
-                  {ACCEPTANCE_STATUS_BY_ID == 'WAITING' ? (
-                    <div className=" flex flex-col gap-y-4 mt-4.5">
-                      <Button
-                        onClick={(e: any) => {
-                          e.preventDefault();
-                          changeType('CONFIRM');
-                          changeContext('ACC');
-                          show();
-                        }}
-                      >
-                        Setujui Pengajuan
-                      </Button>
-                      <Button
-                        onClick={(e: any) => {
-                          e.preventDefault();
-                          changeType('CONFIRM');
-                          changeContext('RJJ');
-                          show();
-                        }}
-                        className=" bg-red-400 border-red-400"
-                      >
-                        Tolak Pengajuan
-                      </Button>
-                    </div>
-                  ) : null}
-                </div>
-              </form>
-            </div>
-          </div>
-
+          <div className="hidden sm:block">{renderStatusPersetujuan()}</div>
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">
@@ -1162,12 +1027,16 @@ const AdminDetailPengajuan: React.FC = () => {
         visible={visible}
         toggle={toggle}
         onConfirm={() => {
-          if (context == 'ACC' || context == 'RJJ') {
+          if (context == 'ADM_ACC' || context == 'ADM_REJ') {
             acceptance(context);
           }
 
-          if (context == 'FIN') {
-            acceptance_fin();
+          if (context == 'FIN_ACC' || context == 'FIN_REJ') {
+            acceptance_fin(context);
+          }
+
+          if (context == 'REV_ACC' || context == 'REV_REJ') {
+            acceptance_reviewer(context);
           }
 
           if (context == 'COA') {

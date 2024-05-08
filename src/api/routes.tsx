@@ -53,8 +53,8 @@ export const SUPERUSER_REPORT_EXPORT = (
 
 // FINANCE
 export const FINANCE_PENGAJUAN = 'finance/pengajuan';
-export const FINANCE_ACCEPTANCE = (id: number) => {
-  return `finance/acceptance/${id}?status=DONE`;
+export const FINANCE_ACCEPTANCE = (id: number, status: string) => {
+  return `finance/acceptance/${id}?status=${status}`;
 };
 export const FINANCE_UPDATE_COA = (id: any) => {
   return `finance/update-coa/${id}`;
