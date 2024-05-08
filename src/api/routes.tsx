@@ -1,7 +1,7 @@
 const PROD = 'https://server.omdc.online/';
 const DEV = 'http://127.0.0.1:8080/';
 
-export const BASE_URL = DEV;
+export const BASE_URL = PROD;
 
 // AUTH
 export const LOGIN = 'user/login';

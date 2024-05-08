@@ -117,7 +117,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             src={`data:image/png;base64,${logo}`}
             alt="Logo"
           />
-          <span className=" text-title-sm font-bold text-white">OMDC v0.9</span>
+          <span className=" text-title-sm font-bold text-white">
+            OMDC v0.9.1
+          </span>
         </NavLink>
 
         <button
