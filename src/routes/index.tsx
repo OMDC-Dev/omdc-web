@@ -32,6 +32,7 @@ import SuperCOAUpdate from '../pages/SuperAdmin/COAUpdate';
 import PermintaanBarangAdmin from '../pages/PermintaanBarang/PermintaanBarangAdmin';
 import ReportReimbursement from '../pages/Dashboard/ReportReimbursement';
 import SuperIcon from '../pages/SuperAdmin/Icon';
+import DownloadReport from '../pages/Dashboard/DownloadReport';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -112,6 +113,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Detail Pengajuan'} />
               <DetailPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/:id/download',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Download Report'} />
+              <DownloadReport />
             </>
           ),
         },

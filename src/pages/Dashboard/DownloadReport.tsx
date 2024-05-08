@@ -8,7 +8,11 @@ import {
 import { colors } from '@material-tailwind/react/types/generic';
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FINANCE_UPDATE_COA, REIMBURSEMENT_DETAIL } from '../../api/routes';
+import {
+  FINANCE_UPDATE_COA,
+  GET_ICON,
+  REIMBURSEMENT_DETAIL,
+} from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
 import { calculateSaldo, downloadPDF } from '../../common/utils';
 import Button from '../../components/Button';
@@ -21,7 +25,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import COAModal from '../../components/Modal/COAModal';
 import { usePDF } from 'react-to-pdf';
 
-const DetailPengajuan: React.FC = () => {
+const DownloadReport: React.FC = () => {
   const {
     toggle,
     visible,
@@ -56,6 +60,7 @@ const DetailPengajuan: React.FC = () => {
   const [coa, setCoa] = React.useState<string>();
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
   const [coaChange, setCoaChange] = React.useState(false);
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
 
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
@@ -63,6 +68,23 @@ const DetailPengajuan: React.FC = () => {
   const { toPDF, targetRef } = usePDF({ filename: 'report.pdf' });
 
   const RID = data?.id;
+
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
+  }
 
   // handle status
   const STATUS_WORDING = (
@@ -237,17 +259,8 @@ const DetailPengajuan: React.FC = () => {
 
   function renderDownloadReportButton() {
     return (
-      <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-        <Button
-          onClick={() =>
-            navigate(`/reimbursement/${data?.id}/download`, {
-              replace: false,
-              state: data,
-            })
-          }
-        >
-          Download Report
-        </Button>
+      <div className=" border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+        <Button onClick={() => toPDF()}>Simpan Report PDF</Button>
       </div>
     );
   }
@@ -343,16 +356,22 @@ const DetailPengajuan: React.FC = () => {
   // ========================================================
 
   return (
-    <DefaultLayout>
-      <div ref={targetRef} className="grid grid-cols-1 gap-9 sm:grid-cols-2">
-        <div className="sm:hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-          {renderDownloadReportButton()}
-        </div>
-        <div className=" sm:hidden">{renderStatusPersetujuan()}</div>
-        <div className="flex flex-col gap-9">
-          <div className="hidden sm:block rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            {renderDownloadReportButton()}
+    <DefaultLayout center={true}>
+      <div className=" w-full sm:max-w-xl  rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+        {renderDownloadReportButton()}
+      </div>
+
+      <div ref={targetRef} className="grid grid-cols-1 gap-4">
+        <div className="flex flex-col gap-4">
+          <div className="  flex justify-center pt-4.5">
+            <img
+              className="block h-40 w-40 object-contain"
+              src={`data:image/png;base64,${icon.icon}`}
+              alt="Logo"
+            />
           </div>
+
+          <div>{renderStatusPersetujuan()}</div>
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -486,11 +505,6 @@ const DetailPengajuan: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
-
-        <div className="flex flex-col gap-9">
-          <div className=" hidden sm:block">{renderStatusPersetujuan()}</div>
-
           {/* <!-- Sign Up Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -659,6 +673,176 @@ const DetailPengajuan: React.FC = () => {
             </div>
           ) : null}
         </div>
+
+        {/* <div className="flex flex-col gap-9">
+          <div className=" hidden sm:block">{renderStatusPersetujuan()}</div>
+
+          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+              <h3 className="font-medium text-black dark:text-white">Item</h3>
+            </div>
+            <form action="#">
+              <div className="p-6.5">
+                <div className="mb-4">
+                  <Card className=" rounded-md">
+                    <List>
+                      {data?.item?.map((item: any, index: number) => {
+                        return (
+                          <ListItem
+                            key={item + index}
+                            ripple={false}
+                            className="py-1 pr-1 pl-4"
+                          >
+                            {item?.name}
+                            <ListItemSuffix className="flex gap-x-4">
+                              {formatRupiah(item.nominal, true)}
+                            </ListItemSuffix>
+                          </ListItem>
+                        );
+                      })}
+                    </List>
+                  </Card>
+                </div>
+                <div className="mb-1">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Total Nominal
+                  </label>
+                  <input
+                    disabled
+                    type="text"
+                    value={data?.nominal}
+                    placeholder="Enter your full name"
+                    className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                {data?.realisasi ? (
+                  <>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Nominal Realisasi
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        value={data?.realisasi}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Saldo
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        value={calculateSaldo(data?.nominal, data?.realisasi)}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  </>
+                ) : null}
+                {data?.pengajuan_ca ? (
+                  <>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Nominal Pengajuan Cash Advance
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        value={data?.pengajuan_ca}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                    <div className="mt-4.5">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Saldo
+                      </label>
+                      <input
+                        disabled
+                        type="text"
+                        value={calculateSaldo(
+                          data?.pengajuan_ca,
+                          data?.nominal,
+                        )}
+                        placeholder="Enter your full name"
+                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </form>
+          </div>
+
+          {data?.bank_detail?.bankname && data?.payment_type == 'TRANSFER' ? (
+            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                <h3 className="font-medium text-black dark:text-white">
+                  Data Bank
+                </h3>
+              </div>
+              <form action="#">
+                <div className="p-6.5">
+                  <div className="mb-4.5">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Bank
+                      </label>
+                      <div className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {data?.bank_detail?.bankname || '-'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full mb-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nomor Rekening
+                    </label>
+                    <input
+                      disabled
+                      type="text"
+                      placeholder="Masukan Nomor Rekening"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      defaultValue={data?.bank_detail?.accountnumber}
+                    />
+                  </div>
+
+                  <div className="w-full mb-4.5">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nama Pemilik Rekening
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      defaultValue={data?.bank_detail?.accountname}
+                      placeholder="Nama Pemilik Rekening"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                    />
+                  </div>
+
+                  {data?.finance_bank ? (
+                    <div className="w-full">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        Dikirim oleh finance dari
+                      </label>
+                      <input
+                        type="text"
+                        disabled
+                        defaultValue={data?.finance_bank}
+                        placeholder="Nama Pemilik Rekening"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              </form>
+            </div>
+          ) : null}
+        </div> */}
       </div>
       {/* MODAL CONTAINER */}
       {/* <Modal visible={visible} toggle={toggle} /> */}
@@ -689,4 +873,4 @@ const DetailPengajuan: React.FC = () => {
   );
 };
 
-export default DetailPengajuan;
+export default DownloadReport;
