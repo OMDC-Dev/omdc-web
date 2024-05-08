@@ -175,14 +175,6 @@ const DetailPengajuan: React.FC = () => {
     }
   }
 
-  function DownloadReport() {
-    return (
-      <div ref={targetRef}>
-        <p>TESTING</p>
-      </div>
-    );
-  }
-
   function renderNoteList() {
     return data?.notes?.map((item: any, index: number) => {
       return (
@@ -252,6 +244,22 @@ const DetailPengajuan: React.FC = () => {
     );
   }
 
+  // function render reviewer status process
+  function renderReviewerStatus() {
+    const reviewStatus = data?.reviewStatus;
+
+    return (
+      <div className=" py-4 flex justify-between">
+        <span className=" text-black font-bold">Reviewer</span>
+        <Chip
+          variant={'ghost'}
+          color={STATUS_WORDING(reviewStatus, true).color}
+          value={STATUS_WORDING(reviewStatus, true).tx}
+        />
+      </div>
+    );
+  }
+
   // ======================== GAP RENDER STATUS PERSETUJUAN
   function renderStatusPersetujuan() {
     return (
@@ -273,6 +281,7 @@ const DetailPengajuan: React.FC = () => {
                 <label className="mb-3 block text-black dark:text-white">
                   Status Approval
                 </label>
+                {renderReviewerStatus()}
                 {data?.accepted_by?.map((item: any, index: number) => {
                   return (
                     <div className=" py-4 flex justify-between">
