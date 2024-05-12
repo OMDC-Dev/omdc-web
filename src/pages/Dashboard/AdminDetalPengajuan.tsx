@@ -18,6 +18,8 @@ import FileModal from '../../components/Modal/FileModal';
 import {
   calculateSaldo,
   downloadPDF,
+  formatAmount,
+  formatCurrencyToNumber,
   getDataById,
   unformatRupiah,
 } from '../../common/utils';
@@ -69,6 +71,7 @@ const AdminDetailPengajuan: React.FC = () => {
   const [data, setData] = React.useState(state);
   const [nominal, setNominal] = React.useState(data?.nominal);
   const [admin, setAdmin] = React.useState<any>('');
+  const [parentData, setParentData] = React.useState<any>();
 
   const [status, setStatus] = React.useState<any>();
 
@@ -79,6 +82,8 @@ const AdminDetailPengajuan: React.FC = () => {
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
   const [selectedBank, setSelectedBank] = React.useState<any>();
+  const [saldo, setSaldo] = React.useState<any>();
+  const [isNeedBank, setIsNeedBank] = React.useState<boolean>(true);
 
   // CONST
   const RID = data?.id;
@@ -133,7 +138,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
   React.useEffect(() => {
     getStatus();
-  }, [location.key]);
+  }, [location.key, type]);
 
   // get status
   async function getStatus() {
@@ -261,10 +266,14 @@ const AdminDetailPengajuan: React.FC = () => {
     if (id) {
       getDetails(id);
     }
+    if (data.jenis_reimbursement == 'Cash Advance Report') {
+      getParentDetails(data.parentId);
+    }
   }, [location.key]);
 
   async function getDetails(id: any) {
     show();
+
     const { state, data, error } = await useFetch({
       url: REIMBURSEMENT_DETAIL(id),
       method: 'GET',
@@ -277,6 +286,24 @@ const AdminDetailPengajuan: React.FC = () => {
       hide();
     }
   }
+
+  async function getParentDetails(id: any) {
+    show();
+
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_DETAIL(id),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setParentData(data);
+    } else {
+      hide();
+    }
+  }
+
+  console.log('PARENT', parentData);
 
   async function onCOAUpdate() {
     changeType('LOADING');
@@ -296,6 +323,26 @@ const AdminDetailPengajuan: React.FC = () => {
       getStatus();
     }
   }
+
+  // handle sisa and need bank
+  React.useEffect(() => {
+    if (data.payment_type == 'CASH') {
+      setIsNeedBank(false);
+    }
+
+    if (data.jenis_reimbursement == 'Cash Advance Report') {
+      const ca: number = formatCurrencyToNumber(parentData?.nominal);
+      const nom: number = formatCurrencyToNumber(data?.nominal);
+
+      const sisa = ca - nom;
+
+      setSaldo(sisa);
+
+      if (sisa > 0) {
+        setIsNeedBank(false);
+      }
+    }
+  }, [parentData, data]);
 
   // Render coa selector
   function renderCOASelector() {
@@ -408,7 +455,7 @@ const AdminDetailPengajuan: React.FC = () => {
   function renderNoteList() {
     return status?.notes?.map((item: any, index: number) => {
       return (
-        <div className=" w-full mb-4.5">
+        <div key={item + index} className=" w-full mb-4.5">
           <label className="mb-2.5 block text-black dark:text-white">
             {item.title}
           </label>
@@ -459,7 +506,8 @@ const AdminDetailPengajuan: React.FC = () => {
           disabled={
             ADMIN_TYPE == 'FINANCE' &&
             data?.payment_type == 'TRANSFER' &&
-            !selectedBank?.namaBank
+            !selectedBank?.namaBank &&
+            isNeedBank
           }
           onClick={(e: any) => {
             e.preventDefault();
@@ -474,7 +522,8 @@ const AdminDetailPengajuan: React.FC = () => {
           disabled={
             ADMIN_TYPE == 'FINANCE' &&
             data?.payment_type == 'TRANSFER' &&
-            !selectedBank?.namaBank
+            !selectedBank?.namaBank &&
+            isNeedBank
           }
           onClick={(e: any) => {
             e.preventDefault();
@@ -618,12 +667,36 @@ const AdminDetailPengajuan: React.FC = () => {
               />
             </div>
 
+            {data.jenis_reimbursement == 'Cash Advance Report' && (
+              <div>
+                <div className="w-full mb-4.5">
+                  <label className="mb-3 block text-black dark:text-white">
+                    Nominal Cash Advance
+                  </label>
+                  <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                    {parentData?.nominal}
+                  </div>
+                </div>
+
+                <div className="w-full mb-4.5">
+                  <label className="mb-3 block text-black dark:text-white">
+                    Saldo
+                  </label>
+                  <div className="w-full rounded-md border border-stroke font-bold py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                    {formatRupiah(saldo, true)}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {renderAdminSelector()}
             {renderCOASelector()}
             {renderNoteList()}
             {renderNote()}
 
-            {data?.payment_type == 'TRANSFER' && ADMIN_TYPE == 'FINANCE' ? (
+            {data?.payment_type == 'TRANSFER' &&
+            ADMIN_TYPE == 'FINANCE' &&
+            isNeedBank ? (
               <div className="mb-full mt-2 mb-12">
                 <div>
                   <label className="mb-3 block text-black dark:text-white">

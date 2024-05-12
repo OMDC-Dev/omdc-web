@@ -172,6 +172,7 @@ export function formatAmount(amountString: string) {
 }
 
 export function formatCurrencyToNumber(currencyString: string) {
+  if (!currencyString) return 0;
   // Hapus karakter non-digit dari string dan konversi menjadi angka
   const number = parseInt(currencyString.replace(/\D/g, ''), 10);
   return number;

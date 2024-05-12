@@ -15,7 +15,6 @@ import {
 } from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
 import { calculateSaldo, downloadPDF } from '../../common/utils';
-import Button from '../../components/Button';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -23,7 +22,8 @@ import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
 import COAModal from '../../components/Modal/COAModal';
-import { usePDF } from 'react-to-pdf';
+import { Margin, usePDF } from 'react-to-pdf';
+import Button from '../../components/Button';
 
 const DownloadReport: React.FC = () => {
   const {
@@ -65,7 +65,19 @@ const DownloadReport: React.FC = () => {
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
 
-  const { toPDF, targetRef } = usePDF({ filename: 'report.pdf' });
+  const opt = {
+    filename: 'report.pdf',
+    page: {
+      // margin is in MM, default is Margin.NONE = 0
+      margin: Margin.MEDIUM,
+      // default is 'A4'
+      format: 'A4',
+      // default is 'portrait'
+      orientation: 'landscape',
+    },
+  };
+
+  const { toPDF, targetRef } = usePDF(opt);
 
   const RID = data?.id;
 
@@ -260,7 +272,35 @@ const DownloadReport: React.FC = () => {
   function renderDownloadReportButton() {
     return (
       <div className=" border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-        <Button onClick={() => toPDF()}>Simpan Report PDF</Button>
+        <Button onClick={() => toPDF()}>Download PDF</Button>
+      </div>
+    );
+  }
+
+  function RenderLabel({
+    children,
+    child,
+  }: {
+    children: any;
+    child?: boolean;
+  }) {
+    return (
+      <span className=" text-sm font-medium text-black dark:text-white">
+        {children}
+      </span>
+    );
+  }
+
+  function RenderValue({
+    children,
+    child,
+  }: {
+    children: any;
+    child?: boolean;
+  }) {
+    return (
+      <div className={` text-sm font-bold ${child ? 'text-black-2' : ''} `}>
+        {children}
       </div>
     );
   }
@@ -268,87 +308,186 @@ const DownloadReport: React.FC = () => {
   // ======================== GAP RENDER STATUS PERSETUJUAN
   function renderStatusPersetujuan() {
     return (
-      <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-        <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-          <h3 className="font-medium text-black dark:text-white">
-            Status Persetujuan
-          </h3>
-          <Chip
-            variant={'outlined'}
-            color={STATUS_WORDING(data?.status).color}
-            value={STATUS_WORDING(data?.status).tx}
-          />
+      <div className="rounded-sm bg-white border-b py-4">
+        <div className="flex justify-between border-stroke py-1 px-6.5 dark:border-strokedark">
+          <RenderLabel>Status Persetujuan</RenderLabel>
+          <RenderValue>{STATUS_WORDING(data?.status).tx}</RenderValue>
         </div>
-        <form action="#">
-          <div className="p-6.5">
-            <div className="mb-1">
-              <div>
-                <label className="mb-3 block text-black dark:text-white">
-                  Status Approval
-                </label>
-                {data?.accepted_by?.map((item: any, index: number) => {
-                  return (
-                    <div className=" py-4 flex justify-between">
-                      <span className=" text-black font-bold">
-                        {item.nm_user}
-                      </span>
-                      <Chip
-                        variant={'ghost'}
-                        color={STATUS_WORDING(item?.status).color}
-                        value={STATUS_WORDING(item?.status).tx}
-                      />
-                    </div>
-                  );
-                })}
-                {data?.status_finance !== 'IDLE' ? (
-                  <div className=" py-4 flex justify-between">
-                    <span className=" text-black font-bold">Finance</span>
-                    <Chip
-                      variant={'ghost'}
-                      color={STATUS_WORDING(data?.status_finance, true).color}
-                      value={STATUS_WORDING(data?.status_finance, true).tx}
-                    />
-                  </div>
-                ) : null}
-              </div>
-              {renderCOASelector()}
-              {renderNoteList()}
-
-              {data?.status == 'WAITING' ? (
-                <div className=" mt-4">
-                  <Button
-                    onClick={(e: any) => {
-                      e.preventDefault();
-                      changeType('CONFIRM');
-                      show();
-                    }}
-                  >
-                    Batalkan Pengajuan
-                  </Button>
-                </div>
-              ) : null}
-
-              {data?.jenis_reimbursement == 'Cash Advance' &&
-              data?.status_finance == 'DONE' &&
-              !IS_PUSHED ? (
-                <div className="w-full mt-4.5">
-                  <Button onClick={onReportButtonPressed}>
-                    {data?.childId ? 'Lihat' : 'Buat'} Report Realisasi
-                  </Button>
-                </div>
-              ) : null}
-              {data?.jenis_reimbursement == 'Cash Advance Report' &&
-              data?.parentId &&
-              !IS_PUSHED ? (
-                <div className="w-full mt-4.5">
-                  <Button onClick={onSeeButtonPressed}>
-                    Lihat Pengajuan Cash Advance
-                  </Button>
-                </div>
-              ) : null}
+        <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
+          <RenderLabel>Status Approval</RenderLabel>
+        </div>
+        {data?.accepted_by?.map((item: any, index: number) => {
+          return (
+            <div className="flex justify-between border-stroke py-1 px-10 dark:border-strokedark">
+              <RenderValue>{item.nm_user}</RenderValue>
+              <RenderValue child={true}>
+                {STATUS_WORDING(item?.status).tx}
+              </RenderValue>
             </div>
+          );
+        })}
+        {data?.status_finance !== 'IDLE' ? (
+          <div className="flex justify-between  border-stroke py-1 px-10 dark:border-strokedark">
+            <RenderValue>Finance</RenderValue>
+            <RenderValue child={true}>
+              {STATUS_WORDING(data?.status_finance, true).tx}
+            </RenderValue>
           </div>
-        </form>
+        ) : null}
+        <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
+          <RenderLabel>Catatan</RenderLabel>
+        </div>
+        {data?.notes?.map((item: any, index: number) => {
+          return (
+            <div className="flex justify-between border-stroke py-1 px-10 dark:border-strokedark">
+              <RenderValue>{item.title}</RenderValue>
+              <RenderValue>{item.msg}</RenderValue>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderFormPengajuan() {
+    const DATA = [
+      {
+        title: 'No. Dok',
+        value: data?.no_doc,
+      },
+      {
+        title: 'Kategori Permintaan',
+        value: data?.tipePembayaran,
+      },
+      {
+        title: 'Jenis R.O.P',
+        value: data?.jenis_reimbursement,
+      },
+      {
+        title: 'COA / Grup Biaya',
+        value: data?.coa,
+      },
+      {
+        title: 'Tanggal',
+        value: data?.tanggal_reimbursement,
+      },
+      {
+        title: 'Cabang',
+        value: data?.kode_cabang,
+      },
+      {
+        title: 'No. WA',
+        value: data?.requester?.nomorwa,
+      },
+      {
+        title: 'Jenis Pembayaran',
+        value: data?.payment_type == 'CASH' ? 'Cash' : 'Transfer',
+      },
+      {
+        title: 'Nama Client / Vendor',
+        value: data?.name || '-',
+      },
+      {
+        title: 'Deskripsi',
+        value: data?.description,
+      },
+    ];
+    return (
+      <div className="rounded-sm bg-white border-b py-4">
+        {DATA.map((item, index) => {
+          return (
+            <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
+              <RenderLabel>{item.title}</RenderLabel>
+              <RenderValue>{item.value}</RenderValue>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderItemData() {
+    return (
+      <div className="rounded-sm bg-white border-b py-4">
+        <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
+          <RenderLabel>Item</RenderLabel>
+        </div>
+        {data?.item?.map((item: any, index: number) => {
+          return (
+            <div className="flex justify-between border-stroke py-1 px-10 dark:border-strokedark">
+              <RenderValue>{item.name}</RenderValue>
+              <RenderValue child>
+                {formatRupiah(item.nominal, true)}
+              </RenderValue>
+            </div>
+          );
+        })}
+        <div className="flex justify-between border-stroke py-1 px-6.5 dark:border-strokedark">
+          <RenderLabel>Total Nominal</RenderLabel>
+          <RenderValue>{data.nominal}</RenderValue>
+        </div>
+        {data?.realisasi && (
+          <div className="flex justify-between border-stroke py-1 px-6.5 dark:border-strokedark">
+            <RenderLabel>Nominal Realisasi</RenderLabel>
+            <RenderValue>{data.realisasi}</RenderValue>
+          </div>
+        )}
+        {data?.pengajuan_ca && (
+          <div className="flex justify-between border-stroke py-1 px-6.5 dark:border-strokedark">
+            <RenderLabel>Nominal Cash Advance</RenderLabel>
+            <RenderValue>{data.pengajuan_ca}</RenderValue>
+          </div>
+        )}
+        {data?.realisasi && (
+          <div className="flex justify-between border-stroke py-1 px-6.5 dark:border-strokedark">
+            <RenderLabel>Saldo</RenderLabel>
+            <RenderValue>
+              {calculateSaldo(data?.nominal, data?.realisasi)}
+            </RenderValue>
+          </div>
+        )}
+        {data?.pengajuan_ca && (
+          <div className="flex justify-between border-stroke py-1 px-6.5 dark:border-strokedark">
+            <RenderLabel>Saldo</RenderLabel>
+            <RenderValue>
+              {calculateSaldo(data?.pengajuan_ca, data?.nominal)}
+            </RenderValue>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  function renderBankData() {
+    if (data?.payment_type == 'CASH') return;
+    const DATA = [
+      {
+        title: 'Nama Bank',
+        value: data?.bank_detail?.bankname,
+      },
+      {
+        title: 'Nama Pemilik Rekening',
+        value: data?.bank_detail?.accountname,
+      },
+      {
+        title: 'Nomor Rekening',
+        value: data?.bank_detail?.accountnumber,
+      },
+      {
+        title: 'Bank Pengirim ( Finance )',
+        value: data?.finance_bank,
+      },
+    ];
+    return (
+      <div className="rounded-sm bg-white border-b py-4">
+        {DATA.map((item, index) => {
+          return (
+            <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
+              <RenderLabel>{item.title}</RenderLabel>
+              <RenderValue>{item.value}</RenderValue>
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -357,492 +496,33 @@ const DownloadReport: React.FC = () => {
 
   return (
     <DefaultLayout center={true}>
-      <div className=" w-full sm:max-w-xl  rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="hidden xl:block  w-full sm:max-w-xl rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         {renderDownloadReportButton()}
       </div>
 
-      <div ref={targetRef} className="grid grid-cols-1 gap-4">
-        <div className="flex flex-col gap-4">
-          <div className="  flex justify-center pt-4.5">
+      <div
+        ref={targetRef}
+        className="grid grid-cols-1 gap-4 bg-white place-items-center"
+      >
+        <div className="flex flex-col gap-4 w-4/5">
+          <div className="  flex justify-start p-4.5">
             <img
-              className="block h-40 w-40 object-contain"
+              className="block h-24 w-24 object-contain"
               src={`data:image/png;base64,${icon.icon}`}
               alt="Logo"
             />
           </div>
-
-          <div>{renderStatusPersetujuan()}</div>
-          {/* <!-- Contact Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Form Pengajuan
-              </h3>
+          <div className=" flex gap-8">
+            <div className=" flex-1">
+              {renderStatusPersetujuan()}
+              {renderFormPengajuan()}
             </div>
-            <form action="#">
-              <div className="p-6.5">
-                <div className="mb-4.5 flex flex-col gap-6">
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      No. Dok
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.no_doc}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Kategori Permintaan
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.tipePembayaran}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Jenis Request of Payment
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.jenis_reimbursement}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      COA / Grup Biaya
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.coa}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Tanggal
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.tanggal_reimbursement}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Cabang
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.kode_cabang}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Nomor WhatsApp
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.requester?.nomorwa}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Jenis Pembayaran
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.payment_type == 'CASH' ? 'Cash' : 'Transfer'}
-                    </div>
-                  </div>
-
-                  <div className="w-full">
-                    <label className="mb-3 block text-black dark:text-white">
-                      Nama Client / Vendor
-                    </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.name || '-'}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="w-full">
-                  <label className="mb-3 block text-black dark:text-white">
-                    Lampiran
-                  </label>
-                  <div className=" flex flex-col gap-4">
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.file_info?.name}
-                    </div>
-                    <Button
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        data?.file_info?.type !== 'application/pdf'
-                          ? setShowFile(!showFile)
-                          : downloadPDF(
-                              data?.attachment,
-                              data?.file_info?.name,
-                            );
-                      }}
-                    >
-                      {data?.file_info?.type !== 'application/pdf'
-                        ? 'Lihat Lampiran'
-                        : 'Unduh Lampiran'}
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="w-full mt-4.5">
-                  <label className="mb-3 block text-black dark:text-white">
-                    Deskripsi
-                  </label>
-                  <textarea
-                    rows={6}
-                    disabled
-                    placeholder="Masukan Deskripsi"
-                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    defaultValue={data?.description}
-                  ></textarea>
-                </div>
-              </div>
-            </form>
+            <div className=" flex-1">
+              {renderItemData()}
+              {renderBankData()}
+            </div>
           </div>
-          {/* <!-- Sign Up Form --> */}
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">Item</h3>
-            </div>
-            <form action="#">
-              <div className="p-6.5">
-                <div className="mb-4">
-                  <Card className=" rounded-md">
-                    <List>
-                      {data?.item?.map((item: any, index: number) => {
-                        return (
-                          <ListItem
-                            key={item + index}
-                            ripple={false}
-                            className="py-1 pr-1 pl-4"
-                          >
-                            {item?.name}
-                            <ListItemSuffix className="flex gap-x-4">
-                              {formatRupiah(item.nominal, true)}
-                            </ListItemSuffix>
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </Card>
-                </div>
-                <div className="mb-1">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Total Nominal
-                  </label>
-                  <input
-                    disabled
-                    type="text"
-                    value={data?.nominal}
-                    placeholder="Enter your full name"
-                    className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
-                </div>
-                {data?.realisasi ? (
-                  <>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Nominal Realisasi
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={data?.realisasi}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Saldo
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={calculateSaldo(data?.nominal, data?.realisasi)}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                  </>
-                ) : null}
-                {data?.pengajuan_ca ? (
-                  <>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Nominal Pengajuan Cash Advance
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={data?.pengajuan_ca}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Saldo
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={calculateSaldo(
-                          data?.pengajuan_ca,
-                          data?.nominal,
-                        )}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                  </>
-                ) : null}
-              </div>
-            </form>
-          </div>
-
-          {/* <!-- Sign In Form --> */}
-          {data?.bank_detail?.bankname && data?.payment_type == 'TRANSFER' ? (
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Data Bank
-                </h3>
-              </div>
-              <form action="#">
-                <div className="p-6.5">
-                  <div className="mb-4.5">
-                    <div>
-                      <label className="mb-3 block text-black dark:text-white">
-                        Bank
-                      </label>
-                      <div className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                        {data?.bank_detail?.bankname || '-'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-full mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nomor Rekening
-                    </label>
-                    <input
-                      disabled
-                      type="text"
-                      placeholder="Masukan Nomor Rekening"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      defaultValue={data?.bank_detail?.accountnumber}
-                    />
-                  </div>
-
-                  <div className="w-full mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nama Pemilik Rekening
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      defaultValue={data?.bank_detail?.accountname}
-                      placeholder="Nama Pemilik Rekening"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-
-                  {data?.finance_bank ? (
-                    <div className="w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Dikirim oleh finance dari
-                      </label>
-                      <input
-                        type="text"
-                        disabled
-                        defaultValue={data?.finance_bank}
-                        placeholder="Nama Pemilik Rekening"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              </form>
-            </div>
-          ) : null}
         </div>
-
-        {/* <div className="flex flex-col gap-9">
-          <div className=" hidden sm:block">{renderStatusPersetujuan()}</div>
-
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">Item</h3>
-            </div>
-            <form action="#">
-              <div className="p-6.5">
-                <div className="mb-4">
-                  <Card className=" rounded-md">
-                    <List>
-                      {data?.item?.map((item: any, index: number) => {
-                        return (
-                          <ListItem
-                            key={item + index}
-                            ripple={false}
-                            className="py-1 pr-1 pl-4"
-                          >
-                            {item?.name}
-                            <ListItemSuffix className="flex gap-x-4">
-                              {formatRupiah(item.nominal, true)}
-                            </ListItemSuffix>
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </Card>
-                </div>
-                <div className="mb-1">
-                  <label className="mb-2.5 block text-black dark:text-white">
-                    Total Nominal
-                  </label>
-                  <input
-                    disabled
-                    type="text"
-                    value={data?.nominal}
-                    placeholder="Enter your full name"
-                    className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                  />
-                </div>
-                {data?.realisasi ? (
-                  <>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Nominal Realisasi
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={data?.realisasi}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Saldo
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={calculateSaldo(data?.nominal, data?.realisasi)}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                  </>
-                ) : null}
-                {data?.pengajuan_ca ? (
-                  <>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Nominal Pengajuan Cash Advance
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={data?.pengajuan_ca}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                    <div className="mt-4.5">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Saldo
-                      </label>
-                      <input
-                        disabled
-                        type="text"
-                        value={calculateSaldo(
-                          data?.pengajuan_ca,
-                          data?.nominal,
-                        )}
-                        placeholder="Enter your full name"
-                        className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                  </>
-                ) : null}
-              </div>
-            </form>
-          </div>
-
-          {data?.bank_detail?.bankname && data?.payment_type == 'TRANSFER' ? (
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Data Bank
-                </h3>
-              </div>
-              <form action="#">
-                <div className="p-6.5">
-                  <div className="mb-4.5">
-                    <div>
-                      <label className="mb-3 block text-black dark:text-white">
-                        Bank
-                      </label>
-                      <div className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                        {data?.bank_detail?.bankname || '-'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="w-full mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nomor Rekening
-                    </label>
-                    <input
-                      disabled
-                      type="text"
-                      placeholder="Masukan Nomor Rekening"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      defaultValue={data?.bank_detail?.accountnumber}
-                    />
-                  </div>
-
-                  <div className="w-full mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nama Pemilik Rekening
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      defaultValue={data?.bank_detail?.accountname}
-                      placeholder="Nama Pemilik Rekening"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                    />
-                  </div>
-
-                  {data?.finance_bank ? (
-                    <div className="w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Dikirim oleh finance dari
-                      </label>
-                      <input
-                        type="text"
-                        disabled
-                        defaultValue={data?.finance_bank}
-                        placeholder="Nama Pemilik Rekening"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              </form>
-            </div>
-          ) : null}
-        </div> */}
       </div>
       {/* MODAL CONTAINER */}
       {/* <Modal visible={visible} toggle={toggle} /> */}

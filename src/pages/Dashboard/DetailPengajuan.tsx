@@ -227,19 +227,32 @@ const DetailPengajuan: React.FC = () => {
     );
   }
 
-  function renderDownloadReportButton() {
+  function renderDownloadReportButton(isTop: boolean) {
+    if (data.status_finance !== 'DONE') return;
+    if (
+      data.jenis_reimbursement == 'Cash Advance' &&
+      data.status_finance_child !== 'DONE'
+    )
+      return;
+
+    let visibility = isTop ? 'sm:hidden' : 'hidden sm:block';
+
     return (
-      <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-        <Button
-          onClick={() =>
-            navigate(`/reimbursement/${data?.id}/download`, {
-              replace: false,
-              state: data,
-            })
-          }
-        >
-          Download Report
-        </Button>
+      <div
+        className={`${visibility} rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
+      >
+        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+          <Button
+            onClick={() =>
+              navigate(`/reimbursement/${data?.id}/download`, {
+                replace: false,
+                state: data,
+              })
+            }
+          >
+            Download Report
+          </Button>
+        </div>
       </div>
     );
   }
@@ -354,14 +367,10 @@ const DetailPengajuan: React.FC = () => {
   return (
     <DefaultLayout>
       <div ref={targetRef} className="grid grid-cols-1 gap-9 sm:grid-cols-2">
-        <div className="sm:hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-          {renderDownloadReportButton()}
-        </div>
+        {renderDownloadReportButton(true)}
         <div className=" sm:hidden">{renderStatusPersetujuan()}</div>
         <div className="flex flex-col gap-9">
-          <div className="hidden sm:block rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            {renderDownloadReportButton()}
-          </div>
+          {renderDownloadReportButton(false)}
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
