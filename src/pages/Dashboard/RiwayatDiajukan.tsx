@@ -15,6 +15,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
 import {
   FINANCE_PENGAJUAN,
+  GET_MAKER_REIMBURSEMENT,
   GET_UNREVIEW_REIMBURSEMENT,
   PENGAJUAN,
 } from '../../api/routes';
@@ -70,7 +71,7 @@ function RiwayatDiajukan() {
   const ADMIN_TYPE = user?.type;
 
   const TABLE =
-    ADMIN_TYPE == 'ADMIN' || ADMIN_TYPE == 'REVIEWER'
+    ADMIN_TYPE == 'ADMIN' || ADMIN_TYPE == 'REVIEWER' || ADMIN_TYPE == 'MAKER'
       ? TABLE_HEAD
       : TABLE_HEAD_FINANCE;
 
@@ -86,9 +87,13 @@ function RiwayatDiajukan() {
       URL = PENGAJUAN;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
-    } else {
+    } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
+    } else {
+      URL = GET_MAKER_REIMBURSEMENT;
     }
+
+    console.log('URL', URL);
 
     const { state, data, error } = await useFetch({
       url: URL + `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,

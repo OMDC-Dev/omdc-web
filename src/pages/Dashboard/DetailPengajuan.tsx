@@ -8,7 +8,11 @@ import {
 import { colors } from '@material-tailwind/react/types/generic';
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FINANCE_UPDATE_COA, REIMBURSEMENT_DETAIL } from '../../api/routes';
+import {
+  FINANCE_UPDATE_COA,
+  REIMBURSEMENT_ACCEPTANCE,
+  REIMBURSEMENT_DETAIL,
+} from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
 import { calculateSaldo, downloadPDF } from '../../common/utils';
 import Button from '../../components/Button';
@@ -56,6 +60,8 @@ const DetailPengajuan: React.FC = () => {
   const [coa, setCoa] = React.useState<string>();
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
   const [coaChange, setCoaChange] = React.useState(false);
+
+  const [status, setStatus] = React.useState<any>();
 
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
@@ -126,6 +132,22 @@ const DetailPengajuan: React.FC = () => {
     }
   }, [location.key]);
 
+  React.useEffect(() => {
+    getStatus();
+  }, [location.key, type]);
+
+  // get status
+  async function getStatus() {
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_ACCEPTANCE(RID),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setStatus(data);
+    }
+  }
+
   async function getDetails(id: any) {
     changeType('LOADING');
     show();
@@ -176,7 +198,9 @@ const DetailPengajuan: React.FC = () => {
   }
 
   function renderNoteList() {
-    return data?.notes?.map((item: any, index: number) => {
+    if (status?.status == 'WAITING') return;
+
+    return status?.notes?.map((item: any, index: number) => {
       return (
         <div className=" w-full mb-4.5">
           <label className="mb-2.5 block text-black dark:text-white">
@@ -294,8 +318,8 @@ const DetailPengajuan: React.FC = () => {
                 <label className="mb-3 block text-black dark:text-white">
                   Status Approval
                 </label>
-                {renderReviewerStatus()}
-                {data?.accepted_by?.map((item: any, index: number) => {
+                {/* {renderReviewerStatus()} */}
+                {status?.accepted_by?.map((item: any, index: number) => {
                   return (
                     <div className=" py-4 flex justify-between">
                       <span className=" text-black font-bold">
@@ -309,7 +333,7 @@ const DetailPengajuan: React.FC = () => {
                     </div>
                   );
                 })}
-                {data?.status_finance !== 'IDLE' ? (
+                {/* {data?.status_finance !== 'IDLE' ? (
                   <div className=" py-4 flex justify-between">
                     <span className=" text-black font-bold">Finance</span>
                     <Chip
@@ -318,7 +342,7 @@ const DetailPengajuan: React.FC = () => {
                       value={STATUS_WORDING(data?.status_finance, true).tx}
                     />
                   </div>
-                ) : null}
+                ) : null} */}
               </div>
               {renderCOASelector()}
               {renderNoteList()}

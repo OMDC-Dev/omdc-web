@@ -13,7 +13,11 @@ import {
   ListItemSuffix,
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
-import { compressImage, hitungTotalNominal } from '../../common/utils';
+import {
+  cekAkses,
+  compressImage,
+  hitungTotalNominal,
+} from '../../common/utils';
 import BankModal from '../../components/Modal/BankModal';
 import useFetch from '../../hooks/useFetch';
 import { GET_BANK_NAME, REIMBURSEMENT } from '../../api/routes';
@@ -88,6 +92,8 @@ const BuatPengajuan: React.FC = () => {
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
   const IS_PRE_BANK =
     suplier?.nm_bank && suplier?.no_rekbank && suplier?.nm_pemilik_rek;
+
+  const hasPaymentRequest = cekAkses('#5');
 
   // dsabled n=button
   const disabledByType = () => {
@@ -347,7 +353,7 @@ const BuatPengajuan: React.FC = () => {
                       <label className="mb-2.5 block text-black dark:text-white">
                         Nama Client / Vendor
                       </label>
-                      {jenis == 'PR' ? (
+                      {jenis == 'PR' && hasPaymentRequest ? (
                         <div
                           onClick={() => setShowSuplier(!showSuplier)}
                           className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
@@ -357,7 +363,7 @@ const BuatPengajuan: React.FC = () => {
                       ) : (
                         <input
                           type="text"
-                          placeholder="Masukan Nama Reimbursement"
+                          placeholder="Masukan Nama Client / Vendor"
                           className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
@@ -601,6 +607,7 @@ const BuatPengajuan: React.FC = () => {
       />
       <AdminModal
         visible={showAdmin}
+        requesterId={user.iduser}
         toggle={() => setShowAdmin(!showAdmin)}
         value={(val: any) => setAdmin(val)}
       />

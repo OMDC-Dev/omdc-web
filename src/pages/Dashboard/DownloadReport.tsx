@@ -11,6 +11,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   FINANCE_UPDATE_COA,
   GET_ICON,
+  REIMBURSEMENT_ACCEPTANCE,
   REIMBURSEMENT_DETAIL,
 } from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
@@ -61,6 +62,7 @@ const DownloadReport: React.FC = () => {
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
   const [coaChange, setCoaChange] = React.useState(false);
   const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+  const [status, setStatus] = React.useState<any>();
 
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
@@ -95,6 +97,22 @@ const DownloadReport: React.FC = () => {
       setIcon(data);
     } else {
       setIcon(null);
+    }
+  }
+
+  React.useEffect(() => {
+    getStatus();
+  }, [location.key, type]);
+
+  // get status
+  async function getStatus() {
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_ACCEPTANCE(RID),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setStatus(data);
     }
   }
 
@@ -316,7 +334,7 @@ const DownloadReport: React.FC = () => {
         <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
           <RenderLabel>Status Approval</RenderLabel>
         </div>
-        {data?.accepted_by?.map((item: any, index: number) => {
+        {status?.accepted_by?.map((item: any, index: number) => {
           return (
             <div className="flex justify-between border-stroke py-1 px-10 dark:border-strokedark">
               <RenderValue>{item.nm_user}</RenderValue>
@@ -326,18 +344,10 @@ const DownloadReport: React.FC = () => {
             </div>
           );
         })}
-        {data?.status_finance !== 'IDLE' ? (
-          <div className="flex justify-between  border-stroke py-1 px-10 dark:border-strokedark">
-            <RenderValue>Finance</RenderValue>
-            <RenderValue child={true}>
-              {STATUS_WORDING(data?.status_finance, true).tx}
-            </RenderValue>
-          </div>
-        ) : null}
         <div className="flex justify-between  border-stroke py-1 px-6.5 dark:border-strokedark">
           <RenderLabel>Catatan</RenderLabel>
         </div>
-        {data?.notes?.map((item: any, index: number) => {
+        {status?.notes?.map((item: any, index: number) => {
           return (
             <div className="flex justify-between border-stroke py-1 px-10 dark:border-strokedark">
               <RenderValue>{item.title}</RenderValue>

@@ -13,6 +13,10 @@ const TYPE_DATA = [
     label: 'Reviewer',
     value: 'REVIEWER',
   },
+  {
+    label: 'Maker',
+    value: 'MAKER',
+  },
 ];
 
 const TypeGroup = ({ value, onChange }: { value: any; onChange?: any }) => {

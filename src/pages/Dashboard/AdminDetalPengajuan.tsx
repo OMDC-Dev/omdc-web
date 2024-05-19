@@ -26,10 +26,12 @@ import {
 import AdminModal from '../../components/Modal/AdminModal';
 import useFetch from '../../hooks/useFetch';
 import {
+  ACCEPT_MAKER_REIMBURSEMENT,
   ACCEPT_REVIEW_REIMBURSEMENT,
   FINANCE_ACCEPTANCE,
   FINANCE_UPDATE_COA,
   REIMBURSEMENT_ACCEPTANCE,
+  REIMBURSEMENT_ACCEPTANCE_EXTRA,
   REIMBURSEMENT_DETAIL,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -149,6 +151,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
     if (state == API_STATES.OK) {
       setStatus(data);
+      setSelectedBank({ namaBank: data.finance_bank });
     } else {
       setStatus(EX_STATUS);
     }
@@ -168,6 +171,7 @@ const AdminDetailPengajuan: React.FC = () => {
       note: note,
       coa: coa,
       bank: selectedBank?.namaBank,
+      extra: admin.iduser,
     };
 
     const { state, data, error } = await useFetch({
@@ -214,6 +218,31 @@ const AdminDetailPengajuan: React.FC = () => {
     }
   }
 
+  // acceptance ext
+  async function acceptance_ext(statusType: any) {
+    changeType('LOADING');
+
+    const status = statusType == 'EXT_ACC' ? 'APPROVED' : 'REJECTED';
+
+    const body = {
+      status: status,
+      note: note,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_ACCEPTANCE_EXTRA(RID),
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      getStatus();
+    } else {
+      changeType('FAILED');
+    }
+  }
+
   // set status finance
   async function acceptance_reviewer(statusType: string) {
     changeType('LOADING');
@@ -223,12 +252,38 @@ const AdminDetailPengajuan: React.FC = () => {
     const body = {
       note: note,
       coa: coa,
-      adminId: admin?.iduser || status?.accepted_by[0]?.iduser,
       status: tStatus,
     };
 
     const { state, data, error } = await useFetch({
       url: ACCEPT_REVIEW_REIMBURSEMENT(RID),
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      getStatus();
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  // set status finance
+  async function acceptance_maker(statusType: string) {
+    changeType('LOADING');
+
+    const tStatus = statusType == 'MAK_ACC' ? 'APPROVED' : 'REJECTED';
+
+    const body = {
+      note: note,
+      coa: coa,
+      status: tStatus,
+      bank: selectedBank?.namaBank,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: ACCEPT_MAKER_REIMBURSEMENT(RID),
       method: 'POST',
       data: body,
     });
@@ -432,9 +487,20 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // === render note
   function renderNote() {
-    if (ADMIN_TYPE === 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
+    if (ADMIN_TYPE == 'ADMIN') {
+      if (!data.needExtraAcceptance) {
+        if (ACCEPTANCE_STATUS_BY_ID !== 'WAITING') {
+          return;
+        }
+      } else {
+        if (status?.extraAcceptanceStatus !== 'WAITING') {
+          return;
+        }
+      }
+    }
     if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
     if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'WAITING') return;
+    if (ADMIN_TYPE == 'MAKER' && status?.makerStatus !== 'IDLE') return;
 
     return (
       <div className=" w-full">
@@ -453,6 +519,7 @@ const AdminDetailPengajuan: React.FC = () => {
   }
 
   function renderNoteList() {
+    if (status?.status == 'WAITING') return;
     return status?.notes?.map((item: any, index: number) => {
       return (
         <div key={item + index} className=" w-full mb-4.5">
@@ -472,9 +539,21 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // ===== render acc reject button
   function renderAccRejectButton() {
-    if (ADMIN_TYPE == 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
+    if (ADMIN_TYPE == 'ADMIN') {
+      if (!data.needExtraAcceptance) {
+        if (ACCEPTANCE_STATUS_BY_ID !== 'WAITING') {
+          return;
+        }
+      } else {
+        if (status?.extraAcceptanceStatus !== 'WAITING') {
+          return;
+        }
+      }
+    }
+
     if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
     if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'WAITING') return;
+    if (ADMIN_TYPE == 'MAKER' && status?.makerStatus !== 'IDLE') return;
 
     let title = '';
     if (ADMIN_TYPE == 'FINANCE') {
@@ -490,24 +569,36 @@ const AdminDetailPengajuan: React.FC = () => {
     let context_rej;
 
     if (ADMIN_TYPE == 'ADMIN') {
-      context_acc = 'ADM_ACC';
-      context_rej = 'ADM_REJ';
+      if (data.extraAcceptance.iduser == user.iduser) {
+        context_acc = 'EXT_ACC';
+        context_rej = 'EXT_REJ';
+      } else {
+        context_acc = 'ADM_ACC';
+        context_rej = 'ADM_REJ';
+      }
     } else if (ADMIN_TYPE == 'FINANCE') {
       context_acc = 'FIN_ACC';
       context_rej = 'FIN_REJ';
-    } else {
+    } else if (ADMIN_TYPE == 'REVIEWER') {
       context_acc = 'REV_ACC';
       context_rej = 'REV_REJ';
+    } else {
+      context_acc = 'MAK_ACC';
+      context_rej = 'MAK_REJ';
     }
 
     return (
       <div className=" flex flex-col gap-y-4 mt-4.5">
         <Button
           disabled={
-            ADMIN_TYPE == 'FINANCE' &&
-            data?.payment_type == 'TRANSFER' &&
-            !selectedBank?.namaBank &&
-            isNeedBank
+            (ADMIN_TYPE == 'FINANCE' &&
+              data?.payment_type == 'TRANSFER' &&
+              !selectedBank?.namaBank &&
+              isNeedBank) ||
+            (ADMIN_TYPE == 'MAKER' &&
+              data?.payment_type == 'TRANSFER' &&
+              !selectedBank?.namaBank &&
+              isNeedBank)
           }
           onClick={(e: any) => {
             e.preventDefault();
@@ -542,24 +633,23 @@ const AdminDetailPengajuan: React.FC = () => {
   // ========== render admin selector
   function renderAdminSelector() {
     if (ADMIN_TYPE == 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
-    if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
-    if (ADMIN_TYPE == 'FINANCE') return;
+    if (ADMIN_TYPE == 'REVIEWER') return;
+    if (ADMIN_TYPE == 'MAKER') return;
+    if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'IDLE') return;
 
     return (
       <div className="w-full mb-4.5">
         <div>
           <label className="mb-3 block text-black dark:text-white">
-            {ADMIN_TYPE == 'ADMIN' ? 'Forward ( Opsional )' : 'Ganti Penyetuju'}
+            {ADMIN_TYPE == 'FINANCE'
+              ? 'Persetujuan Lanjutan ( Opsional )'
+              : 'Forward ( Opsional )'}
           </label>
           <div
             onClick={() => setShowAdmin(!showAdmin)}
             className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
           >
-            {admin?.nm_user
-              ? admin?.nm_user
-              : ADMIN_TYPE == 'REVIEWER'
-              ? status?.accepted_by[0]?.nm_user
-              : 'Pilih Admin'}
+            {admin?.nm_user ? admin?.nm_user : 'Pilih Admin'}
           </div>
         </div>
       </div>
@@ -600,6 +690,37 @@ const AdminDetailPengajuan: React.FC = () => {
     );
   }
 
+  function renderDownloadReportButton(isTop: boolean) {
+    if (ADMIN_TYPE !== 'FINANCE') return;
+    if (data.status_finance !== 'DONE') return;
+    if (
+      data.jenis_reimbursement == 'Cash Advance' &&
+      data.status_finance_child !== 'DONE'
+    )
+      return;
+
+    let visibility = isTop ? 'sm:hidden' : 'hidden sm:block';
+
+    return (
+      <div
+        className={`${visibility} rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
+      >
+        <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+          <Button
+            onClick={() =>
+              navigate(`/reimbursement/${data?.id}/download`, {
+                replace: false,
+                state: data,
+              })
+            }
+          >
+            Download Report
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // ================= GAP
 
   function renderStatusPersetujuan() {
@@ -622,7 +743,7 @@ const AdminDetailPengajuan: React.FC = () => {
                 <label className="mb-3 block text-black dark:text-white">
                   Status Approval
                 </label>
-                {renderReviewerStatus()}
+                {/* {renderReviewerStatus()} */}
                 {status?.accepted_by?.map((item: any, index: number) => {
                   return (
                     <div className=" py-4 flex justify-between">
@@ -637,7 +758,7 @@ const AdminDetailPengajuan: React.FC = () => {
                     </div>
                   );
                 })}
-                {renderFinanceProcessStatus()}
+                {/* {renderFinanceProcessStatus()} */}
               </div>
             </div>
 
@@ -694,9 +815,12 @@ const AdminDetailPengajuan: React.FC = () => {
             {renderNoteList()}
             {renderNote()}
 
-            {data?.payment_type == 'TRANSFER' &&
-            ADMIN_TYPE == 'FINANCE' &&
-            isNeedBank ? (
+            {(data?.payment_type == 'TRANSFER' &&
+              ADMIN_TYPE == 'FINANCE' &&
+              isNeedBank) ||
+            (data?.payment_type == 'TRANSFER' &&
+              ADMIN_TYPE == 'MAKER' &&
+              isNeedBank) ? (
               <div className="mb-full mt-2 mb-12">
                 <div>
                   <label className="mb-3 block text-black dark:text-white">
@@ -704,15 +828,15 @@ const AdminDetailPengajuan: React.FC = () => {
                   </label>
                   <div
                     onClick={() =>
-                      data?.status_finance == 'WAITING'
+                      (ADMIN_TYPE == 'FINANCE' &&
+                        status?.status_finance == 'WAITING') ||
+                      (ADMIN_TYPE == 'MAKER' && status?.makerStatus == 'IDLE')
                         ? setShowBank(!showBank)
                         : null
                     }
                     className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
                   >
-                    {data?.finance_bank ||
-                      selectedBank?.namaBank ||
-                      'Pilih Bank'}
+                    {selectedBank?.namaBank || 'Pilih Bank'}
                   </div>
                 </div>
               </div>
@@ -771,9 +895,11 @@ const AdminDetailPengajuan: React.FC = () => {
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
+        {renderDownloadReportButton(true)}
         <div className=" sm:hidden">{renderStatusPersetujuan()}</div>
 
         <div className="flex flex-col gap-9">
+          {renderDownloadReportButton(false)}
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -1091,7 +1217,7 @@ const AdminDetailPengajuan: React.FC = () => {
       />
       <AdminModal
         visible={showAdmin}
-        requesterId={data?.requester_id}
+        rid={data?.id}
         toggle={() => setShowAdmin(!showAdmin)}
         value={(val: any) => setAdmin(val)}
       />
@@ -1104,12 +1230,20 @@ const AdminDetailPengajuan: React.FC = () => {
             acceptance(context);
           }
 
+          if (context == 'EXT_ACC' || context == 'EXT_REJ') {
+            acceptance_ext(context);
+          }
+
           if (context == 'FIN_ACC' || context == 'FIN_REJ') {
             acceptance_fin(context);
           }
 
           if (context == 'REV_ACC' || context == 'REV_REJ') {
             acceptance_reviewer(context);
+          }
+
+          if (context == 'MAK_ACC' || context == 'MAK_REJ') {
+            acceptance_maker(context);
           }
 
           if (context == 'COA') {

@@ -5,9 +5,9 @@ import { cekAkses } from '../../common/utils';
 const JenisGroup = ({ value }: { value: (arg0: string) => void }) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
-  const [list, setList] = React.useState<any>([]);
+  const [list, setList] = React.useState<any>(DATAS);
 
-  const hasPaymentRequest = cekAkses('#5');
+  //const hasPaymentRequest = cekAkses('#5');
 
   const changeTextColor = () => {
     setIsOptionSelected(true);
@@ -17,17 +17,17 @@ const JenisGroup = ({ value }: { value: (arg0: string) => void }) => {
     value(selectedOption);
   }, [selectedOption]);
 
-  React.useEffect(() => {
-    if (!hasPaymentRequest) {
-      const newData = DATAS.filter((item) => {
-        return item.value !== 'PR';
-      });
+  // React.useEffect(() => {
+  //   if (!hasPaymentRequest) {
+  //     const newData = DATAS.filter((item) => {
+  //       return item.value !== 'PR';
+  //     });
 
-      setList(newData);
-    } else {
-      setList(DATAS);
-    }
-  }, []);
+  //     setList(newData);
+  //   } else {
+  //     setList(DATAS);
+  //   }
+  // }, []);
 
   return (
     <div>

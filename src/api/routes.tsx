@@ -97,3 +97,11 @@ export const UPDATE_ICON = '/updateIcon';
 export const GET_UNREVIEW_REIMBURSEMENT = 'reviewer/reimbursement';
 export const ACCEPT_REVIEW_REIMBURSEMENT = (id: number) =>
   `reviewer/accept/${id}`;
+
+// Maker
+export const GET_MAKER_REIMBURSEMENT = 'maker/reimbursement';
+export const ACCEPT_MAKER_REIMBURSEMENT = (id: number) => `maker/accept/${id}`;
+
+export const REIMBURSEMENT_ACCEPTANCE_EXTRA = (id: number) => {
+  return `reimbursement/extra/${id}`;
+};
