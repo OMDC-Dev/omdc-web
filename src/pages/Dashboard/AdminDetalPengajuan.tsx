@@ -139,7 +139,9 @@ const AdminDetailPengajuan: React.FC = () => {
   };
 
   React.useEffect(() => {
-    getStatus();
+    if (type == 'LOADING') {
+      getStatus();
+    }
   }, [location.key, type]);
 
   // get status
@@ -151,11 +153,17 @@ const AdminDetailPengajuan: React.FC = () => {
 
     if (state == API_STATES.OK) {
       setStatus(data);
-      setSelectedBank({ namaBank: data.finance_bank });
+      //setSelectedBank({ namaBank: data.finance_bank });
     } else {
       setStatus(EX_STATUS);
     }
   }
+
+  React.useEffect(() => {
+    if (status?.finance_bank && status?.finance_bank !== '-') {
+      setSelectedBank({ namaBank: status.finance_bank });
+    }
+  }, [status]);
 
   console.log('STATUS', status);
 
@@ -450,15 +458,15 @@ const AdminDetailPengajuan: React.FC = () => {
           </div>
         </div>
       );
-    } else {
-      const _status = status?.status_finance;
-      if (_status == 'DONE') return;
-      if (_status == 'REJECTED') return;
-
+    } else if (ADMIN_TYPE == 'MAKER') {
+      const _status = status?.makerStatus;
+      if (_status !== 'IDLE') return;
       return (
         <div className="w-full mb-4.5">
           <div>
-            <label className="mb-3 block text-black dark:text-white">COA</label>
+            <label className="mb-3 block text-black dark:text-white">
+              COA / Grup Biaya
+            </label>
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
               <div
                 onClick={() => setShowCoa(!showCoa)}
@@ -466,7 +474,7 @@ const AdminDetailPengajuan: React.FC = () => {
               >
                 {coa || data?.coa || 'Pilih COA'}
               </div>
-              {_status == 'DONE' ? (
+              {_status == 'IDLE' ? (
                 <Button
                   onClick={(e: any) => {
                     e.preventDefault();
@@ -482,13 +490,50 @@ const AdminDetailPengajuan: React.FC = () => {
           </div>
         </div>
       );
+    } else {
+      const _status = status?.status_finance;
+      //if (_status == 'DONE') return;
+      if (_status == 'REJECTED') return;
+      if (
+        status?.extraAcceptanceStatus == 'WAITING' ||
+        status?.extraAcceptanceStatus == 'REJECTED'
+      )
+        return;
+
+      return (
+        <div className="w-full mb-4.5">
+          <div>
+            <label className="mb-3 block text-black dark:text-white">
+              COA / Grup Biaya
+            </label>
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
+              <div
+                onClick={() => setShowCoa(!showCoa)}
+                className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+              >
+                {coa || data?.coa || 'Pilih COA'}
+              </div>
+              <Button
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  changeContext('COA');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Update COA
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
     }
   }
 
   // === render note
   function renderNote() {
     if (ADMIN_TYPE == 'ADMIN') {
-      if (!data.needExtraAcceptance) {
+      if (!status?.needExtraAcceptance) {
         if (ACCEPTANCE_STATUS_BY_ID !== 'WAITING') {
           return;
         }
@@ -501,6 +546,8 @@ const AdminDetailPengajuan: React.FC = () => {
     if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
     if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'WAITING') return;
     if (ADMIN_TYPE == 'MAKER' && status?.makerStatus !== 'IDLE') return;
+    if (ADMIN_TYPE == 'FINANCE' && status?.extraAcceptanceStatus !== 'IDLE')
+      return;
 
     return (
       <div className=" w-full">
@@ -540,7 +587,7 @@ const AdminDetailPengajuan: React.FC = () => {
   // ===== render acc reject button
   function renderAccRejectButton() {
     if (ADMIN_TYPE == 'ADMIN') {
-      if (!data.needExtraAcceptance) {
+      if (!status?.needExtraAcceptance) {
         if (ACCEPTANCE_STATUS_BY_ID !== 'WAITING') {
           return;
         }
@@ -554,6 +601,34 @@ const AdminDetailPengajuan: React.FC = () => {
     if (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus !== 'IDLE') return;
     if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'WAITING') return;
     if (ADMIN_TYPE == 'MAKER' && status?.makerStatus !== 'IDLE') return;
+    if (
+      ADMIN_TYPE == 'FINANCE' &&
+      status?.needExtraAcceptance &&
+      status?.extraAcceptanceStatus !== 'IDLE'
+    ) {
+      if (status?.extraAcceptanceStatus == 'WAITING') {
+        return <Button disabled={true}>Menunggu persetujuan lanjutan</Button>;
+      } else {
+        return (
+          <Button
+            onClick={(e: any) => {
+              e.preventDefault();
+              changeType('CONFIRM');
+              changeContext(
+                status?.extraAcceptanceStatus == 'APPROVED'
+                  ? 'FIN_ACC'
+                  : 'FIN_REJ',
+              );
+              show();
+            }}
+          >
+            Selesaikan ({' '}
+            {status?.extraAcceptanceStatus == 'APPROVED' ? 'Setujui' : 'Tolak'}{' '}
+            )
+          </Button>
+        );
+      }
+    }
 
     let title = '';
     if (ADMIN_TYPE == 'FINANCE') {
@@ -635,7 +710,13 @@ const AdminDetailPengajuan: React.FC = () => {
     if (ADMIN_TYPE == 'ADMIN' && ACCEPTANCE_STATUS_BY_ID !== 'WAITING') return;
     if (ADMIN_TYPE == 'REVIEWER') return;
     if (ADMIN_TYPE == 'MAKER') return;
-    if (ADMIN_TYPE == 'FINANCE' && status?.status_finance !== 'IDLE') return;
+    if (
+      (ADMIN_TYPE == 'FINANCE' && status?.status_finance == 'DONE') ||
+      (ADMIN_TYPE == 'FINANCE' && status?.status_finance == 'REJECTED')
+    )
+      return;
+    if (ADMIN_TYPE == 'FINANCE' && status?.extraAcceptanceStatus !== 'IDLE')
+      return;
 
     return (
       <div className="w-full mb-4.5">
@@ -829,7 +910,8 @@ const AdminDetailPengajuan: React.FC = () => {
                   <div
                     onClick={() =>
                       (ADMIN_TYPE == 'FINANCE' &&
-                        status?.status_finance == 'WAITING') ||
+                        status?.status_finance == 'WAITING' &&
+                        status?.extraAcceptanceStatus == 'IDLE') ||
                       (ADMIN_TYPE == 'MAKER' && status?.makerStatus == 'IDLE')
                         ? setShowBank(!showBank)
                         : null
