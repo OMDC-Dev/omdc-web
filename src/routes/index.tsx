@@ -33,6 +33,7 @@ import PermintaanBarangAdmin from '../pages/PermintaanBarang/PermintaanBarangAdm
 import ReportReimbursement from '../pages/Dashboard/ReportReimbursement';
 import SuperIcon from '../pages/SuperAdmin/Icon';
 import DownloadReport from '../pages/Dashboard/DownloadReport';
+import AdminPB from '../pages/SuperAdmin/AdminPB';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -312,10 +313,19 @@ const Routes = () => {
           ),
         },
         {
+          path: '/adminpb',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Admin PB'} />
+              <AdminPB />
+            </>
+          ),
+        },
+        {
           path: '/reimbursement',
           element: (
             <>
-              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <PageTitle title={TITLE + 'Reimbursement'} />
               <SuperReimbursement />
             </>
           ),
@@ -360,7 +370,7 @@ const Routes = () => {
           path: '/coa/:id',
           element: (
             <>
-              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <PageTitle title={TITLE + 'COA'} />
               <SuperCOAUpdate />
             </>
           ),

@@ -1,7 +1,7 @@
 const PROD = 'https://server.omdc.online/';
 const DEV = 'http://127.0.0.1:8080/';
 
-export const BASE_URL = PROD;
+export const BASE_URL = DEV;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -105,3 +105,7 @@ export const ACCEPT_MAKER_REIMBURSEMENT = (id: number) => `maker/accept/${id}`;
 export const REIMBURSEMENT_ACCEPTANCE_EXTRA = (id: number) => {
   return `reimbursement/extra/${id}`;
 };
+
+// ADMIN PB
+export const GET_ADMIN_PB = '/adminpb';
+export const ADMIN_PB = (iduser: string) => `/adminpb/${iduser}`;
