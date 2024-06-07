@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DocumentTextIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardHeader,
@@ -36,6 +36,7 @@ function PermintaanBarang() {
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -43,10 +44,12 @@ function PermintaanBarang() {
     getList();
   }, [page]);
 
-  async function getList() {
+  async function getList(clear?: boolean) {
     setLoading(true);
     const { state, data, error } = await useFetch({
-      url: LIST_REQUEST_BARANG + `?limit=${limit}&page=${page}`,
+      url:
+        LIST_REQUEST_BARANG +
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
       method: 'GET',
     });
 
@@ -103,6 +106,38 @@ function PermintaanBarang() {
                 Buat Permintaan Barang
               </Button>
             </div>
+          </div>
+          <div className="relative w-full">
+            <form
+              className="w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                // getReimbursementList();
+                getList();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Cari ID PB, cabang, kode cabang..."
+                className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && ( // Tampilkan tombol X jika nilai input tidak kosong
+                <button
+                  type="button"
+                  className="absolute h-11 inset-y-0 top-4 right-0 px-3 flex items-center "
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSearch('');
+                    //getReimbursementList(true);
+                    getList(true);
+                  }}
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              )}
+            </form>
           </div>
         </CardHeader>
         {!list?.length ? (

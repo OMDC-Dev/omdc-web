@@ -48,6 +48,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const hasRequestBarangAkses = cekAkses('#2');
   const hasPengumumanAkses = cekAkses('#3');
   const hasExportExcell = cekAkses('#4');
+  const isAdminPB = cekAkses('#7');
 
   // close on click outside
   useEffect(() => {
@@ -334,6 +335,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     >
                       <RectangleGroupIcon className=" h-5 w-5" />
                       Permintaan Barang
+                    </NavLink>
+                  </li>
+                ) : null}
+                {isAdminPB ? (
+                  <li>
+                    <NavLink
+                      to="/admin-request-barang"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('calendar') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <RectangleGroupIcon className=" h-5 w-5" />
+                      Pengajuan Permintaan Barang
                     </NavLink>
                   </li>
                 ) : null}

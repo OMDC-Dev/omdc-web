@@ -186,7 +186,7 @@ function RiwayatDiajukan() {
               </Typography>
             </div>
           </div>
-          <div className="w-full lg:flex lg:items-center">
+          <div className="relative w-full lg:flex lg:items-center">
             <form
               className="w-full"
               onSubmit={(e) => {

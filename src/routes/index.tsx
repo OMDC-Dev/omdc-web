@@ -34,6 +34,7 @@ import ReportReimbursement from '../pages/Dashboard/ReportReimbursement';
 import SuperIcon from '../pages/SuperAdmin/Icon';
 import DownloadReport from '../pages/Dashboard/DownloadReport';
 import AdminPB from '../pages/SuperAdmin/AdminPB';
+import PermintaanBarangApproval from '../pages/PermintaanBarang/PermintaanBarangAdminApproval';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -222,6 +223,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Ubah Profile'} />
               <UpdateProfile />
+            </>
+          ),
+        },
+        {
+          path: '/admin-request-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Approval Permintaan Barang'} />
+              <PermintaanBarangApproval />
             </>
           ),
         },

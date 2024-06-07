@@ -13,36 +13,25 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT, USER_KODE_AKSES } from '../../api/routes';
+import { LIST_REQUEST_BARANG } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import 'moment/locale/id'; // without this line it didn't work
-moment.locale('id');
-import { cekAkses } from '../../common/utils';
-import { useAuth } from '../../hooks/useAuth';
-import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 
 const TABLE_HEAD = [
-  'Pengajuan',
-  'No. Doc.',
-  'Kategori Permintaan',
-  'Pembayaran',
-  'Tanggal',
+  'ID PB',
+  'ID User',
+  'Kirim ke',
   'Cabang',
-  'Diajukan Oleh',
-  'Nama Client / Vendor',
-  'COA',
-  'Nominal',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
-  'Keterangan Status',
+  'Jam Transaksi',
   'Status',
   '',
 ];
 
-function Reimbursement() {
-  const [rList, setRList] = React.useState([]);
+function PermintaanBarangApproval() {
+  const [list, setList] = React.useState([]);
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
@@ -51,69 +40,36 @@ function Reimbursement() {
 
   const navigate = useNavigate();
 
-  // reimbursement akses
-  const hasReimbursementAkses = cekAkses('#1');
-
-  const { user, setUser } = useAuth();
-
-  console.log('USER DATA X', user);
-
   React.useEffect(() => {
-    getReimbursementList();
+    getList();
   }, [page]);
 
-  React.useEffect(() => {
-    updateKodeKases();
-  }, []);
-
-  async function updateKodeKases() {
-    const { state, data, error } = await useFetch({
-      url: USER_KODE_AKSES(user.iduser),
-      method: 'GET',
-    });
-
-    if (state == API_STATES.OK) {
-      setUser({ ...user, kodeAkses: data.kodeAkses });
-    }
-
-    console.log('UPDTED USER', user);
-  }
-
-  async function getReimbursementList(clear?: boolean, type?: string) {
+  async function getList(clear?: boolean) {
     setLoading(true);
-    const typeParam = type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
     const { state, data, error } = await useFetch({
       url:
-        REIMBURSEMENT +
-        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
-        typeParam,
+        LIST_REQUEST_BARANG +
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}&isAdmin=true`,
       method: 'GET',
     });
 
     if (state == API_STATES.OK) {
       setLoading(false);
-      setRList(data?.rows);
+      setList(data.rows);
       setPageInfo(data?.pageInfo);
     } else {
       setLoading(false);
-      setRList([]);
-      console.log(error);
+      setList([]);
     }
   }
 
-  function statusChip(status: string, finance: string) {
+  function statusChip(status: string) {
     switch (status) {
       case 'WAITING':
         return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
         break;
       case 'APPROVED':
-        return (
-          <Chip
-            variant={'outlined'}
-            color="green"
-            value={finance == 'DONE' ? 'Selesai' : 'Disetujui'}
-          />
-        );
+        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
         break;
       case 'REJECTED':
         return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
@@ -127,73 +83,33 @@ function Reimbursement() {
     }
   }
 
-  function keteranganStatus(item: any) {
-    if (
-      item.jenis_reimbursement !== 'Cash Advance' ||
-      item.status_finance !== 'DONE' ||
-      item.status !== 'APPROVED'
-    ) {
-      return '-';
-    }
-
-    if (
-      item.realisasi?.length > 1 &&
-      item.childId &&
-      item.status_finance_child == 'DONE'
-    ) {
-      return 'Sudah Dikembalikan';
-    } else {
-      return item.childId ? 'Belum dikembalikan' : 'Perlu laporan realisasi';
-    }
-  }
-
   return (
     <DefaultLayout>
       <Card className="h-full w-full">
         <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="flex-col flex sm:flex-row sm:items-center  justify-between gap-8">
+          <div className="flex-col flex sm:flex-row sm:items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Riwayat Pengajuan
+                Pengajuan Permintaan Barang
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua riwayat pengajuan.
+                Menampilkan semua pengajuan permintaan barang yang perlu
+                diproses.
               </Typography>
             </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              {hasReimbursementAkses ? (
-                <Button
-                  variant="filled"
-                  size="sm"
-                  color="blue"
-                  onClick={() =>
-                    navigate('/reimbursement/ajukan', { replace: false })
-                  }
-                >
-                  Buat Pengajuan Baru
-                </Button>
-              ) : null}
-              {/* <Button
-                variant="filled"
-                size="sm"
-                color="blue"
-                onClick={() => onExportToExcell()}
-              >
-                Export ke Excel
-              </Button> */}
-            </div>
           </div>
-          <div className="relative w-full lg:flex lg:items-center">
+          <div className="relative w-full">
             <form
               className="w-full"
               onSubmit={(e) => {
                 e.preventDefault();
-                getReimbursementList();
+                // getReimbursementList();
+                getList();
               }}
             >
               <input
                 type="text"
-                placeholder="Cari No. dokumen, coa, kode cabang..."
+                placeholder="Cari ID PB, cabang, kode cabang..."
                 className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -205,19 +121,17 @@ function Reimbursement() {
                   onClick={(e) => {
                     e.preventDefault();
                     setSearch('');
-                    getReimbursementList(true);
+                    //getReimbursementList(true);
+                    getList(true);
                   }}
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               )}
             </form>
-            <TipeFilterGroup
-              value={(val) => getReimbursementList(false, val)}
-            />
           </div>
         </CardHeader>
-        {!rList?.length ? (
+        {!list?.length ? (
           <CardBody>
             <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm">
               Belum ada pengajuan
@@ -246,8 +160,8 @@ function Reimbursement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {rList.map((item: any, index) => {
-                    const isLast = index === rList?.length - 1;
+                  {list?.map((item: any, index) => {
+                    const isLast = index === list?.length - 1;
                     const classes = isLast
                       ? 'p-4'
                       : 'p-4 border-b border-blue-gray-50';
@@ -261,43 +175,7 @@ function Reimbursement() {
                                 variant="small"
                                 className="font-normal"
                               >
-                                {item?.jenis_reimbursement}
-                              </Typography>
-                            </div>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center gap-3 ">
-                            <div className="flex flex-col">
-                              <Typography
-                                variant="small"
-                                className="font-normal"
-                              >
-                                {item?.no_doc}
-                              </Typography>
-                            </div>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center gap-3 ">
-                            <div className="flex flex-col">
-                              <Typography
-                                variant="small"
-                                className="font-normal"
-                              >
-                                {item?.tipePembayaran}
-                              </Typography>
-                            </div>
-                          </div>
-                        </td>
-                        <td className={classes}>
-                          <div className="flex items-center gap-3 ">
-                            <div className="flex flex-col">
-                              <Typography
-                                variant="small"
-                                className="font-normal"
-                              >
-                                {item?.payment_type}
+                                {item?.id_pb}
                               </Typography>
                             </div>
                           </div>
@@ -305,9 +183,29 @@ function Reimbursement() {
                         <td className={classes}>
                           <div className="flex flex-col">
                             <Typography variant="small" className="font-normal">
-                              {item?.tanggal_reimbursement}
+                              {item?.iduser}
                             </Typography>
                           </div>
+                        </td>
+                        <td className={classes}>
+                          <Typography variant="small" className="font-normal">
+                            {item?.nm_cabang}
+                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <Typography variant="small" className="font-normal">
+                            {item?.nm_induk}
+                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <Typography variant="small" className="font-normal">
+                            {item?.tgl_approve || '-'}
+                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <Typography variant="small" className="font-normal">
+                            {moment(item?.tgl_trans).format('ll') || '-'}
+                          </Typography>
                         </td>
                         <td className={classes}>
                           <div className="w-max">
@@ -315,51 +213,15 @@ function Reimbursement() {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.kode_cabang}
+                              {item?.jam_trans}
                             </Typography>
                           </div>
                         </td>
                         <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.requester?.nm_user}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.name}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.coa}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.nominal}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.accepted_date || '-'}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {moment(item?.createdAt).format('lll') || '-'}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
-                          {keteranganStatus(item)}
-                        </td>
-                        <td className={classes}>
-                          {/* <Typography variant="small" className="font-normal">
-                            {item?.status}
-                          </Typography> */}
-                          {statusChip(item?.status, item?.status_finance)}
+                          {statusChip(item?.status_approve)}
                         </td>
                         <td className={classes}>
                           <Tooltip content="Detail">
@@ -367,7 +229,7 @@ function Reimbursement() {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(`/reimbursement/${item?.id}`, {
+                                navigate(`/request-barang/${item?.id_pb}`, {
                                   replace: false,
                                   state: item,
                                 });
@@ -385,7 +247,7 @@ function Reimbursement() {
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
               <Typography variant="small" color="black" className="font-normal">
-                Page {page} of {pageInfo?.pageCount}
+                Halaman {page} dari {pageInfo?.pageCount}
               </Typography>
               <div className="flex gap-2">
                 <Button
@@ -401,7 +263,7 @@ function Reimbursement() {
                   Previous
                 </Button>
                 <Button
-                  disabled={page == pageInfo?.pageCount || loading}
+                  disabled={page == pageInfo.pageCount || loading}
                   variant="outlined"
                   size="sm"
                   color="blue"
@@ -421,4 +283,4 @@ function Reimbursement() {
   );
 }
 
-export default Reimbursement;
+export default PermintaanBarangApproval;

@@ -77,7 +77,8 @@ export const cekAkses = (akses: string) => {
    * PENGUMUMAN -> 1171 -> #3
    * EXPORT EXCELL -> 1175 -> #4
    * PAYMENT REQUEST -> 1176 -> #5
-   * PB NEED ATTACHMENT -> 1179 -> $6
+   * PB NEED ATTACHMENT -> 1179 -> #6
+   * ADMIN PB -> 999123 -> #7
    */
   const { user } = useAuth();
 
@@ -105,6 +106,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#6') {
     return kd.findIndex((item: string) => item == '1179') !== -1;
+  }
+
+  if (akses == '#7') {
+    return kd.findIndex((item: string) => item == '999123') !== -1;
   }
 };
 
