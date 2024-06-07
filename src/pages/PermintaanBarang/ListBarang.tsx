@@ -27,6 +27,8 @@ import AnakCabangModal from '../../components/Modal/AnakCabangModal';
 import ListBarangModal from '../../components/Modal/ListBarangModal';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import AdminPBModal from '../../components/Modal/AdminPBModal';
+import { cekAkses } from '../../common/utils';
 
 const TABLE_HEAD = [
   'Kode Barang',
@@ -46,6 +48,7 @@ function ListBarang() {
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
   const [loading, setLoading] = React.useState(false);
+  const [admin, setAdmin] = React.useState<any>('');
 
   // item
   const [cabang, setCabang] = React.useState<any>();
@@ -60,10 +63,14 @@ function ListBarang() {
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showAnakCabang, setShowAnakCabang] = React.useState<boolean>(false);
   const [showList, setShowList] = React.useState<boolean>(false);
+  const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
 
   const { show, hide, toggle, visible, type, changeType } = useModal();
 
-  console.log(barangs);
+  const needAttachmentAdmin = cekAkses('#6');
+  const buttonDisabledByAkses = needAttachmentAdmin ? !admin?.iduser : false;
+
+  console.log('Barangs', barangs);
 
   const navigate = useNavigate();
 
@@ -120,6 +127,7 @@ function ListBarang() {
       kodeIndukCabang: cabang?.value,
       kodeAnakCabang: anakCabang?.value,
       barang: barangs,
+      adminId: admin?.iduser || null,
     };
 
     const { state, data, error } = await useFetch({
@@ -148,6 +156,8 @@ function ListBarang() {
     setBarangs(datas);
   }
 
+  console.log('admin', admin);
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9">
@@ -158,6 +168,24 @@ function ListBarang() {
             </h3>
           </div>
           <div className="flex flex-col gap-6 p-4.5">
+            {needAttachmentAdmin && (
+              <div className="w-full">
+                <div>
+                  <label className="mb-3 block text-black dark:text-white">
+                    Approval Ke
+                  </label>
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowAdmin(!showAdmin);
+                    }}
+                    className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                  >
+                    {admin?.nm_user || 'Pilih Approval Ke'}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="w-full">
               <div>
                 <label className="mb-3 block text-black dark:text-white">
@@ -255,7 +283,12 @@ function ListBarang() {
                   changeType('CONFIRM');
                   show();
                 }}
-                disabled={!barangs?.length || !cabang || !anakCabang}
+                disabled={
+                  !barangs?.length ||
+                  !cabang ||
+                  !anakCabang ||
+                  buttonDisabledByAkses
+                }
               >
                 Buat Permintaan Barang
               </Button>
@@ -413,6 +446,7 @@ function ListBarang() {
         <BarangModal
           data={selectedBarang}
           visible={barangModal}
+          needLampiran={needAttachmentAdmin}
           toggle={() => setBarangModal(!barangModal)}
           value={(val: any) =>
             setBarangs([...barangs, { ...val, id: barangs + 1 }])
@@ -441,6 +475,11 @@ function ListBarang() {
           toggle={toggle}
           onConfirm={() => createRequest()}
           onDone={() => navigate('/request-barang')}
+        />
+        <AdminPBModal
+          visible={showAdmin}
+          toggle={() => setShowAdmin(!showAdmin)}
+          value={(val: any) => setAdmin(val)}
         />
       </div>
     </DefaultLayout>

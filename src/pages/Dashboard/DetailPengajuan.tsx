@@ -14,7 +14,11 @@ import {
   REIMBURSEMENT_DETAIL,
 } from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
-import { calculateSaldo, downloadPDF } from '../../common/utils';
+import {
+  calculateSaldo,
+  downloadPDF,
+  downloadPDFDirect,
+} from '../../common/utils';
 import Button from '../../components/Button';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
@@ -500,7 +504,7 @@ const DetailPengajuan: React.FC = () => {
                         e.preventDefault();
                         data?.file_info?.type !== 'application/pdf'
                           ? setShowFile(!showFile)
-                          : downloadPDF(
+                          : downloadPDFDirect(
                               data?.attachment,
                               data?.file_info?.name,
                             );

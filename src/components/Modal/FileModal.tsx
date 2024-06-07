@@ -10,9 +10,14 @@ const FileModal = ({
   visible: boolean;
   toggle: any;
   type?: string;
-  data?: string;
+  data: string;
 }) => {
-  const dataType = `data:${type};base64,${data}`;
+  function isImageUrl(str: string) {
+    const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/i;
+    return urlPattern.test(str);
+  }
+
+  const dataType = isImageUrl(data) ? data : `data:${type};base64,${data}`;
 
   return (
     <Dialog className="bg-transparent" open={visible} handler={toggle}>
@@ -23,7 +28,7 @@ const FileModal = ({
         </div>
         <div className=" w-full h-full">
           <img
-            className="w-full max-h-115 object-cover object-center"
+            className="w-full max-h-500 object-contain object-center"
             src={dataType}
             alt="preview image"
           />

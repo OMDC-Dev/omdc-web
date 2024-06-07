@@ -23,7 +23,11 @@ import {
 } from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
 import FileModal from '../../components/Modal/FileModal';
-import { calculateSaldo, downloadPDF } from '../../common/utils';
+import {
+  calculateSaldo,
+  downloadPDF,
+  downloadPDFDirect,
+} from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { REIMBURSEMENT_DETAIL } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -373,7 +377,7 @@ const DetailReimbursement: React.FC = () => {
                         e.preventDefault();
                         data?.file_info?.type !== 'application/pdf'
                           ? setShowFile(!showFile)
-                          : downloadPDF(
+                          : downloadPDFDirect(
                               data?.attachment,
                               data?.file_info?.name,
                             );

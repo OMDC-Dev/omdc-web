@@ -8,16 +8,23 @@ const BarangModal = ({
   toggle,
   value,
   data,
+  needLampiran,
 }: {
   visible: boolean;
   toggle: any;
   dismissOnBackdrop?: boolean;
   value?: any;
   data?: any;
+  needLampiran?: boolean;
 }) => {
   const [stock, setStock] = React.useState<string>();
   const [permintaan, setPermintaan] = React.useState<string>();
   const [keterangan, setKeterangan] = React.useState<string>();
+  const [image, setImage] = React.useState<string | null>(null);
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const buttonDisabledByAkses = needLampiran ? !image : false;
 
   if (!visible) return null;
 
@@ -30,6 +37,7 @@ const BarangModal = ({
         stock: stock,
         request: permintaan,
         keterangan: keterangan || '-',
+        attachment: image,
       },
     });
 
@@ -40,6 +48,30 @@ const BarangModal = ({
 
     // toggle modal
     toggle();
+  }
+
+  // handle attachment
+  function handleAttachment(event: any) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const maxSize = 1048576;
+
+    if (file.size > maxSize) {
+      alert(
+        'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+      );
+      inputRef.current.value = '';
+    } else {
+      reader.readAsDataURL(file);
+
+      reader.onload = () => {
+        const base64string: any = reader.result;
+
+        const splitted = base64string?.split(';base64,');
+
+        setImage(splitted[1]);
+      };
+    }
   }
 
   return (
@@ -85,8 +117,27 @@ const BarangModal = ({
             onChange={(e) => setKeterangan(e.target.value)}
           ></textarea>
         </div>
+        {needLampiran && (
+          <div className="mb-4.5">
+            <label className="mb-2.5 block text-black dark:text-white">
+              Lampiran
+            </label>
+            <input
+              type="file"
+              className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+              accept="image/*"
+              onChange={handleAttachment}
+              ref={inputRef}
+            />
+          </div>
+        )}
         <Button
-          disabled={!stock || !permintaan || Number(permintaan) < 1}
+          disabled={
+            !stock ||
+            !permintaan ||
+            Number(permintaan) < 1 ||
+            buttonDisabledByAkses
+          }
           onClick={() => onSaveButtonPress()}
         >
           Simpan

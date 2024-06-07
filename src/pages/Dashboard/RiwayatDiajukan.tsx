@@ -23,11 +23,13 @@ import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useAuth } from '../../hooks/useAuth';
+import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
   'No. Dok',
   'Kategori Permintaan',
+  'Pembayaran',
   'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
@@ -44,6 +46,7 @@ const TABLE_HEAD_FINANCE = [
   'Pengajuan',
   'No. Dok',
   'Kategori Permintaan',
+  'Pembayaran',
   'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
@@ -81,22 +84,33 @@ function RiwayatDiajukan() {
     getReimbursementList();
   }, [page]);
 
-  async function getReimbursementList(clear?: boolean) {
+  async function getReimbursementList(clear?: boolean, type?: string) {
+    const typeParam = (key: string) =>
+      type !== 'all' ? `&${key}=${type?.toUpperCase()}` : '';
+
+    let param = '';
     let URL = '';
     if (ADMIN_TYPE == 'ADMIN') {
       URL = PENGAJUAN;
+      param = typeParam('type');
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
+      param = typeParam('type');
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
+      param = typeParam('typePembayaran');
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
+      param = typeParam('typePembayaran');
     }
 
     console.log('URL', URL);
 
     const { state, data, error } = await useFetch({
-      url: URL + `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
+      url:
+        URL +
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
+        param,
       method: 'GET',
     });
 
@@ -172,7 +186,7 @@ function RiwayatDiajukan() {
               </Typography>
             </div>
           </div>
-          <div className="relative w-full">
+          <div className="w-full lg:flex lg:items-center">
             <form
               className="w-full"
               onSubmit={(e) => {
@@ -201,6 +215,9 @@ function RiwayatDiajukan() {
                 </button>
               )}
             </form>
+            <TipeFilterGroup
+              value={(val) => getReimbursementList(false, val)}
+            />
           </div>
         </CardHeader>
 
@@ -273,6 +290,18 @@ function RiwayatDiajukan() {
                                 className="font-normal"
                               >
                                 {item?.tipePembayaran}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.payment_type}
                               </Typography>
                             </div>
                           </div>

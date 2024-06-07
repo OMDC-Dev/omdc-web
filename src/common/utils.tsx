@@ -44,6 +44,19 @@ export const downloadPDF = (base64Data: string, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
+export const downloadPDFDirect = (url: string, fileName: string) => {
+  // Membuat link untuk mengunduh file PDF
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName || 'document.pdf';
+
+  // Klik link secara otomatis untuk memicu unduhan
+  a.click();
+
+  // Menghapus URL objek setelah digunakan
+  URL.revokeObjectURL(url);
+};
+
 export function getDataById(data: any, id: any, idKey: string, key: string) {
   for (var i = 0; i < data?.length; i++) {
     if (data[i][idKey] === id) {
@@ -64,6 +77,7 @@ export const cekAkses = (akses: string) => {
    * PENGUMUMAN -> 1171 -> #3
    * EXPORT EXCELL -> 1175 -> #4
    * PAYMENT REQUEST -> 1176 -> #5
+   * PB NEED ATTACHMENT -> 1179 -> $6
    */
   const { user } = useAuth();
 
@@ -87,6 +101,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#5') {
     return kd.findIndex((item: string) => item == '1176') !== -1;
+  }
+
+  if (akses == '#6') {
+    return kd.findIndex((item: string) => item == '1179') !== -1;
   }
 };
 

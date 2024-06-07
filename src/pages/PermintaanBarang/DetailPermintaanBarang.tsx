@@ -64,33 +64,71 @@ const DetailPermintaanBarang: React.FC = () => {
     }
   }
 
-  return (
-    <DefaultLayout>
-      <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
-        <div className=" sm:hidden">
-          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Status Pengajuan
-              </h3>
-              <Chip
-                variant={'outlined'}
-                color={statusWording().color}
-                value={statusWording().text}
-              />
-            </div>
-            <div className=" p-6.5 flex flex-col gap-y-6">
-              <div className=" w-full flex justify-between">
-                <label className="mb-3 block text-black dark:text-white">
-                  Tanggal Persetujuan
-                </label>
-                <span className=" text-white font-bold">
-                  {data?.tgl_approve || '-'}
-                </span>
-              </div>
+  function renderStatusApproval(smHidden: boolean) {
+    const visibility = smHidden ? 'sm:hidden' : 'hidden sm:block';
+    return (
+      <div className={visibility}>
+        <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+            <h3 className="font-medium text-black dark:text-white">
+              Status Approval Pengajuan
+            </h3>
+            <Chip
+              variant={'outlined'}
+              color={statusWording().color}
+              value={statusWording().text}
+            />
+          </div>
+          <div className=" p-6.5 flex flex-col gap-y-6">
+            <div className=" w-full flex justify-between">
+              <label className="mb-3 block text-black dark:text-white">
+                Tanggal Persetujuan
+              </label>
+              <span className=" text-white font-bold">
+                {data?.tgl_approve || '-'}
+              </span>
             </div>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  function renderStatusPengajuan(smHidden: boolean) {
+    const visibility = smHidden ? 'sm:hidden' : 'hidden sm:block';
+    return (
+      <div className={visibility}>
+        <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+            <h3 className="font-medium text-black dark:text-white">
+              Status Permintaan
+            </h3>
+            <Chip
+              variant={'outlined'}
+              color={statusWording().color}
+              value={statusWording().text}
+            />
+          </div>
+          <div className=" p-6.5 flex flex-col gap-y-6">
+            <div className=" w-full flex justify-between">
+              <label className="mb-3 block text-black dark:text-white">
+                Tanggal Persetujuan
+              </label>
+              <span className=" text-white font-bold">
+                {data?.tgl_approve || '-'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <DefaultLayout>
+      <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
+        {renderStatusApproval(true)}
+        {renderStatusPengajuan(true)}
         <div className="flex flex-col gap-9">
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -149,28 +187,8 @@ const DetailPermintaanBarang: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-9">
-          <div className="hidden sm:block rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-              <h3 className="font-medium text-black dark:text-white">
-                Status Pengajuan
-              </h3>
-              <Chip
-                variant={'outlined'}
-                color={statusWording().color}
-                value={statusWording().text}
-              />
-            </div>
-            <div className=" p-6.5 flex flex-col gap-y-6">
-              <div className=" w-full flex justify-between">
-                <label className="mb-3 block text-black dark:text-white">
-                  Tanggal Persetujuan
-                </label>
-                <span className=" text-black font-bold">
-                  {data?.tgl_approve || '-'}
-                </span>
-              </div>
-            </div>
-          </div>
+          {renderStatusApproval(false)}
+          {renderStatusPengajuan(false)}
 
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">

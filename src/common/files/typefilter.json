@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Semua",
+    "value": "all"
+  },
+  {
+    "label": "Transfer",
+    "value": "transfer"
+  },
+  {
+    "label": "Cash",
+    "value": "cash"
+  }
+]

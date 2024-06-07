@@ -13,20 +13,21 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT } from '../../api/routes';
+import { REIMBURSEMENT, USER_KODE_AKSES } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
 import { cekAkses } from '../../common/utils';
-import { exportToExcell } from '../../common/exportToExcell';
 import { useAuth } from '../../hooks/useAuth';
+import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
   'No. Doc.',
   'Kategori Permintaan',
+  'Pembayaran',
   'Tanggal',
   'Cabang',
   'Diajukan Oleh',
@@ -53,20 +54,39 @@ function Reimbursement() {
   // reimbursement akses
   const hasReimbursementAkses = cekAkses('#1');
 
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
-  console.log('USER DATA', user);
+  console.log('USER DATA X', user);
 
   React.useEffect(() => {
     getReimbursementList();
   }, [page]);
 
-  async function getReimbursementList(clear?: boolean) {
+  React.useEffect(() => {
+    updateKodeKases();
+  }, []);
+
+  async function updateKodeKases() {
+    const { state, data, error } = await useFetch({
+      url: USER_KODE_AKSES(user.iduser),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setUser({ ...user, kodeAkses: data.kodeAkses });
+    }
+
+    console.log('UPDTED USER', user);
+  }
+
+  async function getReimbursementList(clear?: boolean, type?: string) {
     setLoading(true);
+    const typeParam = type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
     const { state, data, error } = await useFetch({
       url:
         REIMBURSEMENT +
-        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
+        typeParam,
       method: 'GET',
     });
 
@@ -163,7 +183,7 @@ function Reimbursement() {
               </Button> */}
             </div>
           </div>
-          <div className="relative w-full">
+          <div className="w-full lg:flex lg:items-center">
             <form
               className="w-full"
               onSubmit={(e) => {
@@ -192,6 +212,9 @@ function Reimbursement() {
                 </button>
               )}
             </form>
+            <TipeFilterGroup
+              value={(val) => getReimbursementList(false, val)}
+            />
           </div>
         </CardHeader>
         {!rList?.length ? (
@@ -263,6 +286,18 @@ function Reimbursement() {
                                 className="font-normal"
                               >
                                 {item?.tipePembayaran}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.payment_type}
                               </Typography>
                             </div>
                           </div>

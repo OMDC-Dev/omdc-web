@@ -80,6 +80,11 @@ function ReportReimbursement() {
     }
   }
 
+  function isImageUrl(str: string) {
+    const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/i;
+    return urlPattern.test(str);
+  }
+
   function onExportToExcell(data = []) {
     const startDate = moment(tanggalStart, true)
       .startOf('day')
@@ -94,6 +99,7 @@ function ReportReimbursement() {
         accepted_by,
         finance_by,
         nominal,
+        attachment,
         ...rest
       }: any = itemCol;
 
@@ -115,6 +121,8 @@ function ReportReimbursement() {
 
       const formatedNominal = formatCurrencyToNumber(nominal);
 
+      const parsedAttachment = isImageUrl(attachment) ? attachment : '';
+
       return {
         ...rest,
         item: parsedItem,
@@ -122,6 +130,7 @@ function ReportReimbursement() {
         accepted_by: parsedAcceptedBy,
         finance_by: parsedFinanceBy,
         nominal: formatedNominal,
+        lampiran: parsedAttachment,
       };
     });
 
@@ -148,6 +157,7 @@ function ReportReimbursement() {
       'Daftar Penyetuju',
       'Nama Finance',
       'Nominal Pengajuan',
+      'Lampiran',
     ];
 
     const title = `Report${startDate}-${endDate}`;

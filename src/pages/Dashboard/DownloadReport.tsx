@@ -227,66 +227,6 @@ const DownloadReport: React.FC = () => {
     }
   }
 
-  function DownloadReport() {
-    return (
-      <div ref={targetRef}>
-        <p>TESTING</p>
-      </div>
-    );
-  }
-
-  function renderNoteList() {
-    return data?.notes?.map((item: any, index: number) => {
-      return (
-        <div className=" w-full mb-4.5">
-          <label className="mb-2.5 block text-black dark:text-white">
-            {item.title}
-          </label>
-          <textarea
-            rows={3}
-            disabled={true}
-            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-            defaultValue={item.msg}
-          />
-        </div>
-      );
-    });
-  }
-
-  // Render coa selector
-  function renderCOASelector() {
-    if (!IS_REPORT) return;
-
-    return (
-      <div className="w-full mb-4.5">
-        <div>
-          <label className="mb-3 block text-black dark:text-white">
-            COA / Grup Biaya
-          </label>
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
-            <div
-              onClick={() => setShowCoa(!showCoa)}
-              className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-            >
-              {coa || data?.coa || 'Pilih COA'}
-            </div>
-            <Button
-              disabled={!coaChange}
-              onClick={(e: any) => {
-                e.preventDefault();
-                changeContext('COA');
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              Update COA
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   function renderDownloadReportButton() {
     return (
       <div className=" border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -502,6 +442,17 @@ const DownloadReport: React.FC = () => {
     );
   }
 
+  function renderAttachment() {
+    if (data?.file?.type == 'application/pdf') return;
+    return (
+      <img
+        className="block h-115 w-115 object-contain mt-4"
+        src={data.attachment}
+        alt="Logo"
+      />
+    );
+  }
+
   // ========================================================
 
   return (
@@ -530,6 +481,7 @@ const DownloadReport: React.FC = () => {
             <div className=" flex-1">
               {renderItemData()}
               {renderBankData()}
+              {renderAttachment()}
             </div>
           </div>
         </div>

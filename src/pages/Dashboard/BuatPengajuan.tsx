@@ -33,6 +33,7 @@ import ModalSelector from '../../components/Modal/ModalSelctor';
 import SuplierModal from '../../components/Modal/SuplierModal';
 import PaymentGroup from '../../components/SelectGroup/PaymentGroup';
 import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
+import useUploadPDF from '../../hooks/useUploadPDF';
 
 function TrashIcon() {
   return (
@@ -209,6 +210,27 @@ const BuatPengajuan: React.FC = () => {
     }
 
     setItem(data);
+  }
+
+  async function checkIsPDF() {
+    pengajuanReimbursement();
+    // changeType('LOADING');
+    // if (fileInfo.type == 'application/pdf') {
+    //   const { state, data, error } = await useUploadPDF({
+    //     data: {
+    //       base64String: result,
+    //       fileName: fileInfo.name,
+    //     },
+    //   });
+
+    //   if (state == API_STATES.OK) {
+    //     changeType('SUCCESS');
+    //   } else {
+    //     changeType('FAILED');
+    //   }
+
+    //   console.log(state, data, error);
+    // }
   }
 
   // Pengajuan
@@ -615,7 +637,7 @@ const BuatPengajuan: React.FC = () => {
         type={type}
         visible={visible}
         toggle={toggle}
-        onConfirm={() => pengajuanReimbursement()}
+        onConfirm={() => checkIsPDF()}
         onDone={() => {
           hide();
           type == 'SUCCESS' ? navigate('/', { replace: true }) : null;

@@ -1,11 +1,14 @@
 const PROD = 'https://server.omdc.online/';
 const DEV = 'http://127.0.0.1:8080/';
+export const DRIVE_API =
+  'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
 export const BASE_URL = DEV;
 
 // AUTH
 export const LOGIN = 'user/login';
 export const LOGOUT = 'user/logout';
+export const USER_KODE_AKSES = (id: number) => `user/kodeakses/${id}`;
 export const USER_COMPLETE = 'user/complete';
 export const UPDATE_PASSWORD = 'user/update-password';
 export const GET_NOTIFICATION = 'pengumuman';
