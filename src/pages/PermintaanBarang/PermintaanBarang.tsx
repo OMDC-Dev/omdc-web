@@ -64,23 +64,15 @@ function PermintaanBarang() {
   }
 
   function statusChip(status: string) {
-    switch (status) {
-      case 'WAITING':
-        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
-        break;
-      case 'APPROVED':
-        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
-        break;
-      case 'REJECTED':
-        return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
-        break;
-      case 'DONE':
-        return <Chip variant={'outlined'} color="green" value={'Selesai'} />;
-        break;
-      default:
-        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
-        break;
+    if (status == 'Disetujui') {
+      return <Chip variant={'outlined'} color="green" value={'Diterima'} />;
     }
+
+    if (status == 'Ditolak') {
+      return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+    }
+
+    return <Chip variant={'outlined'} color="amber" value={status} />;
   }
 
   return (
@@ -230,7 +222,7 @@ function PermintaanBarang() {
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
-                          {statusChip(item?.status_approve)}
+                          {statusChip(item?.status_pb)}
                         </td>
                         <td className={classes}>
                           <Tooltip content="Detail">

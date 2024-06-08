@@ -42,9 +42,7 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
   // data state
   const [data, setData] = React.useState<any>([]);
   const [barang, setBarang] = React.useState<any>([]);
-  const [adminResult, setAdminResult] = React.useState<any>({
-    approval_admin_status: data?.approval_admin_status,
-  });
+  const [adminResult, setAdminResult] = React.useState<any>();
   const [showFile, setShowFile] = React.useState<boolean>(false);
   const [selectedFile, setSelectedFile] = React.useState<any>();
   const [note, setNote] = React.useState('');
@@ -65,6 +63,7 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
         approval_admin_status: state.approval_admin_status,
         approval_admin_date: state.approval_admin_date,
         keterangan: state.keterangan,
+        status_pb: state.status_pb,
       });
       getDetails(id);
     }
@@ -122,18 +121,32 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
     }
   }
 
-  function statusPengajuanWording(): { text: string; color: colors } {
+  function statusPengajuanWording(): { text: string; color: string } {
     switch (adminResult?.approval_admin_status) {
       case 'REJECTED':
-        return { text: 'Ditolak', color: 'red' };
+        return { text: 'Ditolak', color: 'text-red-500' };
         break;
       case 'APPROVED':
-        return { text: 'Disetujui', color: 'green' };
+        return { text: 'Disetujui', color: 'text-green-500' };
         break;
       default:
-        return { text: 'Menunggu', color: 'amber' };
+        return { text: 'Menunggu Disetujui', color: 'text-amber-500' };
         break;
     }
+  }
+
+  function renderChip() {
+    if (adminResult?.status_pb == 'Disetujui') {
+      return <Chip variant={'outlined'} color="green" value={'Diterima'} />;
+    }
+
+    if (adminResult?.status_pb == 'Ditolak') {
+      return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+    }
+
+    return (
+      <Chip variant={'outlined'} color="amber" value={adminResult?.status_pb} />
+    );
   }
 
   function renderStatusApproval(smHidden: boolean) {
@@ -143,13 +156,9 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
             <h3 className="font-medium text-black dark:text-white">
-              Status Approval Pengajuan
+              Status Permintaan Barang
             </h3>
-            <Chip
-              variant={'outlined'}
-              color={statusPengajuanWording().color}
-              value={statusPengajuanWording().text}
-            />
+            {renderChip()}
           </div>
           <div className=" px-6.5 py-4.5  flex flex-col">
             <div className=" w-full flex justify-between">
@@ -158,6 +167,16 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
               </label>
               <span className=" text-black font-bold">
                 {data?.approval_admin_name || '-'}
+              </span>
+            </div>
+          </div>
+          <div className=" px-6.5 mb-4.5 flex flex-col">
+            <div className=" w-full flex justify-between">
+              <label className="mb-3 block text-black dark:text-white">
+                Status Approval
+              </label>
+              <span className={statusPengajuanWording().color}>
+                {statusPengajuanWording().text}
               </span>
             </div>
           </div>
@@ -177,7 +196,7 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
             </label>
             <textarea
               rows={3}
-              disabled={adminResult.approval_admin_status !== 'WAITING'}
+              disabled={adminResult?.approval_admin_status !== 'WAITING'}
               placeholder="Masukan Catatan"
               className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
               value={
@@ -188,7 +207,7 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
               onChange={(e) => setNote(e.target.value)}
             />
           </div>
-          {adminResult.approval_admin_status == 'WAITING' && (
+          {adminResult?.approval_admin_status == 'WAITING' && (
             <div className="w-full px-6.5 mb-4.5 flex flex-col gap-y-2">
               <Button
                 onClick={(e: any) => {
@@ -253,7 +272,6 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
         <div className="flex flex-col gap-9">
           {renderStatusApproval(false)}
-          {renderStatusPengajuan(false)}
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -358,11 +376,8 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
                           <span className=" mt-4 text-xs text-blue-gray-300">
                             Status Approve:{' '}
                             <span className={statusTextColor}>
-                              {item?.status_approve || '-'}
+                              {item?.status_pb || '-'}
                             </span>
-                          </span>
-                          <span className="text-xs text-blue-gray-300">
-                            Tanggal Approve: {item?.tgl_approve || '-'}
                           </span>
                           <MButton
                             className=" mt-4"

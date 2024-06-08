@@ -26,8 +26,8 @@ const TABLE_HEAD = [
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
   'Jam Transaksi',
-  'Status Approval Saya',
-  'Status',
+  'Status Approval',
+  'Status PB',
   '',
 ];
 
@@ -67,7 +67,13 @@ function PermintaanBarangApproval() {
   function statusChip(status: string) {
     switch (status) {
       case 'WAITING':
-        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
+        return (
+          <Chip
+            variant={'outlined'}
+            color="amber"
+            value={'Menunggu Disetujui'}
+          />
+        );
         break;
       case 'APPROVED':
         return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
@@ -75,13 +81,28 @@ function PermintaanBarangApproval() {
       case 'REJECTED':
         return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
         break;
-      case 'DONE':
-        return <Chip variant={'outlined'} color="green" value={'Selesai'} />;
-        break;
       default:
-        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
+        return (
+          <Chip
+            variant={'outlined'}
+            color="amber"
+            value={'Menunggu Disetujui'}
+          />
+        );
         break;
     }
+  }
+
+  function statusChipPB(status: string) {
+    if (status == 'Disetujui') {
+      return <Chip variant={'outlined'} color="green" value={'Diterima'} />;
+    }
+
+    if (status == 'Ditolak') {
+      return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+    }
+
+    return <Chip variant={'outlined'} color="amber" value={status} />;
   }
 
   return (
@@ -200,7 +221,7 @@ function PermintaanBarangApproval() {
                         </td>
                         <td className={classes}>
                           <Typography variant="small" className="font-normal">
-                            {item?.tgl_approve || '-'}
+                            {item?.approval_admin_date || '-'}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -228,7 +249,7 @@ function PermintaanBarangApproval() {
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
-                          {statusChip(item?.status_approve)}
+                          {statusChipPB(item?.status_pb)}
                         </td>
                         <td className={classes}>
                           <Tooltip content="Detail">

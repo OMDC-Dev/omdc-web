@@ -67,8 +67,9 @@ function ListBarang() {
 
   const { show, hide, toggle, visible, type, changeType } = useModal();
 
-  const needAttachmentAdmin = cekAkses('#6');
-  const buttonDisabledByAkses = needAttachmentAdmin ? !admin?.iduser : false;
+  const noNeedAttachmentAdmin = cekAkses('#6');
+  const noNeedApproval = cekAkses('#8');
+  const buttonDisabledByAkses = !noNeedApproval ? !admin?.iduser : false;
 
   console.log('Barangs', barangs);
 
@@ -168,7 +169,7 @@ function ListBarang() {
             </h3>
           </div>
           <div className="flex flex-col gap-6 p-4.5">
-            {needAttachmentAdmin && (
+            {!noNeedApproval && (
               <div className="w-full">
                 <div>
                   <label className="mb-3 block text-black dark:text-white">
@@ -446,7 +447,7 @@ function ListBarang() {
         <BarangModal
           data={selectedBarang}
           visible={barangModal}
-          needLampiran={needAttachmentAdmin}
+          needLampiran={!noNeedAttachmentAdmin}
           toggle={() => setBarangModal(!barangModal)}
           value={(val: any) =>
             setBarangs([...barangs, { ...val, id: barangs + 1 }])

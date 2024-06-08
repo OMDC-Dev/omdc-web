@@ -90,7 +90,7 @@ const DetailPermintaanBarang: React.FC = () => {
   }
 
   function statusWording(): { text: string; color: colors } {
-    switch (data?.status_approve?.toLowerCase()) {
+    switch (data?.status_pb?.toLowerCase()) {
       case 'ditolak':
         return { text: 'Ditolak', color: 'red' };
         break;
@@ -106,55 +106,77 @@ const DetailPermintaanBarang: React.FC = () => {
     }
   }
 
-  function statusPengajuanWording(): { text: string; color: colors } {
+  function statusPengajuanWording(): { text: string; color: string } {
     switch (data?.approval_admin_status) {
       case 'REJECTED':
-        return { text: 'Ditolak', color: 'red' };
+        return { text: 'Ditolak', color: 'text-red-500' };
         break;
       case 'APPROVED':
-        return { text: 'Disetujui', color: 'green' };
+        return { text: 'Disetujui', color: 'text-green-500' };
         break;
       default:
-        return { text: 'Menunggu', color: 'amber' };
+        return { text: 'Menunggu Disetujui', color: 'text-amber-500' };
         break;
     }
   }
 
+  function renderChip() {
+    if (data.status_pb == 'Disetujui') {
+      return <Chip variant={'outlined'} color="green" value={'Diterima'} />;
+    }
+
+    if (data.status_pb == 'Ditolak') {
+      return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+    }
+
+    return <Chip variant={'outlined'} color="amber" value={data.status_pb} />;
+  }
+
   function renderStatusApproval(smHidden: boolean) {
-    const visibility = smHidden ? 'sm:hidden' : 'hidden sm:block';
     return (
       <div>
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
           <div className="flex justify-between border-b border-stroke py-4 px-6.5 dark:border-strokedark">
             <h3 className="font-medium text-black dark:text-white">
-              Status Approval Pengajuan
+              Status Permintaan Barang
             </h3>
-            <Chip
-              variant={'outlined'}
-              color={statusPengajuanWording().color}
-              value={statusPengajuanWording().text}
-            />
+            {renderChip()}
           </div>
-          <div className=" px-6.5 py-4.5  flex flex-col">
-            <div className=" w-full flex justify-between">
-              <label className="mb-3 block text-black dark:text-white">
-                Approval oleh
-              </label>
-              <span className=" text-black font-bold">
-                {data?.approval_admin_name || '-'}
-              </span>
-            </div>
-          </div>
-          <div className=" px-6.5 mb-4.5 flex flex-col">
-            <div className=" w-full flex justify-between">
-              <label className="mb-3 block text-black dark:text-white">
-                Tanggal Persetujuan
-              </label>
-              <span className=" text-black font-bold">
-                {data?.approval_admin_date || '-'}
-              </span>
-            </div>
-          </div>
+          {data.approval_adminid ? (
+            <>
+              <div className=" px-6.5 py-4.5  flex flex-col">
+                <div className=" w-full flex justify-between">
+                  <label className="mb-3 block text-black dark:text-white">
+                    Approval oleh
+                  </label>
+                  <span className=" text-black font-bold">
+                    {data?.approval_admin_name || '-'}
+                  </span>
+                </div>
+              </div>
+              <div className=" px-6.5 mb-4.5 flex flex-col">
+                <div className=" w-full flex justify-between">
+                  <label className="mb-3 block text-black dark:text-white">
+                    Status Approval
+                  </label>
+                  <span className={statusPengajuanWording().color}>
+                    {statusPengajuanWording().text}
+                  </span>
+                </div>
+              </div>
+              <div className=" px-6.5 mb-4.5 flex flex-col">
+                <div className=" w-full flex justify-between">
+                  <label className="mb-3 block text-black dark:text-white">
+                    Tanggal Persetujuan
+                  </label>
+                  <span className=" text-black font-bold">
+                    {data?.approval_admin_date || '-'}
+                  </span>
+                </div>
+              </div>
+            </>
+          ) : null}
+
           {data.keterangan && (
             <div className=" px-6.5 mb-4.5">
               <label className="mb-2.5 block text-black dark:text-white">
@@ -239,7 +261,6 @@ const DetailPermintaanBarang: React.FC = () => {
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
         <div className="flex flex-col gap-9">
           {renderStatusApproval(false)}
-          {renderStatusPengajuan(false)}
           {/* <!-- Contact Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -342,13 +363,10 @@ const DetailPermintaanBarang: React.FC = () => {
                             Keterangan: {item?.requestData?.keterangan || '-'}
                           </span>
                           <span className=" mt-4 text-xs text-blue-gray-300">
-                            Status Approve:{' '}
+                            Status:{' '}
                             <span className={statusTextColor}>
-                              {item?.status_approve || '-'}
+                              {item?.status_pb || '-'}
                             </span>
-                          </span>
-                          <span className="text-xs text-blue-gray-300">
-                            Tanggal Approve: {item?.tgl_approve || '-'}
                           </span>
                           {item.attachment && (
                             <MButton
