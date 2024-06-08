@@ -46,6 +46,10 @@ const DetailPermintaanBarang: React.FC = () => {
   const [selectedFile, setSelectedFile] = React.useState<any>();
 
   const ID_PB = data.id_pb;
+  const IS_CAN_DOWBLOAD_REPORT =
+    data.status_pb !== 'Menunggu Diproses' &&
+    data.status_pb !== 'Menunggu Disetujui' &&
+    data.status_pb !== 'Ditolak';
 
   console.log(selectedFile);
 
@@ -206,7 +210,7 @@ const DetailPermintaanBarang: React.FC = () => {
               </Button>
             </div>
           )}
-          {data.status_approve && (
+          {IS_CAN_DOWBLOAD_REPORT && (
             <div className="w-full px-6.5 mb-4.5">
               <Button
                 onClick={(e: any) => {
