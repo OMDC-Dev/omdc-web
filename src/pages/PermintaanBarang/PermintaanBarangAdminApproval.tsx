@@ -26,6 +26,7 @@ const TABLE_HEAD = [
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
   'Jam Transaksi',
+  'Status Approval Saya',
   'Status',
   '',
 ];
@@ -221,6 +222,12 @@ function PermintaanBarangApproval() {
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
+                          {statusChip(item?.approval_admin_status)}
+                        </td>
+                        <td className={classes}>
+                          {/* <Typography variant="small" className="font-normal">
+                            {item?.status}
+                          </Typography> */}
                           {statusChip(item?.status_approve)}
                         </td>
                         <td className={classes}>
@@ -229,10 +236,13 @@ function PermintaanBarangApproval() {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(`/request-barang/${item?.id_pb}`, {
-                                  replace: false,
-                                  state: item,
-                                });
+                                navigate(
+                                  `/admin-request-barang/${item?.id_pb}`,
+                                  {
+                                    replace: false,
+                                    state: item,
+                                  },
+                                );
                               }}
                             >
                               <DocumentTextIcon className="h-4 w-4" />

@@ -35,6 +35,7 @@ import SuperIcon from '../pages/SuperAdmin/Icon';
 import DownloadReport from '../pages/Dashboard/DownloadReport';
 import AdminPB from '../pages/SuperAdmin/AdminPB';
 import PermintaanBarangApproval from '../pages/PermintaanBarang/PermintaanBarangAdminApproval';
+import DetailPermintaanBarangAdmin from '../pages/PermintaanBarang/DetailPermintaanBarangAdmin';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -42,6 +43,7 @@ const Routes = () => {
   // cek akses
   const hasRequestBarangAkses = token ? cekAkses('#2') : null;
   const hasPengumumanAkses = token ? cekAkses('#3') : null;
+  const isAdminPB = token ? cekAkses('#7') : null;
 
   // TITLE
   const TITLE = 'OMDC - ';
@@ -226,12 +228,35 @@ const Routes = () => {
             </>
           ),
         },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
+  const routesForAdminPB: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
         {
           path: '/admin-request-barang',
           element: (
             <>
               <PageTitle title={TITLE + 'Approval Permintaan Barang'} />
               <PermintaanBarangApproval />
+            </>
+          ),
+        },
+        {
+          path: '/admin-request-barang/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Approval Permintaan Barang'} />
+              <DetailPermintaanBarangAdmin />
             </>
           ),
         },
@@ -427,6 +452,7 @@ const Routes = () => {
     ...routesForPublic,
     ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
     ...(hasPengumumanAkses ? routesForPengumuman : []),
+    ...(isAdminPB ? routesForAdminPB : []),
   ]);
 
   const routerSa = createBrowserRouter([

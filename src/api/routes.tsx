@@ -78,6 +78,7 @@ export const LIST_REQUEST_BARANG = 'barang/requested';
 export const DETAIL_REQUEST_BARANG = (id: number) => {
   return `barang/requested/detail?id_pb=${id}`;
 };
+export const BARANG = 'barang';
 
 // DEPT
 export const DEPT = 'dept';
@@ -112,3 +113,5 @@ export const REIMBURSEMENT_ACCEPTANCE_EXTRA = (id: number) => {
 // ADMIN PB
 export const GET_ADMIN_PB = '/adminpb';
 export const ADMIN_PB = (iduser: string) => `/adminpb/${iduser}`;
+export const BARANG_ADMIN_APPROVAL = (id: string, mode: string) =>
+  `barang/admin-approval/${id}/${mode}`;

@@ -5,7 +5,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { colors } from '@material-tailwind/react/types/generic';
 import useFetch from '../../hooks/useFetch';
 import {
-  BARANG,
+  BARANG_ADMIN_APPROVAL,
   DETAIL_REQUEST_BARANG,
   REIMBURSEMENT_DETAIL,
 } from '../../api/routes';
@@ -22,7 +22,7 @@ import FileModal from '../../components/Modal/FileModal';
 import Button from '../../components/Button';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 
-const DetailPermintaanBarang: React.FC = () => {
+const DetailPermintaanBarangAdmin: React.FC = () => {
   const {
     show,
     hide,
@@ -42,12 +42,17 @@ const DetailPermintaanBarang: React.FC = () => {
   // data state
   const [data, setData] = React.useState<any>([]);
   const [barang, setBarang] = React.useState<any>([]);
+  const [adminResult, setAdminResult] = React.useState<any>({
+    approval_admin_status: data?.approval_admin_status,
+  });
   const [showFile, setShowFile] = React.useState<boolean>(false);
   const [selectedFile, setSelectedFile] = React.useState<any>();
+  const [note, setNote] = React.useState('');
 
-  const ID_PB = data.id_pb;
+  const ID_PB = data?.id_pb;
 
-  console.log(selectedFile);
+  console.log(adminResult);
+  console.log('DATA', data);
 
   const state = location.state;
 
@@ -56,6 +61,11 @@ const DetailPermintaanBarang: React.FC = () => {
       navigate('/', { replace: true });
     } else {
       setData(state);
+      setAdminResult({
+        approval_admin_status: state.approval_admin_status,
+        approval_admin_date: state.approval_admin_date,
+        keterangan: state.keterangan,
+      });
       getDetails(id);
     }
   }, []);
@@ -75,19 +85,25 @@ const DetailPermintaanBarang: React.FC = () => {
     }
   }
 
-  async function onCancelPengajuan() {
+  // [Start Approval]
+  async function onAdminApproval() {
     changeType('LOADING');
     const { state, data, error } = await useFetch({
-      url: BARANG + `/${ID_PB}`,
-      method: 'DELETE',
+      url: BARANG_ADMIN_APPROVAL(ID_PB, context),
+      method: 'POST',
+      data: {
+        note: note,
+      },
     });
 
     if (state == API_STATES.OK) {
       changeType('SUCCESS');
+      setAdminResult(data);
     } else {
       changeType('FAILED');
     }
   }
+  // [End Approval]
 
   function statusWording(): { text: string; color: colors } {
     switch (data?.status_approve?.toLowerCase()) {
@@ -107,7 +123,7 @@ const DetailPermintaanBarang: React.FC = () => {
   }
 
   function statusPengajuanWording(): { text: string; color: colors } {
-    switch (data?.approval_admin_status) {
+    switch (adminResult?.approval_admin_status) {
       case 'REJECTED':
         return { text: 'Ditolak', color: 'red' };
         break;
@@ -151,26 +167,39 @@ const DetailPermintaanBarang: React.FC = () => {
                 Tanggal Persetujuan
               </label>
               <span className=" text-black font-bold">
-                {data?.approval_admin_date || '-'}
+                {adminResult?.approval_admin_date || '-'}
               </span>
             </div>
           </div>
-          {data.keterangan && (
-            <div className=" px-6.5 mb-4.5">
-              <label className="mb-2.5 block text-black dark:text-white">
-                Catatan
-              </label>
-              <textarea
-                rows={3}
-                disabled
-                placeholder="Masukan Catatan"
-                className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                value={data.keterangan}
-              />
-            </div>
-          )}
-          {data.approval_admin_status == 'WAITING' && (
-            <div className="w-full px-6.5 mb-4.5">
+          <div className=" px-6.5 mb-4.5">
+            <label className="mb-2.5 block text-black dark:text-white">
+              Catatan ( Opsional )
+            </label>
+            <textarea
+              rows={3}
+              disabled={adminResult.approval_admin_status !== 'WAITING'}
+              placeholder="Masukan Catatan"
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+              value={
+                adminResult?.approval_admin_status !== 'WAITING'
+                  ? adminResult?.keterangan
+                  : note
+              }
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+          {adminResult.approval_admin_status == 'WAITING' && (
+            <div className="w-full px-6.5 mb-4.5 flex flex-col gap-y-2">
+              <Button
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  changeType('CONFIRM');
+                  changeContext('ACC');
+                  show();
+                }}
+              >
+                Setujui
+              </Button>
               <Button
                 onClick={(e: any) => {
                   e.preventDefault();
@@ -180,7 +209,7 @@ const DetailPermintaanBarang: React.FC = () => {
                 }}
                 className=" bg-red-400 border-red-400"
               >
-                Batalkan Pengajuan
+                Tolak
               </Button>
             </div>
           )}
@@ -335,22 +364,20 @@ const DetailPermintaanBarang: React.FC = () => {
                           <span className="text-xs text-blue-gray-300">
                             Tanggal Approve: {item?.tgl_approve || '-'}
                           </span>
-                          {item.attachment && (
-                            <MButton
-                              className=" mt-4"
-                              size={'sm'}
-                              variant={'outlined'}
-                              fullWidth
-                              color={'blue'}
-                              onClick={(e: any) => {
-                                e.preventDefault();
-                                setSelectedFile(item);
-                                setShowFile(!showFile);
-                              }}
-                            >
-                              Lihat lampiran
-                            </MButton>
-                          )}
+                          <MButton
+                            className=" mt-4"
+                            size={'sm'}
+                            variant={'outlined'}
+                            fullWidth
+                            color={'blue'}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedFile(item);
+                              setShowFile(!showFile);
+                            }}
+                          >
+                            Lihat lampiran
+                          </MButton>
                         </div>
                       </ListItem>
                     );
@@ -370,16 +397,13 @@ const DetailPermintaanBarang: React.FC = () => {
         type={type}
         visible={visible}
         toggle={toggle}
-        onConfirm={() => onCancelPengajuan()}
+        onConfirm={() => onAdminApproval()}
         onDone={() => {
           hide();
-          type == 'SUCCESS'
-            ? navigate('/request-barang', { replace: true })
-            : null;
         }}
       />
     </DefaultLayout>
   );
 };
 
-export default DetailPermintaanBarang;
+export default DetailPermintaanBarangAdmin;
