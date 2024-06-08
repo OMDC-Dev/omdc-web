@@ -184,6 +184,21 @@ const DetailPermintaanBarang: React.FC = () => {
               </Button>
             </div>
           )}
+          {data.status_approve && (
+            <div className="w-full px-6.5 mb-4.5">
+              <Button
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  navigate(`/request-barang/${id}/report`, {
+                    replace: false,
+                    state: data,
+                  });
+                }}
+              >
+                Download Report
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

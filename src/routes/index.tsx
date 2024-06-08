@@ -36,6 +36,7 @@ import DownloadReport from '../pages/Dashboard/DownloadReport';
 import AdminPB from '../pages/SuperAdmin/AdminPB';
 import PermintaanBarangApproval from '../pages/PermintaanBarang/PermintaanBarangAdminApproval';
 import DetailPermintaanBarangAdmin from '../pages/PermintaanBarang/DetailPermintaanBarangAdmin';
+import ReportPermintaanBarang from '../pages/PermintaanBarang/ReportPermintaanBarang';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -298,6 +299,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Permintaan Barang'} />
               <DetailPermintaanBarang />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang/:id/report',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Report Permintaan Barang'} />
+              <ReportPermintaanBarang />
             </>
           ),
         },
