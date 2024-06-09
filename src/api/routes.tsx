@@ -50,8 +50,9 @@ export const SUPERUSER_REPORT_EXPORT = (
   endDate: string,
   cabang?: string,
   bank?: string,
+  tipe?: string,
 ) => {
-  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}`;
+  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}`;
 };
 
 // FINANCE

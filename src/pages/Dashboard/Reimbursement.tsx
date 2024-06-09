@@ -48,6 +48,7 @@ function Reimbursement() {
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
+  const [tipeFilter, setTipeFilter] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -213,7 +214,11 @@ function Reimbursement() {
               )}
             </form>
             <TipeFilterGroup
-              value={(val) => getReimbursementList(false, val)}
+              setValue={(val: string) => {
+                setTipeFilter(val);
+                getReimbursementList(false, val);
+              }}
+              value={tipeFilter}
             />
           </div>
         </CardHeader>

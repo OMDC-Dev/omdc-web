@@ -19,6 +19,7 @@ import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { exportToExcell } from '../../common/exportToExcell';
 import formatRupiah from '../../common/formatRupiah';
+import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 
 function ReportReimbursement() {
   const [data, setData] = React.useState();
@@ -32,6 +33,8 @@ function ReportReimbursement() {
 
   const [tanggalStart, setTanggalStart] = React.useState<Date | any>();
   const [tanggalEnd, setTanggalEnd] = React.useState<Date | any>();
+
+  const [typeFilter, setTypeFilter] = React.useState<string>('');
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
@@ -67,6 +70,7 @@ function ReportReimbursement() {
         endDate,
         cabang ? cabang.value : '',
         selectedBank ? selectedBank?.namaBank : '',
+        typeFilter,
       ),
       method: 'GET',
     });
@@ -83,6 +87,15 @@ function ReportReimbursement() {
   function isImageUrl(str: string) {
     const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/i;
     return urlPattern.test(str);
+  }
+
+  function isValidURL(str: string) {
+    try {
+      new URL(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   function onExportToExcell(data = []) {
@@ -121,7 +134,7 @@ function ReportReimbursement() {
 
       const formatedNominal = formatCurrencyToNumber(nominal);
 
-      const parsedAttachment = isImageUrl(attachment) ? attachment : '';
+      const parsedAttachment = isValidURL(attachment) ? attachment : '';
 
       return {
         ...rest,
@@ -230,6 +243,31 @@ function ReportReimbursement() {
                     Reset
                   </Button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full">
+            <label className="mb-3 block text-black dark:text-white">
+              Tipe Pembayaran
+            </label>
+            <div className=" flex flex-row gap-x-4">
+              <TipeFilterGroup
+                className="mx-0 w-full"
+                typeOnly
+                setValue={(val: string) => setTypeFilter(val)}
+                value={typeFilter}
+              />
+              <div className=" w-56">
+                <Button
+                  onClick={() => {
+                    setTypeFilter('');
+                  }}
+                  mode="outlined"
+                  className=" h-full"
+                >
+                  Reset
+                </Button>
               </div>
             </div>
           </div>

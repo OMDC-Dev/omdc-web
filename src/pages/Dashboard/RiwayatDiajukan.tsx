@@ -68,6 +68,7 @@ function RiwayatDiajukan() {
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
+  const [tipeFilter, setTipeFilter] = React.useState<string>('');
 
   const { user } = useAuth();
 
@@ -216,7 +217,11 @@ function RiwayatDiajukan() {
               )}
             </form>
             <TipeFilterGroup
-              value={(val) => getReimbursementList(false, val)}
+              setValue={(val: string) => {
+                setTipeFilter(val);
+                getReimbursementList(false, val);
+              }}
+              value={tipeFilter}
             />
           </div>
         </CardHeader>

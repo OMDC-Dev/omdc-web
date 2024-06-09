@@ -1,25 +1,34 @@
 import React, { useState } from 'react';
 import DATAS from '../../common/files/typefilter.json';
 
-const TipeFilterGroup = ({ value }: { value: (arg0: string) => void }) => {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+const TipeFilterGroup = ({
+  value,
+  setValue,
+  className,
+  typeOnly,
+}: {
+  value: string;
+  setValue: any;
+  className?: string;
+  typeOnly?: boolean;
+}) => {
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
   const changeTextColor = () => {
     setIsOptionSelected(true);
   };
 
-  React.useEffect(() => {
-    value(selectedOption);
-  }, [selectedOption]);
+  const LIST = typeOnly
+    ? DATAS.filter((item: any) => item.value != 'all')
+    : DATAS;
 
   return (
-    <div className=" w-1/2 lg:w-1/3 mt-4 lg:mx-4">
+    <div className={className || ' w-1/2 lg:w-1/3 mt-4 lg:mx-4'}>
       <div className="relative z-20">
         <select
-          value={selectedOption}
+          value={value}
           onChange={(e) => {
-            setSelectedOption(e.target.value);
+            setValue(e.target.value);
             changeTextColor();
           }}
           className={`relative z-20 w-full appearance-none rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
@@ -29,7 +38,7 @@ const TipeFilterGroup = ({ value }: { value: (arg0: string) => void }) => {
           <option value="" disabled className="text-body dark:text-bodydark">
             Tipe Pembayaran
           </option>
-          {DATAS.map((item, index) => {
+          {LIST.map((item, index) => {
             return (
               <option
                 value={item.value}
