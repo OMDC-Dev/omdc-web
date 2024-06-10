@@ -228,6 +228,8 @@ const AdminDetailPengajuan: React.FC = () => {
 
   // acceptance ext
   async function acceptance_ext(statusType: any) {
+    console.log('EXTRA ACCEPTANCE!!');
+
     changeType('LOADING');
 
     const status = statusType == 'EXT_ACC' ? 'APPROVED' : 'REJECTED';
@@ -645,9 +647,13 @@ const AdminDetailPengajuan: React.FC = () => {
 
     if (ADMIN_TYPE == 'ADMIN') {
       if (data.extraAcceptance.iduser == user.iduser) {
+        console.log('EXTRA ADMIN');
+
         context_acc = 'EXT_ACC';
         context_rej = 'EXT_REJ';
       } else {
+        console.log('NORMAL ADMIN', data.extraAcceptance.iduser, user.iduser);
+
         context_acc = 'ADM_ACC';
         context_rej = 'ADM_REJ';
       }

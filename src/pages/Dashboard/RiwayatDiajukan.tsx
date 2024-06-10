@@ -38,7 +38,8 @@ const TABLE_HEAD = [
   'Nominal',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
-  'Status',
+  'Status Approval Saya',
+  'Status Pengajuan',
   '',
 ];
 
@@ -56,7 +57,7 @@ const TABLE_HEAD_FINANCE = [
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
   'Keterangan Status',
-  'Status',
+  'Status Pengajuan',
   'Status Finance',
   '',
 ];
@@ -84,6 +85,8 @@ function RiwayatDiajukan() {
   React.useEffect(() => {
     getReimbursementList();
   }, [page]);
+
+  console.log('ADMIN TYPE', ADMIN_TYPE);
 
   async function getReimbursementList(clear?: boolean, type?: string) {
     const typeParam = (key: string) =>
@@ -170,6 +173,39 @@ function RiwayatDiajukan() {
       return 'Sudah Dikembalikan';
     } else {
       return item.childId ? 'Belum dikembalikan' : 'Perlu laporan realisasi';
+    }
+  }
+
+  function renderAdminChip(item: any) {
+    let status = '';
+    if (ADMIN_TYPE == 'ADMIN') {
+      if (item.needExtraAcceptance) {
+        const self = item.extraAcceptance.iduser == user.iduser;
+        if (self) {
+          status = item.extraAcceptanceStatus;
+        }
+      } else {
+        const self = item.accepted_by.find(
+          (item: any) => item.iduser == user.iduser,
+        );
+        status = self.status;
+      }
+    }
+
+    if (ADMIN_TYPE == 'REVIEWER') {
+      status = item.reviewStatus;
+    }
+
+    if (ADMIN_TYPE == 'MAKER') {
+      status = item.makerStatus;
+    }
+
+    if (status == 'APPROVED') {
+      return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
+    } else if (status == 'REJECTED') {
+      return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+    } else {
+      return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
     }
   }
 
@@ -358,6 +394,9 @@ function RiwayatDiajukan() {
                             {moment(item?.createdAt).format('lll') || '-'}
                           </Typography>
                         </td>
+                        {ADMIN_TYPE !== 'FINANCE' ? (
+                          <td className={classes}>{renderAdminChip(item)}</td>
+                        ) : null}
                         {ADMIN_TYPE == 'FINANCE' ? (
                           <td className={classes}>
                             {/* <Typography variant="small" className="font-normal">
