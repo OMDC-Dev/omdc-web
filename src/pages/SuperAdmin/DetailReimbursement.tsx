@@ -27,6 +27,7 @@ import {
   calculateSaldo,
   downloadPDF,
   downloadPDFDirect,
+  openInNewTab,
 } from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { REIMBURSEMENT_DETAIL } from '../../api/routes';
@@ -377,16 +378,23 @@ const DetailReimbursement: React.FC = () => {
                         e.preventDefault();
                         data?.file_info?.type !== 'application/pdf'
                           ? setShowFile(!showFile)
-                          : downloadPDFDirect(
-                              data?.attachment,
-                              data?.file_info?.name,
-                            );
+                          : openInNewTab(data?.attachment);
                       }}
                     >
                       {data?.file_info?.type !== 'application/pdf'
                         ? 'Lihat Lampiran'
                         : 'Unduh Lampiran'}
                     </Button>
+                    {/* {data?.file_info?.type == 'application/pdf' && (
+                      <Button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          openInNewTab(data?.attachment);
+                        }}
+                      >
+                        Lihat Lampiran
+                      </Button>
+                    )} */}
                   </div>
                 </div>
 

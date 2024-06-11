@@ -21,6 +21,7 @@ import {
   formatAmount,
   formatCurrencyToNumber,
   getDataById,
+  openInNewTab,
   unformatRupiah,
 } from '../../common/utils';
 import AdminModal from '../../components/Modal/AdminModal';
@@ -1093,10 +1094,7 @@ const AdminDetailPengajuan: React.FC = () => {
                         e.preventDefault();
                         data?.file_info?.type !== 'application/pdf'
                           ? setShowFile(!showFile)
-                          : downloadPDF(
-                              data?.attachment,
-                              data?.file_info?.name,
-                            );
+                          : openInNewTab(data?.attachment);
                       }}
                     >
                       {data?.file_info?.type !== 'application/pdf'

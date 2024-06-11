@@ -18,6 +18,7 @@ import {
   calculateSaldo,
   downloadPDF,
   downloadPDFDirect,
+  openInNewTab,
 } from '../../common/utils';
 import Button from '../../components/Button';
 import FileModal from '../../components/Modal/FileModal';
@@ -504,10 +505,7 @@ const DetailPengajuan: React.FC = () => {
                         e.preventDefault();
                         data?.file_info?.type !== 'application/pdf'
                           ? setShowFile(!showFile)
-                          : downloadPDFDirect(
-                              data?.attachment,
-                              data?.file_info?.name,
-                            );
+                          : openInNewTab(data?.attachment);
                       }}
                     >
                       {data?.file_info?.type !== 'application/pdf'

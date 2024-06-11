@@ -97,15 +97,19 @@ function RiwayatDiajukan() {
     if (ADMIN_TYPE == 'ADMIN') {
       URL = PENGAJUAN;
       param = typeParam('type');
+      param += '&sort=ADMIN';
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
+      param += '&sort=FINANCE';
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
+      param += '&sort=REVIEWER';
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
+      param += '&sort=MAKER';
     }
 
     console.log('URL', URL);

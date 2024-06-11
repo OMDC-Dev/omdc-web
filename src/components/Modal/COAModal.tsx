@@ -28,7 +28,7 @@ const COAModal = ({
 
   async function getBankList() {
     const { state, data, error } = await useFetch({
-      url: GET_COA('') + '&limit=200',
+      url: GET_COA('') + '&limit=1000',
       method: 'GET',
     });
 

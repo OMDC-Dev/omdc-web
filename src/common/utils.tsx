@@ -205,3 +205,7 @@ export function formatCurrencyToNumber(currencyString: string) {
   const number = parseInt(currencyString.replace(/\D/g, ''), 10);
   return number;
 }
+
+export const openInNewTab = (url: string) => {
+  window.open(url, '_blank', 'noreferrer');
+};
