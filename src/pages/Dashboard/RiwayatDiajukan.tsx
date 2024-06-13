@@ -30,7 +30,6 @@ const TABLE_HEAD = [
   'No. Dok',
   'Kategori Permintaan',
   'Pembayaran',
-  'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
   'Nama Client / Vendor',
@@ -48,7 +47,6 @@ const TABLE_HEAD_FINANCE = [
   'No. Dok',
   'Kategori Permintaan',
   'Pembayaran',
-  'Tanggal',
   'Induk Cabang',
   'Diajukan Oleh',
   'Nama Client / Vendor',
@@ -351,13 +349,13 @@ function RiwayatDiajukan() {
                             </div>
                           </div>
                         </td>
-                        <td className={classes}>
+                        {/* <td className={classes}>
                           <div className="flex flex-col">
                             <Typography variant="small" className="font-normal">
                               {item?.tanggal_reimbursement}
                             </Typography>
                           </div>
-                        </td>
+                        </td> */}
                         <td className={classes}>
                           <div className="w-max">
                             <Typography
