@@ -381,9 +381,7 @@ const DetailReimbursement: React.FC = () => {
                           : openInNewTab(data?.attachment);
                       }}
                     >
-                      {data?.file_info?.type !== 'application/pdf'
-                        ? 'Lihat Lampiran'
-                        : 'Unduh Lampiran'}
+                      Lihat Lampiran
                     </Button>
                     {/* {data?.file_info?.type == 'application/pdf' && (
                       <Button

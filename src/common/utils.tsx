@@ -206,6 +206,20 @@ export function formatCurrencyToNumber(currencyString: string) {
   return number;
 }
 
+function convertToPreviewLink(downloadLink: string) {
+  const downloadPrefix = 'https://drive.google.com/uc?export=download&id=';
+  const previewPrefix = 'https://drive.google.com/file/d/';
+  const previewSuffix = '/preview';
+
+  if (downloadLink.startsWith(downloadPrefix)) {
+    const fileId = downloadLink.slice(downloadPrefix.length);
+    return `${previewPrefix}${fileId}${previewSuffix}`;
+  } else {
+    return 'Invalid download link format';
+  }
+}
+
 export const openInNewTab = (url: string) => {
-  window.open(url, '_blank', 'noreferrer');
+  const previewUrl = convertToPreviewLink(url);
+  window.open(previewUrl, '_blank', 'noreferrer');
 };
