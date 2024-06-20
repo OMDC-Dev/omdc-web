@@ -46,6 +46,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
   // check akses
   const hasRequestBarangAkses = cekAkses('#2');
+  const hasMasterBarangAkses = cekAkses('#9');
   const hasPengumumanAkses = cekAkses('#3');
   const hasExportExcell = cekAkses('#4');
   const isAdminPB = cekAkses('#7');
@@ -329,7 +330,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <NavLink
                       to="/request-barang"
                       className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                        pathname.includes('calendar') &&
+                        pathname.includes('request-barang') &&
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >
@@ -338,12 +339,26 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </NavLink>
                   </li>
                 ) : null}
+                {hasMasterBarangAkses ? (
+                  <li>
+                    <NavLink
+                      to="/master-barang"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('master-barang') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <RectangleGroupIcon className=" h-5 w-5" />
+                      Master Barang
+                    </NavLink>
+                  </li>
+                ) : null}
                 {isAdminPB ? (
                   <li>
                     <NavLink
                       to="/admin-request-barang"
                       className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                        pathname.includes('calendar') &&
+                        pathname.includes('admin-request-barang') &&
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >
@@ -358,7 +373,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <NavLink
                       to="/pengumuman"
                       className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                        pathname.includes('calendar') &&
+                        pathname.includes('pengumuman') &&
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >

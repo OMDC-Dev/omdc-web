@@ -80,6 +80,7 @@ export const cekAkses = (akses: string) => {
    * NO PB NEED ATTACHMENT -> 1179 -> #6
    * ADMIN PB -> 999123 -> #7
    * NO NEED APPROVAL -> 1177 -> #8
+   * MASTER BARANG -> 1128 -> #9
    */
   const { user } = useAuth();
 
@@ -115,6 +116,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#8') {
     return kd.findIndex((item: string) => item == '1177') !== -1;
+  }
+
+  if (akses == '#9') {
+    return kd.findIndex((item: string) => item == '1128') !== -1;
   }
 };
 

@@ -174,14 +174,6 @@ function Reimbursement() {
                   Buat Pengajuan Baru
                 </Button>
               ) : null}
-              {/* <Button
-                variant="filled"
-                size="sm"
-                color="blue"
-                onClick={() => onExportToExcell()}
-              >
-                Export ke Excel
-              </Button> */}
             </div>
           </div>
           <div className="relative w-full lg:flex lg:items-center">

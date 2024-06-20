@@ -37,12 +37,15 @@ import AdminPB from '../pages/SuperAdmin/AdminPB';
 import PermintaanBarangApproval from '../pages/PermintaanBarang/PermintaanBarangAdminApproval';
 import DetailPermintaanBarangAdmin from '../pages/PermintaanBarang/DetailPermintaanBarangAdmin';
 import ReportPermintaanBarang from '../pages/PermintaanBarang/ReportPermintaanBarang';
+import ListMasterBarang from '../pages/MasterBarang/ListBarang';
+import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
 
 const Routes = () => {
   const { token, user } = useAuth();
 
   // cek akses
   const hasRequestBarangAkses = token ? cekAkses('#2') : null;
+  const hasMasterBarangAkses = token ? cekAkses('#9') : null;
   const hasPengumumanAkses = token ? cekAkses('#3') : null;
   const isAdminPB = token ? cekAkses('#7') : null;
 
@@ -320,6 +323,38 @@ const Routes = () => {
   ];
 
   // routes for authenticated user
+  const routesForMasterBarang: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/master-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Master Barang'} />
+              <ListMasterBarang />
+            </>
+          ),
+        },
+        {
+          path: '/master-barang/add',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Add Master Barang'} />
+              <ListMasterBarangInput />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
   const routesForPengumuman: routesTypes[] = [
     {
       path: '/',
@@ -461,6 +496,7 @@ const Routes = () => {
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
     ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
+    ...(hasMasterBarangAkses ? routesForMasterBarang : []),
     ...(hasPengumumanAkses ? routesForPengumuman : []),
     ...(isAdminPB ? routesForAdminPB : []),
   ]);

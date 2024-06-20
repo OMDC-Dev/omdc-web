@@ -3,7 +3,7 @@ const DEV = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = DEV;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -116,3 +116,16 @@ export const GET_ADMIN_PB = '/adminpb';
 export const ADMIN_PB = (iduser: string) => `/adminpb/${iduser}`;
 export const BARANG_ADMIN_APPROVAL = (id: string, mode: string) =>
   `barang/admin-approval/${id}/${mode}`;
+
+// Master Barang
+export const GET_GROUP_BARANG = 'barang/grup';
+export const GET_KATEGORY_BARANG = 'barang/kategory';
+export const GET_KEMASAN = 'barang/kemasan';
+export const GET_SATUAN = 'barang/satuan';
+export const CEK_BARKODE_BARANG = (code: string) =>
+  `barang/cek-barkode/${code}`;
+export const CREATE_BARANG = 'barang/add';
+export const UPDATE_BARANG = (kode: string) => `barang/update/${kode}`;
+
+// Invoice
+export const CEK_INVOICE = (inv: string) => `invoice/${inv}`;
