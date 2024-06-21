@@ -202,6 +202,7 @@ function ListMasterBarang() {
                                   e.preventDefault();
                                   navigate('/master-barang/add', {
                                     replace: false,
+                                    state: item,
                                   });
                                 }}
                               >

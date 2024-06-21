@@ -78,20 +78,24 @@ const DetailPengajuan: React.FC = () => {
   // handle status
   const STATUS_WORDING = (
     status: string,
-    isFinance?: boolean,
+    tgl_approve?: string,
+    useTgl: boolean = true,
   ): { tx: string; color: colors } => {
     switch (status) {
       case 'WAITING':
         return {
-          tx: isFinance ? 'Menunggu Ditransfer' : 'Menunggu Disetujui',
+          tx: 'Menunggu',
           color: 'amber',
         };
         break;
       case 'APPROVED':
-        return { tx: 'Disetujui', color: 'green' };
+        return {
+          tx: !useTgl ? 'Disetujui' : `Disetujui -- ${tgl_approve}`,
+          color: 'green',
+        };
         break;
       case 'DONE':
-        return { tx: 'Selesai', color: 'green' };
+        return { tx: `Selesai -- ${tgl_approve}`, color: 'green' };
         break;
       case 'REJECTED':
         return { tx: 'DItolak', color: 'red' };
@@ -286,22 +290,6 @@ const DetailPengajuan: React.FC = () => {
     );
   }
 
-  // function render reviewer status process
-  function renderReviewerStatus() {
-    const reviewStatus = data?.reviewStatus;
-
-    return (
-      <div className=" py-4 flex justify-between">
-        <span className=" text-black font-bold">Reviewer</span>
-        <Chip
-          variant={'ghost'}
-          color={STATUS_WORDING(reviewStatus, true).color}
-          value={STATUS_WORDING(reviewStatus, true).tx}
-        />
-      </div>
-    );
-  }
-
   // ======================== GAP RENDER STATUS PERSETUJUAN
   function renderStatusPersetujuan() {
     return (
@@ -313,7 +301,7 @@ const DetailPengajuan: React.FC = () => {
           <Chip
             variant={'outlined'}
             color={STATUS_WORDING(data?.status).color}
-            value={STATUS_WORDING(data?.status).tx}
+            value={STATUS_WORDING(data?.status, '', false).tx}
           />
         </div>
         <form action="#">
@@ -333,7 +321,9 @@ const DetailPengajuan: React.FC = () => {
                       <Chip
                         variant={'ghost'}
                         color={STATUS_WORDING(item?.status).color}
-                        value={STATUS_WORDING(item?.status).tx}
+                        value={
+                          STATUS_WORDING(item?.status, item?.tgl_approve).tx
+                        }
                       />
                     </div>
                   );

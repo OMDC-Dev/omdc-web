@@ -14,7 +14,7 @@ import {
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useModal from '../../hooks/useModal';
 import GrupModal from '../../components/Modal/GrupModal';
 import KategoryModal from '../../components/Modal/KategoryModal';
@@ -24,12 +24,19 @@ import SatuanModal from '../../components/Modal/SatuanModal';
 import formatRupiah from '../../common/formatRupiah';
 import Button from '../../components/Button';
 import { generateRandomNumber } from '../../common/utils';
-import { CEK_BARKODE_BARANG, CREATE_BARANG } from '../../api/routes';
+import {
+  CEK_BARKODE_BARANG,
+  CREATE_BARANG,
+  UPDATE_BARANG,
+} from '../../api/routes';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import PickListGroup from '../../components/SelectGroup/PickListGrup';
 
 function ListMasterBarangInput() {
   const { show, hide, toggle, visible, type, changeType } = useModal();
+  const location = useLocation();
+
+  const DETAIL_DATA = location.state;
 
   // Input State
   const [kodeBarang, setKodeBarang] = React.useState<any>();
@@ -80,6 +87,26 @@ function ListMasterBarangInput() {
 
   const navigate = useNavigate();
 
+  // [Handle detail] ====
+  React.useEffect(() => {
+    if (DETAIL_DATA) {
+      const ext = DETAIL_DATA;
+
+      setNamaBarang(ext.nm_barang);
+      setQtyBarang(String(ext?.qty_satuan));
+      setHargaSatuan(String(ext?.hrga_satuan));
+      setHPPSatuan(String(ext?.hppsatuan));
+      setHargaJualSatuan(String(ext?.hrga_jualsatuan));
+      setStatus(ext?.sts_brg == 'AKTIF' ? 'AKTIF' : 'TIDAKAKTIF');
+      setGrup(ext.grup_brg);
+      setKategory(ext.kategory_brg);
+      setSuplier(ext.kdsp);
+      setKemasan(ext.nm_kemasan);
+      setSatuan(ext.nm_satuan);
+    }
+  }, []);
+  // ====================
+
   // [Calculation] ===
   React.useEffect(() => {
     if (hargaSatuan !== '0' && qtyBarang !== '0') {
@@ -105,9 +132,15 @@ function ListMasterBarangInput() {
 
   // [Initial State] ===
   React.useEffect(() => {
-    const genID = generateRandomNumber(100000, 999999);
-    setKodeBarang(genID);
-    setBarcodeBarang(String(genID));
+    if (!DETAIL_DATA) {
+      const genID = generateRandomNumber(100000, 999999);
+      setKodeBarang(genID);
+      setBarcodeBarang(String(genID));
+    } else {
+      setKodeBarang(DETAIL_DATA.kd_brg);
+      setBarcodeBarang(DETAIL_DATA.barcode_brg);
+    }
+
     setBarcodeAva(true);
   }, []);
   // ===================
@@ -151,6 +184,36 @@ function ListMasterBarangInput() {
 
     const { state, data, error } = await useFetch({
       url: CREATE_BARANG,
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  async function onUpdateBarang() {
+    changeType('LOADING');
+    const body = {
+      barcode_brg: barcodeBarang,
+      nama_brg: namaBarang,
+      grup_brg: grup,
+      kategory_brg: kategory,
+      suplier: suplier?.kdsp || null,
+      kemasan: kemasan,
+      satuan: satuan,
+      qty_isi: qtyBarang,
+      harga_satuan: hargaSatuan,
+      hpp_satuan: hppSatuan,
+      hargajual_satuan: hargaJualSatuan,
+      status: status,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: UPDATE_BARANG(kodeBarang),
       method: 'POST',
       data: body,
     });
@@ -473,7 +536,7 @@ function ListMasterBarangInput() {
                     show();
                   }}
                 >
-                  Simpan Barang
+                  {DETAIL_DATA ? 'Update Barang' : 'Simpan Barang'}
                 </Button>
               </div>
             </div>
@@ -510,7 +573,7 @@ function ListMasterBarangInput() {
         type={type}
         visible={visible}
         toggle={toggle}
-        onConfirm={() => onSaveBarang()}
+        onConfirm={() => (DETAIL_DATA ? onUpdateBarang() : onSaveBarang())}
         onDone={() => {
           hide();
           type == 'SUCCESS'

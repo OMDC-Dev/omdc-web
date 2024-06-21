@@ -586,7 +586,6 @@ const BuatPengajuan: React.FC = () => {
                     changeType('CONFIRM');
                     show();
                   }}
-                  isLoading
                   disabled={buttonDisabled}
                 >
                   Buat Pengajuan
@@ -602,6 +601,7 @@ const BuatPengajuan: React.FC = () => {
         visible={showItem}
         toggle={() => setShowItem(!showItem)}
         value={(cb: any) => setItem([...item, { ...cb, id: item.length + 1 }])}
+        includeData={item}
       />
       <BankModal
         visible={showBank}

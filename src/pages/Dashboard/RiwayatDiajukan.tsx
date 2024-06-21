@@ -95,7 +95,7 @@ function RiwayatDiajukan() {
     if (ADMIN_TYPE == 'ADMIN') {
       URL = PENGAJUAN;
       param = typeParam('type');
-      param += '&sort=ADMIN';
+      param += '&sort=ADMIN&web=true';
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
