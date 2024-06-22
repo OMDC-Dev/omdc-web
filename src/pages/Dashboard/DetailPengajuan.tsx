@@ -89,6 +89,7 @@ const DetailPengajuan: React.FC = () => {
     tgl_approve?: string,
     useTgl: boolean = true,
   ): { tx: string; color: colors } => {
+    const tglStr = tgl_approve ? `Disetujui -- ${tgl_approve}` : 'Disetujui';
     switch (status) {
       case 'WAITING':
         return {
@@ -98,7 +99,7 @@ const DetailPengajuan: React.FC = () => {
         break;
       case 'APPROVED':
         return {
-          tx: !useTgl ? 'Disetujui' : `Disetujui -- ${tgl_approve}`,
+          tx: !useTgl ? 'Disetujui' : tglStr,
           color: 'green',
         };
         break;
@@ -106,7 +107,7 @@ const DetailPengajuan: React.FC = () => {
         return { tx: `Selesai -- ${tgl_approve}`, color: 'green' };
         break;
       case 'REJECTED':
-        return { tx: 'DItolak', color: 'red' };
+        return { tx: 'Ditolak', color: 'red' };
         break;
       default:
         return { tx: 'Menunggu Disetujui', color: 'amber' };

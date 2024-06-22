@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Semua",
+    "value": "all"
+  },
+  {
+    "label": "Selesai",
+    "value": "DONE"
+  },
+  {
+    "label": "Menunggu",
+    "value": "WAITING"
+  }
+]

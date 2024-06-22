@@ -109,29 +109,28 @@ const AdminDetailPengajuan: React.FC = () => {
   // handle status
   const STATUS_WORDING = (
     status: string,
-    isFinance?: boolean,
+    tgl_approve?: string,
+    useTgl: boolean = true,
   ): { tx: string; color: colors } => {
+    const tglStr = tgl_approve ? `Disetujui -- ${tgl_approve}` : 'Disetujui';
     switch (status) {
-      case 'IDLE':
-        return {
-          tx: 'Menunggu Direview',
-          color: 'amber',
-        };
-        break;
       case 'WAITING':
         return {
-          tx: isFinance ? 'Menunggu Diproses' : 'Menunggu Disetujui',
+          tx: 'Menunggu',
           color: 'amber',
         };
         break;
       case 'APPROVED':
-        return { tx: 'Disetujui', color: 'green' };
+        return {
+          tx: !useTgl ? 'Disetujui' : tglStr,
+          color: 'green',
+        };
+        break;
+      case 'DONE':
+        return { tx: `Selesai -- ${tgl_approve}`, color: 'green' };
         break;
       case 'REJECTED':
         return { tx: 'Ditolak', color: 'red' };
-        break;
-      case 'DONE':
-        return { tx: 'Selesai', color: 'green' };
         break;
       default:
         return { tx: 'Menunggu Disetujui', color: 'amber' };
@@ -744,40 +743,6 @@ const AdminDetailPengajuan: React.FC = () => {
     );
   }
 
-  // function render reviewer status process
-  function renderReviewerStatus() {
-    const reviewStatus = status?.reviewStatus;
-
-    return (
-      <div className=" py-4 flex justify-between">
-        <span className=" text-black font-bold">Reviewer</span>
-        <Chip
-          variant={'ghost'}
-          color={STATUS_WORDING(reviewStatus, true).color}
-          value={STATUS_WORDING(reviewStatus, true).tx}
-        />
-      </div>
-    );
-  }
-
-  // render finance process status
-  function renderFinanceProcessStatus() {
-    const statusFinance = status?.status_finance;
-
-    if (statusFinance == 'IDLE') return;
-
-    return (
-      <div className=" py-4 flex justify-between">
-        <span className=" text-black font-bold">Finance</span>
-        <Chip
-          variant={'ghost'}
-          color={STATUS_WORDING(statusFinance, true).color}
-          value={STATUS_WORDING(statusFinance, true).tx}
-        />
-      </div>
-    );
-  }
-
   function renderDownloadReportButton(isTop: boolean) {
     if (ADMIN_TYPE !== 'FINANCE') return;
     if (data.status_finance !== 'DONE') return;
@@ -821,7 +786,7 @@ const AdminDetailPengajuan: React.FC = () => {
           <Chip
             variant={'outlined'}
             color={STATUS_WORDING(status?.status).color}
-            value={STATUS_WORDING(status?.status).tx}
+            value={STATUS_WORDING(data?.status, '', false).tx}
           />
         </div>
         <div>
@@ -841,7 +806,9 @@ const AdminDetailPengajuan: React.FC = () => {
                       <Chip
                         variant={'ghost'}
                         color={STATUS_WORDING(item?.status).color}
-                        value={STATUS_WORDING(item?.status).tx}
+                        value={
+                          STATUS_WORDING(item?.status, item?.tgl_approve).tx
+                        }
                       />
                     </div>
                   );

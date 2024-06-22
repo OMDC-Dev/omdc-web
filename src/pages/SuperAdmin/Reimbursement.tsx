@@ -21,6 +21,8 @@ import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
 import { cekAkses } from '../../common/utils';
 import { exportToExcell } from '../../common/exportToExcell';
+import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
+import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -46,6 +48,8 @@ function SuperReimbursement() {
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
+  const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  const [financeFilter, setFinanceFilter] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -53,12 +57,22 @@ function SuperReimbursement() {
     getReimbursementList();
   }, [page]);
 
-  async function getReimbursementList(clear?: boolean) {
+  async function getReimbursementList(
+    clear?: boolean,
+    type?: string,
+    finance?: string,
+  ) {
     setLoading(true);
+    const typeParam =
+      type !== 'all' && type ? `&type=${type?.toUpperCase()}` : '';
+    const financeParam =
+      finance !== 'all' && finance ? `&finance=${finance?.toUpperCase()}` : '';
     const { state, data, error } = await useFetch({
       url:
         SUPERUSER_REIMBURSEMENT +
-        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
+        typeParam +
+        financeParam,
       method: 'GET',
     });
 
@@ -155,7 +169,7 @@ function SuperReimbursement() {
               </Button> */}
             </div>
           </div>
-          <div className="relative w-full">
+          <div className="relative w-full lg:flex lg:items-center">
             <form
               className="w-full"
               onSubmit={(e) => {
@@ -184,6 +198,20 @@ function SuperReimbursement() {
                 </button>
               )}
             </form>
+            <TipeFilterGroup
+              setValue={(val: string) => {
+                setTipeFilter(val);
+                getReimbursementList(false, val, financeFilter);
+              }}
+              value={tipeFilter}
+            />
+            <FinanceStatusFilterGroup
+              setValue={(val: string) => {
+                setFinanceFilter(val);
+                getReimbursementList(false, tipeFilter, val);
+              }}
+              value={financeFilter}
+            />
           </div>
         </CardHeader>
         {!rList?.length ? (
