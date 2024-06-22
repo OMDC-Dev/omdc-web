@@ -40,8 +40,8 @@ const DatePicker = ({
 
   return (
     <div>
-      <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-        {title || 'Pilih Tanggal'}
+      <label className="mb-3 block text-md text-black dark:text-white">
+        {title || 'Tanggal Invoice'}
       </label>
       <div className="relative">
         <input

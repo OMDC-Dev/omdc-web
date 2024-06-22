@@ -318,7 +318,7 @@ const DownloadReport: React.FC = () => {
         value: data?.coa,
       },
       {
-        title: 'Tanggal',
+        title: 'Tanggal Invoice',
         value: data?.tanggal_reimbursement,
       },
       {

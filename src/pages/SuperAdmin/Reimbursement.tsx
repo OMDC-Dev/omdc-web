@@ -28,7 +28,7 @@ const TABLE_HEAD = [
   'Pengajuan',
   'No. Doc.',
   'Kategori Permintaan',
-  'Tanggal',
+  'Tanggal Invoice',
   'Cabang',
   'Diajukan Oleh',
   'Nama Client / Vendor',

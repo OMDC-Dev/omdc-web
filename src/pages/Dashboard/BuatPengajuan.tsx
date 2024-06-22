@@ -536,7 +536,7 @@ const BuatPengajuan: React.FC = () => {
                               ripple={false}
                               className="py-1 pr-1 pl-4"
                             >
-                              {item?.name}
+                              {item?.invoice || '-'} - {item?.name}
                               <ListItemSuffix className="flex gap-x-4">
                                 {formatRupiah(item.nominal, true)}
                                 <IconButton

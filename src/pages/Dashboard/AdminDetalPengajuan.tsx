@@ -1004,7 +1004,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
-                      Tanggal
+                      Tanggal Invoice
                     </label>
                     <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                       {data?.tanggal_reimbursement}
@@ -1165,7 +1165,7 @@ const AdminDetailPengajuan: React.FC = () => {
                             ripple={false}
                             className="py-1 pr-1 pl-4"
                           >
-                            {item?.name}
+                            {item?.invoice || '-'} - {item?.name}
                             <ListItemSuffix className="flex gap-x-4">
                               {formatRupiah(item.nominal, true)}
                             </ListItemSuffix>

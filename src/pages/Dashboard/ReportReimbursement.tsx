@@ -20,6 +20,7 @@ import { API_STATES } from '../../constants/ApiEnum';
 import { exportToExcell } from '../../common/exportToExcell';
 import formatRupiah from '../../common/formatRupiah';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
+import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 
 function ReportReimbursement() {
   const [data, setData] = React.useState();
@@ -35,6 +36,7 @@ function ReportReimbursement() {
   const [tanggalEnd, setTanggalEnd] = React.useState<Date | any>();
 
   const [typeFilter, setTypeFilter] = React.useState<string>('');
+  const [financeFilter, setFinanceFilter] = React.useState<string>('');
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
@@ -71,6 +73,7 @@ function ReportReimbursement() {
         cabang ? cabang.value : '',
         selectedBank ? selectedBank?.namaBank : '',
         typeFilter,
+        financeFilter,
       ),
       method: 'GET',
     });
@@ -262,6 +265,31 @@ function ReportReimbursement() {
                 <Button
                   onClick={() => {
                     setTypeFilter('');
+                  }}
+                  mode="outlined"
+                  className=" h-full"
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full">
+            <label className="mb-3 block text-black dark:text-white">
+              Status Finance
+            </label>
+            <div className=" flex flex-row gap-x-4">
+              <FinanceStatusFilterGroup
+                className="mx-0 w-full"
+                typeOnly
+                setValue={(val: string) => setFinanceFilter(val)}
+                value={financeFilter}
+              />
+              <div className=" w-56">
+                <Button
+                  onClick={() => {
+                    setFinanceFilter('');
                   }}
                   mode="outlined"
                   className=" h-full"
