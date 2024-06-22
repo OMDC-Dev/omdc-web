@@ -1081,28 +1081,42 @@ const AdminDetailPengajuan: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="w-full">
-                  <label className="mb-3 block text-black dark:text-white">
-                    Lampiran
-                  </label>
-                  <div className=" flex flex-col gap-4">
-                    <div className="w-full truncate rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.file_info?.name}
+                {data?.attachment ? (
+                  <div className="w-full">
+                    <label className="mb-3 block text-black dark:text-white">
+                      Lampiran
+                    </label>
+                    <div className=" flex flex-col gap-4">
+                      <div className="w-full truncate rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {data?.file_info?.name}
+                      </div>
+                      <Button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          data?.file_info?.type !== 'application/pdf'
+                            ? setShowFile(!showFile)
+                            : openInNewTab(data?.attachment);
+                        }}
+                      >
+                        {data?.file_info?.type !== 'application/pdf'
+                          ? 'Lihat'
+                          : 'Unduh'}
+                      </Button>
                     </div>
-                    <Button
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        data?.file_info?.type !== 'application/pdf'
-                          ? setShowFile(!showFile)
-                          : openInNewTab(data?.attachment);
-                      }}
-                    >
-                      {data?.file_info?.type !== 'application/pdf'
-                        ? 'Lihat'
-                        : 'Unduh'}
-                    </Button>
                   </div>
-                </div>
+                ) : (
+                  <div className="w-full">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Lampiran
+                      </label>
+                      <div className=" text-md text-red-500">
+                        Sepertinya lampiran gagal di upload, mohon hubungi user
+                        untuk melakukan upload ulang lampiran.
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="w-full mt-4.5">
                   <label className="mb-3 block text-black dark:text-white">

@@ -24,7 +24,7 @@ import moment from 'moment';
 
 const TABLE_HEAD = [
   'ID PB',
-  'ID User',
+  'Dibuat oleh',
   'Kirim ke',
   'Cabang',
   'Tanggal Disetujui',
@@ -151,7 +151,7 @@ function PermintaanBarangAdmin() {
                         <td className={classes}>
                           <div className="flex flex-col">
                             <Typography variant="small" className="font-normal">
-                              {item?.iduser}
+                              {item?.nm_user}
                             </Typography>
                           </div>
                         </td>

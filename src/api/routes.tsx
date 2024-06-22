@@ -29,6 +29,8 @@ export const REIMBURSEMENT_DETAIL = (id: number) => {
 export const REIMBURSEMENT_ACCEPTANCE = (id: number) => {
   return `reimbursement/status/${id}`;
 };
+export const REIMBURSEMENT_UPDATE_ADMIN = (id: string, adminId: string) =>
+  `reimbursement/update-admin/${id}?adminId=${adminId}`;
 
 // BANK
 export const GET_BANK = 'bank';
@@ -110,6 +112,8 @@ export const ACCEPT_MAKER_REIMBURSEMENT = (id: number) => `maker/accept/${id}`;
 export const REIMBURSEMENT_ACCEPTANCE_EXTRA = (id: number) => {
   return `reimbursement/extra/${id}`;
 };
+export const REIMBURSEMENT_REUPLOAD_FILE = (id: string) =>
+  `reimbursement/reupload-file/${id}`;
 
 // ADMIN PB
 export const GET_ADMIN_PB = '/adminpb';

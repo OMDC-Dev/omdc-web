@@ -12,10 +12,13 @@ import {
   FINANCE_UPDATE_COA,
   REIMBURSEMENT_ACCEPTANCE,
   REIMBURSEMENT_DETAIL,
+  REIMBURSEMENT_REUPLOAD_FILE,
+  REIMBURSEMENT_UPDATE_ADMIN,
 } from '../../api/routes';
 import formatRupiah from '../../common/formatRupiah';
 import {
   calculateSaldo,
+  compressImage,
   downloadPDF,
   downloadPDFDirect,
   openInNewTab,
@@ -29,6 +32,7 @@ import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
 import COAModal from '../../components/Modal/COAModal';
 import { usePDF } from 'react-to-pdf';
+import AdminModal from '../../components/Modal/AdminModal';
 
 const DetailPengajuan: React.FC = () => {
   const {
@@ -67,9 +71,13 @@ const DetailPengajuan: React.FC = () => {
   const [coaChange, setCoaChange] = React.useState(false);
 
   const [status, setStatus] = React.useState<any>();
+  const [admin, setAdmin] = React.useState<any>('');
+  const [result, setResult] = React.useState<any>();
+  const [fileInfo, setFileInfo] = React.useState<any>();
 
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
+  const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
 
   const { toPDF, targetRef } = usePDF({ filename: 'report.pdf' });
 
@@ -206,6 +214,86 @@ const DetailPengajuan: React.FC = () => {
     }
   }
 
+  async function onAdminChange() {
+    changeType('LOADING');
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_UPDATE_ADMIN(RID, admin.iduser),
+      method: 'POST',
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      getStatus();
+      setAdmin('');
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  async function onReuploadFile() {
+    changeType('LOADING');
+    const body = {
+      file: fileInfo,
+      attachment: result,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_REUPLOAD_FILE(RID),
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+      getStatus();
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  // handle attachment
+  function handleAttachment(event: any) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const maxSize = 1048576;
+
+    // handle file type
+    const fileInfo = {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    };
+
+    if (file.size > maxSize) {
+      console.log('NEED COMPRESS');
+      if (file.type.includes('image')) {
+        compressImage(file, maxSize, handleAttachment);
+        return; // Menghentikan eksekusi lebih lanjut
+      } else {
+        // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
+        alert(
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+        );
+        event.target.value = null; // Mengosongkan input file
+        return;
+      }
+    } else {
+      console.log('AMAN');
+    }
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const base64string: any = reader.result;
+
+      const splitted = base64string?.split(';base64,');
+
+      setResult(splitted[1]);
+    };
+
+    setFileInfo(fileInfo);
+  }
+
   function renderNoteList() {
     if (status?.status == 'WAITING') return;
 
@@ -290,6 +378,36 @@ const DetailPengajuan: React.FC = () => {
     );
   }
 
+  function renderAdminSelector() {
+    return (
+      <div className="w-full mb-4.5">
+        <div>
+          <label className="mb-3 block text-black dark:text-white">
+            Ganti penyetuju ke
+          </label>
+          <div
+            onClick={() => setShowAdmin(!showAdmin)}
+            className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+          >
+            {admin?.nm_user ? admin?.nm_user : 'Pilih Admin'}
+          </div>
+        </div>
+        <Button
+          disabled={!admin}
+          className=" mt-4"
+          onClick={(e: any) => {
+            e.preventDefault();
+            changeType('CONFIRM');
+            changeContext('ADMIN');
+            show();
+          }}
+        >
+          Simpan Penyetuju
+        </Button>
+      </div>
+    );
+  }
+
   // ======================== GAP RENDER STATUS PERSETUJUAN
   function renderStatusPersetujuan() {
     return (
@@ -344,10 +462,14 @@ const DetailPengajuan: React.FC = () => {
 
               {data?.status == 'WAITING' ? (
                 <div className=" mt-4">
+                  {renderAdminSelector()}
                   <Button
+                    className=" border-red-500 text-red-500"
+                    mode={'outlined'}
                     onClick={(e: any) => {
                       e.preventDefault();
                       changeType('CONFIRM');
+                      changeContext('DELETE');
                       show();
                     }}
                   >
@@ -482,26 +604,66 @@ const DetailPengajuan: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="w-full">
-                  <label className="mb-3 block text-black dark:text-white">
-                    Lampiran
-                  </label>
-                  <div className=" flex flex-col gap-4">
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.file_info?.name}
+                {status?.attachment ? (
+                  <div className="w-full">
+                    <label className="mb-3 block text-black dark:text-white">
+                      Lampiran
+                    </label>
+                    <div className=" flex flex-col gap-4">
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {status?.file_info?.name}
+                      </div>
+                      <Button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          status?.file_info?.type !== 'application/pdf'
+                            ? setShowFile(!showFile)
+                            : openInNewTab(status?.attachment);
+                        }}
+                      >
+                        Lihat Lampiran
+                      </Button>
+                    </div>
+                  </div>
+                ) : data?.status == 'WAITING' ? (
+                  <div className="w-full">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Lampirkan File ( Maks. 1MB )
+                      </label>
+                      <input
+                        type="file"
+                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        accept=".pdf,image/*"
+                        onChange={handleAttachment}
+                      />
                     </div>
                     <Button
+                      disabled={!fileInfo}
+                      className=" mt-4"
                       onClick={(e: any) => {
                         e.preventDefault();
-                        data?.file_info?.type !== 'application/pdf'
-                          ? setShowFile(!showFile)
-                          : openInNewTab(data?.attachment);
+                        changeContext('UPLOAD');
+                        changeType('CONFIRM');
+                        show();
                       }}
                     >
-                      Lihat Lampiran
+                      Upload Lampiran Baru
                     </Button>
                   </div>
-                </div>
+                ) : (
+                  <div className="w-full">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Lampiran
+                      </label>
+                      <div className=" text-md text-red-500">
+                        Sepertinya lampiran anda gagal di upload, mohon hubungi
+                        penyetuju untuk melakukan pengecekan.
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="w-full mt-4.5">
                   <label className="mb-3 block text-black dark:text-white">
@@ -695,8 +857,8 @@ const DetailPengajuan: React.FC = () => {
       {/* MODAL CONTAINER */}
       {/* <Modal visible={visible} toggle={toggle} /> */}
       <FileModal
-        type={data?.file_info?.type}
-        data={data?.attachment}
+        type={status?.file_info?.type}
+        data={status?.attachment}
         visible={showFile}
         toggle={() => setShowFile(!showFile)}
       />
@@ -704,9 +866,19 @@ const DetailPengajuan: React.FC = () => {
         visible={visible}
         toggle={toggle}
         type={type}
-        onConfirm={() => (context == 'COA' ? onCOAUpdate() : deletePengajuan())}
+        onConfirm={() => {
+          if (context == 'COA') {
+            onCOAUpdate();
+          } else if (context == 'ADMIN') {
+            onAdminChange();
+          } else if (context == 'UPLOAD') {
+            onReuploadFile();
+          } else {
+            deletePengajuan();
+          }
+        }}
         onDone={() =>
-          context !== 'COA' ? navigate('/', { replace: true }) : null
+          context == 'DELETE' ? navigate('/', { replace: true }) : null
         }
       />
       <COAModal
@@ -716,6 +888,12 @@ const DetailPengajuan: React.FC = () => {
           setCoa(val);
           setCoaChange(true);
         }}
+      />
+      <AdminModal
+        visible={showAdmin}
+        rid={data?.id}
+        toggle={() => setShowAdmin(!showAdmin)}
+        value={(val: any) => setAdmin(val)}
       />
     </DefaultLayout>
   );
