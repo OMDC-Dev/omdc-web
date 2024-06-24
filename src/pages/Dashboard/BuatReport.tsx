@@ -118,7 +118,7 @@ const BuatReport: React.FC = () => {
     !result ||
     !selectDate ||
     !admin ||
-    !item.length ||
+    !item?.length ||
     !tipePembayaran ||
     disabledByBank() ||
     disabledByType();
@@ -585,7 +585,7 @@ const BuatReport: React.FC = () => {
       <ItemModal
         visible={showItem}
         toggle={() => setShowItem(!showItem)}
-        value={(cb: any) => setItem([...item, { ...cb, id: item.length + 1 }])}
+        value={(cb: any) => setItem([...item, { ...cb, id: item?.length + 1 }])}
         includeData={item}
       />
       <BankModal

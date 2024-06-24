@@ -121,7 +121,7 @@ const BuatPengajuan: React.FC = () => {
     !admin ||
     !payment ||
     isNeedBank() ||
-    !item.length ||
+    !item?.length ||
     !tipePembayaran ||
     disabledByType();
 
@@ -204,7 +204,7 @@ const BuatPengajuan: React.FC = () => {
     let data = item;
     data = data.filter((item: any) => item.id !== id);
 
-    for (let index = 0; index < data.length; index++) {
+    for (let index = 0; index < data?.length; index++) {
       const element = data[index];
       element.id = index;
     }
@@ -600,7 +600,7 @@ const BuatPengajuan: React.FC = () => {
       <ItemModal
         visible={showItem}
         toggle={() => setShowItem(!showItem)}
-        value={(cb: any) => setItem([...item, { ...cb, id: item.length + 1 }])}
+        value={(cb: any) => setItem([...item, { ...cb, id: item?.length + 1 }])}
         includeData={item}
       />
       <BankModal

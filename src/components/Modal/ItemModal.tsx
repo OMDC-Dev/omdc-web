@@ -115,7 +115,7 @@ const ItemModal = ({
           />
         </div>
         <Button
-          disabled={!name || !nominal || !invoice || invoiceError.length > 1}
+          disabled={!name || !nominal || !invoice || invoiceError?.length > 1}
           onClick={() => checkInvoice()}
         >
           Simpan
