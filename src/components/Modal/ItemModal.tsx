@@ -37,7 +37,7 @@ const ItemModal = ({
     }
 
     const { state, data, error } = await useFetch({
-      url: CEK_INVOICE(invoice),
+      url: CEK_INVOICE(encodeURIComponent(invoice)),
       method: 'GET',
     });
 
