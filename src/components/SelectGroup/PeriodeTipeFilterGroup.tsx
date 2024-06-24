@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import DATAS from '../../common/files/typefilter.json';
+import DATAS from '../../common/files/typePeriodeFilter.json';
 
-const TipeFilterGroup = ({
+const PeriodeTipeFilterGroup = ({
   value,
   setValue,
   className,
@@ -36,7 +36,7 @@ const TipeFilterGroup = ({
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
-            Tipe Pembayaran
+            Tipe Periode
           </option>
           {LIST.map((item, index) => {
             return (
@@ -73,4 +73,4 @@ const TipeFilterGroup = ({
   );
 };
 
-export default TipeFilterGroup;
+export default PeriodeTipeFilterGroup;

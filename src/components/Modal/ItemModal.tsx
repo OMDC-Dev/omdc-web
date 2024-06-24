@@ -37,7 +37,7 @@ const ItemModal = ({
     }
 
     const { state, data, error } = await useFetch({
-      url: CEK_INVOICE(encodeURIComponent(invoice)),
+      url: CEK_INVOICE(invoice),
       method: 'GET',
     });
 
@@ -70,7 +70,16 @@ const ItemModal = ({
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-full">
         <div className=" flex flex-row items-center border-b border-blue-gray-800 py-2 mb-4.5">
           <div className=" flex-1">Tambah Item</div>
-          <XMarkIcon className=" w-5 h-5 cursor-pointer" onClick={toggle} />
+          <XMarkIcon
+            className=" w-5 h-5 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              toggle();
+              setName('');
+              setNominal('');
+              setInvoice('');
+            }}
+          />
         </div>
         <div className="mb-4.5">
           <label className="mb-2.5 block text-black dark:text-white">

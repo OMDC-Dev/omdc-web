@@ -570,7 +570,6 @@ const BuatReport: React.FC = () => {
                     changeType('CONFIRM');
                     show();
                   }}
-                  isLoading
                   disabled={buttonDisabled}
                 >
                   Buat Pengajuan

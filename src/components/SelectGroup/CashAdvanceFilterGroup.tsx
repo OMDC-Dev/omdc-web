@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import DATAS from '../../common/files/typefilter.json';
+import DATAS from '../../common/files/caFilter.json';
 
-const TipeFilterGroup = ({
+const CashAdvanceFilterGroup = ({
   value,
   setValue,
   className,
@@ -23,7 +23,7 @@ const TipeFilterGroup = ({
     : DATAS;
 
   return (
-    <div className={className || 'w-full lg:w-1/3 mt-4 lg:mx-4'}>
+    <div className={className || ' w-full lg:w-1/3 mt-4 lg:mx-4'}>
       <div className="relative z-20">
         <select
           value={value}
@@ -36,7 +36,7 @@ const TipeFilterGroup = ({
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
-            Tipe Pembayaran
+            Status Cash Advance
           </option>
           {LIST.map((item, index) => {
             return (
@@ -73,4 +73,4 @@ const TipeFilterGroup = ({
   );
 };
 
-export default TipeFilterGroup;
+export default CashAdvanceFilterGroup;

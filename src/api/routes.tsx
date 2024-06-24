@@ -3,7 +3,7 @@ const DEV = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = DEV;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -54,8 +54,9 @@ export const SUPERUSER_REPORT_EXPORT = (
   bank?: string,
   tipe?: string,
   finance?: string,
+  tipePeriode?: string,
 ) => {
-  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}`;
+  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}`;
 };
 
 // FINANCE
@@ -133,4 +134,4 @@ export const CREATE_BARANG = 'barang/add';
 export const UPDATE_BARANG = (kode: string) => `barang/update/${kode}`;
 
 // Invoice
-export const CEK_INVOICE = (inv: string) => `invoice/${inv}`;
+export const CEK_INVOICE = (inv: string) => `invoice?inv=${inv}`;

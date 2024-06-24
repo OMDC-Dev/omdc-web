@@ -21,6 +21,7 @@ import { exportToExcell } from '../../common/exportToExcell';
 import formatRupiah from '../../common/formatRupiah';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
+import PeriodeTipeFilterGroup from '../../components/SelectGroup/PeriodeTipeFilterGroup';
 
 function ReportReimbursement() {
   const [data, setData] = React.useState();
@@ -37,6 +38,7 @@ function ReportReimbursement() {
 
   const [typeFilter, setTypeFilter] = React.useState<string>('');
   const [financeFilter, setFinanceFilter] = React.useState<string>('');
+  const [typePeriodeFilter, setTypePeriodeFilter] = React.useState<string>('');
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
@@ -74,6 +76,7 @@ function ReportReimbursement() {
         selectedBank ? selectedBank?.namaBank : '',
         typeFilter,
         financeFilter,
+        typePeriodeFilter,
       ),
       method: 'GET',
     });
@@ -116,14 +119,20 @@ function ReportReimbursement() {
         finance_by,
         nominal,
         attachment,
+        maker_approve,
+        reviewer_approve,
         ...rest
       }: any = itemCol;
 
       const parsedItem = item
         .map(
-          (item: any) => `${item.name} - ${formatRupiah(item.nominal, true)}`,
+          (item: any) =>
+            `${item.invoice} || ${item.name} || ${formatRupiah(
+              item.nominal,
+              true,
+            )}`,
         )
-        .join(', ');
+        .join(', \n');
 
       const parsedBankDetail = bank_detail.bankname
         ? `${bank_detail.bankname}, Data: ${bank_detail.accountname} - ${bank_detail.accountnumber}`
@@ -147,6 +156,8 @@ function ReportReimbursement() {
         finance_by: parsedFinanceBy,
         nominal: formatedNominal,
         lampiran: parsedAttachment,
+        makerApprove: maker_approve,
+        reviewerApprove: reviewer_approve,
       };
     });
 
@@ -174,6 +185,8 @@ function ReportReimbursement() {
       'Nama Finance',
       'Nominal Pengajuan',
       'Lampiran',
+      'Tanggal Disetujui Maker',
+      'Tanggal Disetujui Reviewer',
     ];
 
     const title = `Report${startDate}-${endDate}`;
@@ -314,6 +327,31 @@ function ReportReimbursement() {
               title="Periode Akhir"
               onChange={(date) => setTanggalEnd(date)}
             />
+          </div>
+
+          <div className="w-full">
+            <label className="mb-3 block text-black dark:text-white">
+              Tipe Periode
+            </label>
+            <div className=" flex flex-row gap-x-4">
+              <PeriodeTipeFilterGroup
+                className="mx-0 w-full"
+                typeOnly
+                setValue={(val: string) => setTypePeriodeFilter(val)}
+                value={typePeriodeFilter}
+              />
+              <div className=" w-56">
+                <Button
+                  onClick={() => {
+                    setTypePeriodeFilter('');
+                  }}
+                  mode="outlined"
+                  className=" h-full"
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
           </div>
 
           <div className=" w-full">

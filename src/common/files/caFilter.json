@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Semua",
+    "value": "ALL"
+  },
+  {
+    "label": "Belum Dikembalikan",
+    "value": "WAITING"
+  },
+  {
+    "label": "Sudah Dikembalikan",
+    "value": "DONE"
+  }
+]

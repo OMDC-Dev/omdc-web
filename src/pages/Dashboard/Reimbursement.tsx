@@ -22,6 +22,7 @@ moment.locale('id');
 import { cekAkses } from '../../common/utils';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
+import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -49,6 +50,7 @@ function Reimbursement() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
   const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  const [caFilter, setCaFilter] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -80,14 +82,22 @@ function Reimbursement() {
     console.log('UPDTED USER', user);
   }
 
-  async function getReimbursementList(clear?: boolean, type?: string) {
+  async function getReimbursementList(
+    clear?: boolean,
+    type?: string,
+    ca?: string,
+  ) {
     setLoading(true);
-    const typeParam = type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
+    const typeParam =
+      type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
+    const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
+
     const { state, data, error } = await useFetch({
       url:
         REIMBURSEMENT +
         `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
-        typeParam,
+        typeParam +
+        caParam,
       method: 'GET',
     });
 
@@ -176,9 +186,9 @@ function Reimbursement() {
               ) : null}
             </div>
           </div>
-          <div className="relative w-full lg:flex lg:items-center">
+          <div className="relative w-full lg:flex lg:items-center lg:space-x-4">
             <form
-              className="w-full"
+              className="w-full relative"
               onSubmit={(e) => {
                 e.preventDefault();
                 getReimbursementList();
@@ -194,7 +204,7 @@ function Reimbursement() {
               {search && ( // Tampilkan tombol X jika nilai input tidak kosong
                 <button
                   type="button"
-                  className="absolute h-11 inset-y-0 top-4 right-0 px-3 flex items-center "
+                  className="absolute inset-y-0 top-4 right-0 px-3 flex items-center"
                   onClick={(e) => {
                     e.preventDefault();
                     setSearch('');
@@ -208,9 +218,16 @@ function Reimbursement() {
             <TipeFilterGroup
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val);
+                getReimbursementList(false, val, caFilter);
               }}
               value={tipeFilter}
+            />
+            <CashAdvanceFilterGroup
+              setValue={(val: string) => {
+                setCaFilter(val);
+                getReimbursementList(false, tipeFilter, val);
+              }}
+              value={caFilter}
             />
           </div>
         </CardHeader>

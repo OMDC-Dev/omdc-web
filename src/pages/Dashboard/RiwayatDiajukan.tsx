@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
+import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -37,6 +38,7 @@ const TABLE_HEAD = [
   'Nominal',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
+  'Keterangan Status',
   'Status Approval Saya',
   'Status Pengajuan',
   '',
@@ -68,6 +70,7 @@ function RiwayatDiajukan() {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
   const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  const [caFilter, setCaFilter] = React.useState<string>('');
 
   const { user } = useAuth();
 
@@ -86,9 +89,15 @@ function RiwayatDiajukan() {
 
   console.log('ADMIN TYPE', ADMIN_TYPE);
 
-  async function getReimbursementList(clear?: boolean, type?: string) {
+  async function getReimbursementList(
+    clear?: boolean,
+    type?: string,
+    ca?: string,
+  ) {
     const typeParam = (key: string) =>
-      type !== 'all' ? `&${key}=${type?.toUpperCase()}` : '';
+      type && type !== 'all' ? `&${key}=${type?.toUpperCase()}` : '';
+
+    const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
 
     let param = '';
     let URL = '';
@@ -96,18 +105,22 @@ function RiwayatDiajukan() {
       URL = PENGAJUAN;
       param = typeParam('type');
       param += '&sort=ADMIN&web=true';
+      param += caParam;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
       param += '&sort=FINANCE';
+      param += caParam;
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
       param += '&sort=REVIEWER';
+      param += caParam;
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
       param += '&sort=MAKER';
+      param += caParam;
     }
 
     console.log('URL', URL);
@@ -225,9 +238,9 @@ function RiwayatDiajukan() {
               </Typography>
             </div>
           </div>
-          <div className="relative w-full lg:flex lg:items-center">
+          <div className="relative w-full lg:flex lg:items-center lg:space-x-4">
             <form
-              className="w-full"
+              className="w-full relative"
               onSubmit={(e) => {
                 e.preventDefault();
                 getReimbursementList();
@@ -243,7 +256,7 @@ function RiwayatDiajukan() {
               {search && ( // Tampilkan tombol X jika nilai input tidak kosong
                 <button
                   type="button"
-                  className="absolute h-11 inset-y-0 top-4 right-0 px-3 flex items-center "
+                  className="absolute inset-y-0 top-4 right-0 px-3 flex items-center"
                   onClick={(e) => {
                     e.preventDefault();
                     setSearch('');
@@ -257,9 +270,16 @@ function RiwayatDiajukan() {
             <TipeFilterGroup
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val);
+                getReimbursementList(false, val, caFilter);
               }}
               value={tipeFilter}
+            />
+            <CashAdvanceFilterGroup
+              setValue={(val: string) => {
+                setCaFilter(val);
+                getReimbursementList(false, tipeFilter, val);
+              }}
+              value={caFilter}
             />
           </div>
         </CardHeader>
@@ -397,15 +417,13 @@ function RiwayatDiajukan() {
                           </Typography>
                         </td>
                         {ADMIN_TYPE !== 'FINANCE' ? (
+                          <td className={classes}>{keteranganStatus(item)}</td>
+                        ) : null}
+                        {ADMIN_TYPE !== 'FINANCE' ? (
                           <td className={classes}>{renderAdminChip(item)}</td>
                         ) : null}
                         {ADMIN_TYPE == 'FINANCE' ? (
-                          <td className={classes}>
-                            {/* <Typography variant="small" className="font-normal">
-                              {item?.status_finance}
-                            </Typography> */}
-                            {keteranganStatus(item)}
-                          </td>
+                          <td className={classes}>{keteranganStatus(item)}</td>
                         ) : null}
                         <td className={classes}>
                           {/* <Typography variant="small" className="font-normal">
