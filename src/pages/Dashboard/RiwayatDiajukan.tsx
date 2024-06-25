@@ -27,6 +27,9 @@ import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 
 const TABLE_HEAD = [
+  '',
+  'Status Approval Saya',
+  'Status Pengajuan',
   'Pengajuan',
   'No. Dok',
   'Kategori Permintaan',
@@ -39,12 +42,12 @@ const TABLE_HEAD = [
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
   'Keterangan Status',
-  'Status Approval Saya',
-  'Status Pengajuan',
-  '',
 ];
 
 const TABLE_HEAD_FINANCE = [
+  '',
+  'Status Pengajuan',
+  'Status Finance',
   'Pengajuan',
   'No. Dok',
   'Kategori Permintaan',
@@ -57,9 +60,6 @@ const TABLE_HEAD_FINANCE = [
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
   'Keterangan Status',
-  'Status Pengajuan',
-  'Status Finance',
-  '',
 ];
 
 function RiwayatDiajukan() {
@@ -322,6 +322,36 @@ function RiwayatDiajukan() {
                     return (
                       <tr key={item?.id}>
                         <td className={classes}>
+                          <Tooltip content="Detail">
+                            <IconButton
+                              variant="text"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigate(`/reimbursement/admin/${item?.id}`, {
+                                  replace: false,
+                                  state: item,
+                                });
+                              }}
+                            >
+                              <DocumentTextIcon className="h-4 w-4" />
+                            </IconButton>
+                          </Tooltip>
+                        </td>
+                        {ADMIN_TYPE !== 'FINANCE' ? (
+                          <td className={classes}>{renderAdminChip(item)}</td>
+                        ) : null}
+                        <td className={classes}>
+                          {statusChip(item?.status, item?.status_finance)}
+                        </td>
+                        {ADMIN_TYPE == 'FINANCE' ? (
+                          <td className={classes}>
+                            {/* <Typography variant="small" className="font-normal">
+                              {item?.status_finance}
+                            </Typography> */}
+                            {statusChip(item?.status_finance, '')}
+                          </td>
+                        ) : null}
+                        <td className={classes}>
                           <div className="flex items-center gap-3 ">
                             <div className="flex flex-col">
                               <Typography
@@ -419,42 +449,10 @@ function RiwayatDiajukan() {
                         {ADMIN_TYPE !== 'FINANCE' ? (
                           <td className={classes}>{keteranganStatus(item)}</td>
                         ) : null}
-                        {ADMIN_TYPE !== 'FINANCE' ? (
-                          <td className={classes}>{renderAdminChip(item)}</td>
-                        ) : null}
+
                         {ADMIN_TYPE == 'FINANCE' ? (
                           <td className={classes}>{keteranganStatus(item)}</td>
                         ) : null}
-                        <td className={classes}>
-                          {/* <Typography variant="small" className="font-normal">
-                            {item?.status}
-                          </Typography> */}
-                          {statusChip(item?.status, item?.status_finance)}
-                        </td>
-                        {ADMIN_TYPE == 'FINANCE' ? (
-                          <td className={classes}>
-                            {/* <Typography variant="small" className="font-normal">
-                              {item?.status_finance}
-                            </Typography> */}
-                            {statusChip(item?.status_finance, '')}
-                          </td>
-                        ) : null}
-                        <td className={classes}>
-                          <Tooltip content="Detail">
-                            <IconButton
-                              variant="text"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                navigate(`/reimbursement/admin/${item?.id}`, {
-                                  replace: false,
-                                  state: item,
-                                });
-                              }}
-                            >
-                              <DocumentTextIcon className="h-4 w-4" />
-                            </IconButton>
-                          </Tooltip>
-                        </td>
                       </tr>
                     );
                   })}
