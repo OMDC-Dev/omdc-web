@@ -47,7 +47,7 @@ const DropdownUser = () => {
   // on logout
   async function onLogout() {
     const { state, data, error } = await useFetch({
-      url: LOGOUT,
+      url: LOGOUT + '?isWeb=true',
       method: 'POST',
     });
     if (state == API_STATES.OK) {

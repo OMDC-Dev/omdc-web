@@ -49,6 +49,7 @@ const SignIn: React.FC = () => {
     const body = {
       iduser: userId,
       password: password,
+      isWeb: true,
     };
 
     const { state, data, error } = await useFetch({
