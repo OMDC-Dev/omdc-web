@@ -436,7 +436,11 @@ const BuatPengajuan: React.FC = () => {
                       </div>
                     </>
                   ) : (
-                    <PaymentGroup value={(val) => setPayment(val)} />
+                    <PaymentGroup
+                      jenis={jenis}
+                      setValue={(val: any) => setPayment(val)}
+                      value={payment}
+                    />
                   )}
                 </div>
 

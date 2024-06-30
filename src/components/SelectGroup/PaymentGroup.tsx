@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 
-const PaymentGroup = ({ value }: { value: (arg0: string) => void }) => {
-  const [selectedOption, setSelectedOption] = useState<string>('');
-  const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
-
-  const changeTextColor = () => {
-    setIsOptionSelected(true);
-  };
-
-  React.useEffect(() => {
-    value(selectedOption);
-  }, [selectedOption]);
-
-  const TYPE = [
+const PaymentGroup = ({
+  setValue,
+  value,
+  jenis,
+}: {
+  setValue: any;
+  value: any;
+  jenis?: any;
+}) => {
+  let TYPE = [
     {
       label: 'Transfer',
       value: 'TRANSFER',
@@ -27,6 +24,10 @@ const PaymentGroup = ({ value }: { value: (arg0: string) => void }) => {
     },
   ];
 
+  if (jenis !== 'PR') {
+    TYPE = TYPE.filter((item) => item.value !== 'VA');
+  }
+
   return (
     <div>
       <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
@@ -35,13 +36,12 @@ const PaymentGroup = ({ value }: { value: (arg0: string) => void }) => {
 
       <div className="relative z-20">
         <select
-          value={selectedOption}
+          value={value}
           onChange={(e) => {
-            setSelectedOption(e.target.value);
-            changeTextColor();
+            setValue(e.target.value);
           }}
           className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
-            isOptionSelected ? 'text-black dark:text-white' : ''
+            value ? 'text-black dark:text-white' : ''
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">

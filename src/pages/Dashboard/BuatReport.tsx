@@ -445,7 +445,11 @@ const BuatReport: React.FC = () => {
               <form action="#">
                 <div className="p-6.5">
                   <div className="w-full mb-4.5">
-                    <PaymentGroup value={(val) => setPayment(val)} />
+                    <PaymentGroup
+                      jenis={jenis}
+                      setValue={(val: any) => setPayment(val)}
+                      value={payment}
+                    />
                   </div>
                   {payment && payment == 'TRANSFER' ? (
                     <>
