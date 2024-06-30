@@ -18,6 +18,10 @@ const PaymentGroup = ({ value }: { value: (arg0: string) => void }) => {
       value: 'TRANSFER',
     },
     {
+      label: 'Virtual Account',
+      value: 'VA',
+    },
+    {
       label: 'Cash',
       value: 'CASH',
     },

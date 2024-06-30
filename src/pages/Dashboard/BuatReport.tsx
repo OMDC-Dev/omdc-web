@@ -187,6 +187,11 @@ const BuatReport: React.FC = () => {
     setSelectedBank(null);
   }, [nominal]);
 
+  // handle bank rek
+  React.useEffect(() => {
+    setBankRek('');
+  }, [payment]);
+
   // on Cek REKENING
   async function onCekRek(e: any) {
     e.preventDefault();
@@ -230,13 +235,29 @@ const BuatReport: React.FC = () => {
     // formated date
     const formattedDate = moment(selectDate).format('YYYY-MM-DD');
 
+    const paymentType = payment == 'CASH' ? 'CASH' : 'TRANSFER';
+    let bankData;
+
+    if (payment == 'TRANSFER') {
+      bankData = bankDetail;
+    } else if (payment == 'VA') {
+      bankData = {
+        bankcode: selectedBank.kodeBank,
+        bankname: selectedBank.namaBank,
+        accountnumber: bankRek,
+        accountname: 'Virtual Account',
+      };
+    } else {
+      bankData = {};
+    }
+
     const body = {
       type: jenis,
       date: formattedDate,
       cabang: cabang,
       description: desc,
       attachment: result,
-      bank_detail: bankDetail || {},
+      bank_detail: bankData,
       nominal: nominal,
       name: name,
       item: item,
@@ -244,7 +265,7 @@ const BuatReport: React.FC = () => {
       file: fileInfo,
       approved_by: admin?.iduser,
       parentId: stateData?.id || '',
-      payment_type: payment || stateData.payment_type,
+      payment_type: paymentType || stateData.payment_type,
       tipePembayaran: tipePembayaran,
     };
 
@@ -483,6 +504,49 @@ const BuatReport: React.FC = () => {
                         </div>
                       ) : null}
                     </>
+                  ) : null}
+
+                  {jenis !== 'PC' && payment && payment == 'VA' ? (
+                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                      <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                        <h3 className="font-medium text-black dark:text-white">
+                          Data Bank
+                        </h3>
+                      </div>
+                      <div>
+                        <div className="p-6.5">
+                          <div className="mb-4.5">
+                            <div>
+                              <label className="mb-3 block text-black dark:text-white">
+                                Bank
+                              </label>
+                              <div
+                                onClick={() => setShowBank(!showBank)}
+                                className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                              >
+                                {selectedBank?.namaBank || 'Pilih Bank'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="w-full mb-4.5">
+                            <label className="mb-2.5 block text-black dark:text-white">
+                              Nomor VA
+                            </label>
+                            <div className=" flex flex-col xl:flex-row gap-4">
+                              <input
+                                disabled={!selectedBank}
+                                type="text"
+                                placeholder="Masukan Nomor VA"
+                                className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                value={bankRek}
+                                onChange={(e) => setBankRek(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   ) : null}
                 </div>
               </form>
