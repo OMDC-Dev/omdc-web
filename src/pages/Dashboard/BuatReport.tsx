@@ -368,7 +368,7 @@ const BuatReport: React.FC = () => {
                   {isNeedName ? (
                     <div className="w-full">
                       <label className="mb-2.5 block text-black dark:text-white">
-                        Nama Reimbursement
+                        Nama Suplier / Client
                       </label>
                       <input
                         type="text"
