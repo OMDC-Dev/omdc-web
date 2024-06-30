@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Semua",
+    "value": "all"
+  },
+  {
+    "label": "Menunggu",
+    "value": "WAITING"
+  },
+  {
+    "label": "Disetujui",
+    "value": "APPROVED"
+  },
+  {
+    "label": "Ditolak",
+    "value": "REJECTED"
+  },
+  {
+    "label": "Selesai",
+    "value": "DONE"
+  }
+]

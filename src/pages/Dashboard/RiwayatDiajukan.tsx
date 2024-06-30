@@ -25,6 +25,7 @@ import moment from 'moment';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
+import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
 
 const TABLE_HEAD = [
   '',
@@ -71,6 +72,7 @@ function RiwayatDiajukan() {
   const [search, setSearch] = React.useState<string>('');
   const [tipeFilter, setTipeFilter] = React.useState<string>('');
   const [caFilter, setCaFilter] = React.useState<string>('');
+  const [ropFilter, setROPFilter] = React.useState<string>('');
 
   const { user } = useAuth();
 
@@ -93,11 +95,14 @@ function RiwayatDiajukan() {
     clear?: boolean,
     type?: string,
     ca?: string,
+    rop?: string,
   ) {
     const typeParam = (key: string) =>
       type && type !== 'all' ? `&${key}=${type?.toUpperCase()}` : '';
 
     const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
+    const ropParam =
+      rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
 
     let param = '';
     let URL = '';
@@ -106,21 +111,25 @@ function RiwayatDiajukan() {
       param = typeParam('type');
       param += '&sort=ADMIN&web=true';
       param += caParam;
+      param += ropParam;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
       param += '&sort=FINANCE';
       param += caParam;
+      param += ropParam;
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
       param += '&sort=REVIEWER';
       param += caParam;
+      param += ropParam;
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
       param += '&sort=MAKER';
       param += caParam;
+      param += ropParam;
     }
 
     console.log('URL', URL);
@@ -238,7 +247,7 @@ function RiwayatDiajukan() {
               </Typography>
             </div>
           </div>
-          <div className="relative w-full lg:flex lg:items-center lg:space-x-4">
+          <div className="relative w-full">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -267,19 +276,31 @@ function RiwayatDiajukan() {
                 </button>
               )}
             </form>
+          </div>
+          <div className=" space-y-2 w-full lg:flex lg:items-center lg:space-x-4 mt-2">
             <TipeFilterGroup
+              className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val, caFilter);
+                getReimbursementList(false, val, caFilter, ropFilter);
               }}
               value={tipeFilter}
             />
             <CashAdvanceFilterGroup
+              className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setCaFilter(val);
-                getReimbursementList(false, tipeFilter, val);
+                getReimbursementList(false, tipeFilter, val, ropFilter);
               }}
               value={caFilter}
+            />
+            <StatusROPFilterGroup
+              className="w-full lg:w-1/3"
+              setValue={(val: string) => {
+                setROPFilter(val);
+                getReimbursementList(false, tipeFilter, caFilter, val);
+              }}
+              value={ropFilter}
             />
           </div>
         </CardHeader>

@@ -23,6 +23,7 @@ import { cekAkses } from '../../common/utils';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
+import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -51,6 +52,7 @@ function Reimbursement() {
   const [search, setSearch] = React.useState<string>('');
   const [tipeFilter, setTipeFilter] = React.useState<string>('');
   const [caFilter, setCaFilter] = React.useState<string>('');
+  const [ropFilter, setROPFilter] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -86,18 +88,22 @@ function Reimbursement() {
     clear?: boolean,
     type?: string,
     ca?: string,
+    rop?: string,
   ) {
     setLoading(true);
     const typeParam =
       type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
     const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
+    const ropParam =
+      rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
+
+    const filterParam = typeParam + caParam + ropParam;
 
     const { state, data, error } = await useFetch({
       url:
         REIMBURSEMENT +
         `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
-        typeParam +
-        caParam,
+        filterParam,
       method: 'GET',
     });
 
@@ -186,7 +192,7 @@ function Reimbursement() {
               ) : null}
             </div>
           </div>
-          <div className="relative w-full lg:flex lg:items-center lg:space-x-4">
+          <div className="relative w-full">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -215,19 +221,31 @@ function Reimbursement() {
                 </button>
               )}
             </form>
+          </div>
+          <div className=" space-y-2 w-full lg:flex lg:items-center lg:space-x-4 mt-2">
             <TipeFilterGroup
+              className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val, caFilter);
+                getReimbursementList(false, val, caFilter, ropFilter);
               }}
               value={tipeFilter}
             />
             <CashAdvanceFilterGroup
+              className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setCaFilter(val);
-                getReimbursementList(false, tipeFilter, val);
+                getReimbursementList(false, tipeFilter, val, ropFilter);
               }}
               value={caFilter}
+            />
+            <StatusROPFilterGroup
+              className="w-full lg:w-1/3"
+              setValue={(val: string) => {
+                setROPFilter(val);
+                getReimbursementList(false, tipeFilter, caFilter, val);
+              }}
+              value={ropFilter}
             />
           </div>
         </CardHeader>
