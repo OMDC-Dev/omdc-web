@@ -479,6 +479,22 @@ const DetailPengajuan: React.FC = () => {
                 </div>
               ) : null}
 
+              {data?.status == 'REJECTED' ? (
+                <div className=" mt-4">
+                  <Button
+                    onClick={(e: any) => {
+                      e.preventDefault();
+                      navigate(`/reimbursement/ajukan-ulang`, {
+                        replace: false,
+                        state: data,
+                      });
+                    }}
+                  >
+                    Buat Ulang Pengajuan
+                  </Button>
+                </div>
+              ) : null}
+
               {data?.jenis_reimbursement == 'Cash Advance' &&
               data?.status_finance == 'DONE' &&
               !IS_PUSHED ? (

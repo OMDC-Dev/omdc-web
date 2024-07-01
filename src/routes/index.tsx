@@ -39,6 +39,7 @@ import DetailPermintaanBarangAdmin from '../pages/PermintaanBarang/DetailPermint
 import ReportPermintaanBarang from '../pages/PermintaanBarang/ReportPermintaanBarang';
 import ListMasterBarang from '../pages/MasterBarang/ListBarang';
 import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
+import BuatPengajuanUlang from '../pages/Dashboard/BuatPengajuanUlang';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -103,6 +104,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Buat Pengajuan'} />
               <BuatPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/ajukan-ulang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Buat Pengajuan'} />
+              <BuatPengajuanUlang />
             </>
           ),
         },
