@@ -23,7 +23,7 @@ const TipeFilterGroup = ({
     : DATAS;
 
   return (
-    <div className={className || 'w-full lg:w-1/3 mt-4 lg:mx-4'}>
+    <div className={className || ' w-full lg:w-1/3 mt-4 lg:mx-4'}>
       <div className="relative z-20">
         <select
           value={value}

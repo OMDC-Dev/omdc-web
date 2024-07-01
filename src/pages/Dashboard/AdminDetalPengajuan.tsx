@@ -113,6 +113,7 @@ const AdminDetailPengajuan: React.FC = () => {
     useTgl: boolean = true,
   ): { tx: string; color: colors } => {
     const tglStr = tgl_approve ? `Disetujui -- ${tgl_approve}` : 'Disetujui';
+    const tglStrReject = tgl_approve ? `Ditolak -- ${tgl_approve}` : 'Ditolak';
     switch (status) {
       case 'WAITING':
         return {
@@ -130,7 +131,7 @@ const AdminDetailPengajuan: React.FC = () => {
         return { tx: `Selesai -- ${tgl_approve}`, color: 'green' };
         break;
       case 'REJECTED':
-        return { tx: 'Ditolak', color: 'red' };
+        return { tx: !useTgl ? 'Ditolak' : tglStrReject, color: 'red' };
         break;
       default:
         return { tx: 'Menunggu Disetujui', color: 'amber' };
@@ -642,8 +643,8 @@ const AdminDetailPengajuan: React.FC = () => {
       title = 'Setujui Pengajuan';
     }
 
-    let context_acc;
-    let context_rej;
+    let context_acc: string;
+    let context_rej: string;
 
     if (ADMIN_TYPE == 'ADMIN') {
       if (data.extraAcceptance.iduser == user.iduser) {

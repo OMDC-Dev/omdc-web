@@ -60,7 +60,7 @@ const BuatPengajuan: React.FC = () => {
   const navigate = useNavigate();
 
   // state
-  const [jenis, setJenis] = React.useState<string>();
+  const [jenis, setJenis] = React.useState<string>('');
   const [coa, setCoa] = React.useState<string>();
   const [cabang, setCabang] = React.useState<string | any>();
   const [nominal, setNominal] = React.useState<string | number>();
@@ -74,7 +74,7 @@ const BuatPengajuan: React.FC = () => {
   const [admin, setAdmin] = React.useState<any>();
   const [suplier, setSuplier] = React.useState<any>();
   const [payment, setPayment] = React.useState<any>();
-  const [tipePembayaran, setTipePembayaran] = React.useState<any>();
+  const [tipePembayaran, setTipePembayaran] = React.useState<any>('');
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -208,6 +208,15 @@ const BuatPengajuan: React.FC = () => {
     }
   }
 
+  // on Cek REKENING
+  async function onResetRek(e: any) {
+    e.preventDefault();
+
+    setBankDetail({});
+    setBankRek('');
+    setSelectedBank(null);
+  }
+
   // delete item by ID
   function hapusDataById(id: number) {
     let data = item;
@@ -332,12 +341,16 @@ const BuatPengajuan: React.FC = () => {
               <div className="p-6.5">
                 <div className="mb-4.5 flex flex-col gap-6">
                   <div className="w-full">
-                    <JenisGroup value={(val) => setJenis(val)} />
+                    <JenisGroup
+                      value={jenis}
+                      setValue={(val: any) => setJenis(val)}
+                    />
                   </div>
 
                   <div className="w-full">
                     <TipePembayaranGroup
-                      value={(val) => setTipePembayaran(val)}
+                      value={tipePembayaran}
+                      setValue={(val: any) => setTipePembayaran(val)}
                     />
                   </div>
 
@@ -527,10 +540,15 @@ const BuatPengajuan: React.FC = () => {
                           onChange={(e) => setBankRek(e.target.value)}
                         />
                         <Button
-                          disabled={bankDetail?.accountname?.length}
-                          onClick={onCekRek}
+                          onClick={(e: any) =>
+                            bankDetail?.accountname?.length
+                              ? onResetRek(e)
+                              : onCekRek(e)
+                          }
                         >
-                          Cek Nomor
+                          {bankDetail?.accountname?.length
+                            ? 'Reset'
+                            : 'Cek Nomor'}
                         </Button>
                       </div>
                     )}

@@ -24,6 +24,7 @@ import { exportToExcell } from '../../common/exportToExcell';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
+import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -52,6 +53,7 @@ function SuperReimbursement() {
   const [tipeFilter, setTipeFilter] = React.useState<string>('');
   const [financeFilter, setFinanceFilter] = React.useState<string>('');
   const [caFilter, setCaFilter] = React.useState<string>('');
+  const [ropFilter, setROPFilter] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -63,19 +65,22 @@ function SuperReimbursement() {
     clear?: boolean,
     type?: string,
     ca?: string,
+    rop?: string,
   ) {
     setLoading(true);
     const typeParam =
-      type !== 'all' && type ? `&type=${type?.toUpperCase()}` : '';
-
+      type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
     const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
+    const ropParam =
+      rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
+
+    const filterParam = typeParam + caParam + ropParam;
 
     const { state, data, error } = await useFetch({
       url:
         SUPERUSER_REIMBURSEMENT +
         `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
-        typeParam +
-        caParam,
+        filterParam,
       method: 'GET',
     });
 
@@ -172,7 +177,7 @@ function SuperReimbursement() {
               </Button> */}
             </div>
           </div>
-          <div className="relative w-full lg:flex lg:items-center lg:space-x-4">
+          <div className="relative w-full">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -201,19 +206,31 @@ function SuperReimbursement() {
                 </button>
               )}
             </form>
+          </div>
+          <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
             <TipeFilterGroup
+              className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val, caFilter);
+                getReimbursementList(false, val, caFilter, ropFilter);
               }}
               value={tipeFilter}
             />
             <CashAdvanceFilterGroup
+              className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setCaFilter(val);
-                getReimbursementList(false, tipeFilter, val);
+                getReimbursementList(false, tipeFilter, val, ropFilter);
               }}
               value={caFilter}
+            />
+            <StatusROPFilterGroup
+              className="w-full lg:w-1/3"
+              setValue={(val: string) => {
+                setROPFilter(val);
+                getReimbursementList(false, tipeFilter, caFilter, val);
+              }}
+              value={ropFilter}
             />
           </div>
         </CardHeader>

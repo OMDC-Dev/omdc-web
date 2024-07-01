@@ -71,7 +71,7 @@ const BuatReport: React.FC = () => {
   const [item, setItem] = React.useState<any>([]);
   const [admin, setAdmin] = React.useState<any>();
   const [payment, setPayment] = React.useState<any>();
-  const [tipePembayaran, setTipePembayaran] = React.useState<any>();
+  const [tipePembayaran, setTipePembayaran] = React.useState<any>('');
 
   // Bank Modal State
   const [needBank, setNeedBank] = React.useState(false);
@@ -216,6 +216,15 @@ const BuatReport: React.FC = () => {
     }
   }
 
+  // on Cek REKENING
+  async function onResetRek(e: any) {
+    e.preventDefault();
+
+    setBankDetail({});
+    setBankRek('');
+    setSelectedBank(null);
+  }
+
   // delete item by ID
   function hapusDataById(id: number) {
     let data = item;
@@ -318,7 +327,8 @@ const BuatReport: React.FC = () => {
 
                   <div className="w-full">
                     <TipePembayaranGroup
-                      value={(val) => setTipePembayaran(val)}
+                      value={tipePembayaran}
+                      setValue={(val: any) => setTipePembayaran(val)}
                     />
                   </div>
 
@@ -485,10 +495,15 @@ const BuatReport: React.FC = () => {
                             onChange={(e) => setBankRek(e.target.value)}
                           />
                           <Button
-                            disabled={bankDetail?.accountname?.length}
-                            onClick={onCekRek}
+                            onClick={(e: any) =>
+                              bankDetail?.accountname?.length
+                                ? onResetRek(e)
+                                : onCekRek(e)
+                            }
                           >
-                            Cek Nomor
+                            {bankDetail?.accountname?.length
+                              ? 'Reset'
+                              : 'Cek Nomor'}
                           </Button>
                         </div>
                       </div>

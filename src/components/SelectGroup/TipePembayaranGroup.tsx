@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import DATAS from '../../common/files/payment.json';
 
-const TipePembayaranGroup = ({ value }: { value: (arg0: string) => void }) => {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+const TipePembayaranGroup = ({
+  setValue,
+  value,
+}: {
+  value: any;
+  setValue: any;
+}) => {
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
   const changeTextColor = () => {
     setIsOptionSelected(true);
   };
-
-  React.useEffect(() => {
-    value(selectedOption);
-  }, [selectedOption]);
 
   return (
     <div>
@@ -21,9 +22,9 @@ const TipePembayaranGroup = ({ value }: { value: (arg0: string) => void }) => {
 
       <div className="relative z-20">
         <select
-          value={selectedOption}
+          value={value}
           onChange={(e) => {
-            setSelectedOption(e.target.value);
+            setValue(e.target.value);
             changeTextColor();
           }}
           className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${

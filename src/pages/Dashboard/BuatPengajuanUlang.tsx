@@ -33,7 +33,9 @@ import ModalSelector from '../../components/Modal/ModalSelctor';
 import SuplierModal from '../../components/Modal/SuplierModal';
 import PaymentGroup from '../../components/SelectGroup/PaymentGroup';
 import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
-import useUploadPDF from '../../hooks/useUploadPDF';
+
+// Constant file
+import FILE_JENIS_ROP from '../../common/files/type.json';
 
 function TrashIcon() {
   return (
@@ -61,8 +63,10 @@ const BuatPengajuanUlang: React.FC = () => {
   const location = useLocation();
   const state = location.state;
 
+  console.log('EXISTING DATA', state);
+
   // state
-  const [jenis, setJenis] = React.useState<string>();
+  const [jenis, setJenis] = React.useState<string | undefined>('');
   const [coa, setCoa] = React.useState<string>();
   const [cabang, setCabang] = React.useState<string | any>();
   const [nominal, setNominal] = React.useState<string | number>();
@@ -76,7 +80,7 @@ const BuatPengajuanUlang: React.FC = () => {
   const [admin, setAdmin] = React.useState<any>();
   const [suplier, setSuplier] = React.useState<any>();
   const [payment, setPayment] = React.useState<any>();
-  const [tipePembayaran, setTipePembayaran] = React.useState<any>();
+  const [tipePembayaran, setTipePembayaran] = React.useState<any>('');
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -186,6 +190,35 @@ const BuatPengajuanUlang: React.FC = () => {
     setBankRek('');
   }, [payment]);
 
+  // handle existing value
+  React.useEffect(() => {
+    // handle
+    const jenisROP = FILE_JENIS_ROP.find(
+      (item) => item.label == state.jenis_reimbursement,
+    )?.value;
+
+    // handle cabang
+    const cabangSplit = state.kode_cabang.split('-');
+
+    // assign
+    setJenis(jenisROP);
+    setTipePembayaran(state.tipePembayaran);
+    setCoa(state.coa);
+    setCabang({
+      label: cabangSplit[1].trimStart(),
+      value: cabangSplit[0].trimEnd(),
+    });
+    setAdmin(state.accepted_by[0]);
+    setDesc(state.description);
+    setItem(state.item);
+    setSelectedBank({
+      namaBank: state.bank_detail.bankname,
+      kodeBank: state.bank_detail.bankcode,
+    });
+  }, []);
+
+  console.log('CABANG', cabang);
+
   // on Cek REKENING
   async function onCekRek(e: any) {
     e.preventDefault();
@@ -210,6 +243,15 @@ const BuatPengajuanUlang: React.FC = () => {
     }
   }
 
+  // on Cek REKENING
+  async function onResetRek(e: any) {
+    e.preventDefault();
+
+    setBankDetail({});
+    setBankRek('');
+    setSelectedBank(null);
+  }
+
   // delete item by ID
   function hapusDataById(id: number) {
     let data = item;
@@ -225,23 +267,6 @@ const BuatPengajuanUlang: React.FC = () => {
 
   async function checkIsPDF() {
     pengajuanReimbursement();
-    // changeType('LOADING');
-    // if (fileInfo.type == 'application/pdf') {
-    //   const { state, data, error } = await useUploadPDF({
-    //     data: {
-    //       base64String: result,
-    //       fileName: fileInfo.name,
-    //     },
-    //   });
-
-    //   if (state == API_STATES.OK) {
-    //     changeType('SUCCESS');
-    //   } else {
-    //     changeType('FAILED');
-    //   }
-
-    //   console.log(state, data, error);
-    // }
   }
 
   console.log('SELECTED BANK', selectedBank);
@@ -334,12 +359,16 @@ const BuatPengajuanUlang: React.FC = () => {
               <div className="p-6.5">
                 <div className="mb-4.5 flex flex-col gap-6">
                   <div className="w-full">
-                    <JenisGroup value={(val) => setJenis(val)} />
+                    <JenisGroup
+                      setValue={(val: any) => setJenis(val)}
+                      value={jenis}
+                    />
                   </div>
 
                   <div className="w-full">
                     <TipePembayaranGroup
-                      value={(val) => setTipePembayaran(val)}
+                      value={tipePembayaran}
+                      setValue={(val: any) => setTipePembayaran(val)}
                     />
                   </div>
 
@@ -529,10 +558,15 @@ const BuatPengajuanUlang: React.FC = () => {
                           onChange={(e) => setBankRek(e.target.value)}
                         />
                         <Button
-                          disabled={bankDetail?.accountname?.length}
-                          onClick={onCekRek}
+                          onClick={(e: any) =>
+                            bankDetail?.accountname?.length
+                              ? onResetRek(e)
+                              : onCekRek(e)
+                          }
                         >
-                          Cek Nomor
+                          {bankDetail?.accountname?.length
+                            ? 'Reset'
+                            : 'Cek Nomor'}
                         </Button>
                       </div>
                     )}

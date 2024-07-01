@@ -277,9 +277,9 @@ function RiwayatDiajukan() {
               )}
             </form>
           </div>
-          <div className=" space-y-2 w-full lg:flex lg:items-center lg:space-x-4 mt-2">
+          <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
             <TipeFilterGroup
-              className="w-full lg:w-1/3"
+              className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
                 setTipeFilter(val);
                 getReimbursementList(false, val, caFilter, ropFilter);
