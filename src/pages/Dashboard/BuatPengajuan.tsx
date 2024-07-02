@@ -7,6 +7,7 @@ import useModal from '../../hooks/useModal';
 import ItemModal from '../../components/Modal/ItemModal';
 import {
   Card,
+  Checkbox,
   IconButton,
   List,
   ListItem,
@@ -75,6 +76,7 @@ const BuatPengajuan: React.FC = () => {
   const [suplier, setSuplier] = React.useState<any>();
   const [payment, setPayment] = React.useState<any>();
   const [tipePembayaran, setTipePembayaran] = React.useState<any>('');
+  const [useSuplierList, setUseSuplierlist] = React.useState<boolean>(true);
 
   // Bank Modal State
   const [showBank, setShowBank] = React.useState<boolean>(false);
@@ -326,6 +328,12 @@ const BuatPengajuan: React.FC = () => {
     }
   }, [suplier]);
 
+  React.useEffect(() => {
+    setSuplier(null);
+    setBankDetail({});
+    setName('');
+  }, [useSuplierList]);
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -419,12 +427,35 @@ const BuatPengajuan: React.FC = () => {
                         Nama Client / Vendor
                       </label>
                       {jenis == 'PR' && hasPaymentRequest ? (
-                        <div
-                          onClick={() => setShowSuplier(!showSuplier)}
-                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        >
-                          {suplier?.nmsp || 'Pilih Suplier'}
-                        </div>
+                        <>
+                          <Checkbox
+                            id="list-on"
+                            color={'blue'}
+                            label="Pilih dari List"
+                            defaultChecked
+                            ripple={true}
+                            checked={useSuplierList}
+                            onChange={(e) =>
+                              setUseSuplierlist(e.target.checked)
+                            }
+                          />
+                          {useSuplierList ? (
+                            <div
+                              onClick={() => setShowSuplier(!showSuplier)}
+                              className="w-full mt-3 cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                            >
+                              {suplier?.nmsp || 'Pilih Suplier'}
+                            </div>
+                          ) : (
+                            <input
+                              type="text"
+                              placeholder="Masukan Nama Client / Vendor"
+                              className="w-full mt-3 rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                            />
+                          )}
+                        </>
                       ) : (
                         <input
                           type="text"
