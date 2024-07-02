@@ -391,7 +391,7 @@ const DetailPengajuan: React.FC = () => {
             onClick={() => setShowAdmin(!showAdmin)}
             className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
           >
-            {admin?.nm_user ? admin?.nm_user : 'Pilih Admin'}
+            {admin?.nm_user ? admin?.nm_user : 'Pilih Approval'}
           </div>
         </div>
         <Button

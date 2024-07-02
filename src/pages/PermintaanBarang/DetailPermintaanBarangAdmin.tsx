@@ -373,10 +373,10 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
                             {item?.nm_barang}
                           </span>
                           <span className=" text-xs text-blue-gray-300">
-                            Stock: {item?.jml_kemasan} {item?.nm_kemasan}
+                            Stock: {item?.qty_stock} {item?.nm_kemasan}
                           </span>
                           <span className=" text-xs text-blue-gray-300">
-                            Permintaan: {item?.qty_stock} {item?.nm_kemasan}
+                            Permintaan: {item?.jml_kemasan} {item?.nm_kemasan}
                           </span>
                           <span className=" text-xs text-blue-gray-300">
                             Keterangan: {item?.requestData?.keterangan || '-'}
