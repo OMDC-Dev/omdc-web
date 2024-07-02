@@ -133,5 +133,10 @@ export const CEK_BARKODE_BARANG = (code: string) =>
 export const CREATE_BARANG = 'barang/add';
 export const UPDATE_BARANG = (kode: string) => `barang/update/${kode}`;
 
+export const UPDATE_REQUEST_BARANG = (id: string) =>
+  `barang/update-request?id=${id}`;
+export const REJECT_REQUEST_BARANG = (id: string) =>
+  `barang/reject-request?id=${id}`;
+
 // Invoice
 export const CEK_INVOICE = (inv: string) => `invoice?inv=${inv}`;

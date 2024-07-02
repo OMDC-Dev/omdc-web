@@ -8,6 +8,8 @@ import {
   BARANG_ADMIN_APPROVAL,
   DETAIL_REQUEST_BARANG,
   REIMBURSEMENT_DETAIL,
+  REJECT_REQUEST_BARANG,
+  UPDATE_REQUEST_BARANG,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import {
@@ -21,6 +23,8 @@ import moment from 'moment';
 import FileModal from '../../components/Modal/FileModal';
 import Button from '../../components/Button';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import BarangEditModal from '../../components/Modal/BarangEditModal';
+import AdminBarangList from '../../components/AdminBarangList';
 
 const DetailPermintaanBarangAdmin: React.FC = () => {
   const {
@@ -46,6 +50,8 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
   const [showFile, setShowFile] = React.useState<boolean>(false);
   const [selectedFile, setSelectedFile] = React.useState<any>();
   const [note, setNote] = React.useState('');
+  const [showEdit, setShowEdit] = React.useState<boolean>(false);
+  const [selectedBarang, setSelectedBarang] = React.useState<any>();
 
   const ID_PB = data?.id_pb;
 
@@ -70,7 +76,9 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
   }, []);
 
   async function getDetails(id: any) {
+    changeType('LOADING');
     show();
+
     const { state, data, error } = await useFetch({
       url: DETAIL_REQUEST_BARANG(id),
       method: 'GET',
@@ -103,6 +111,46 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
     }
   }
   // [End Approval]
+
+  // [Start Barang]
+  async function onUpdatedBarang(barang: any) {
+    show();
+    changeContext('UPDATE');
+    changeType('LOADING');
+    const body = {
+      stock: barang.stock,
+      request: barang.request,
+    };
+
+    const { state, data, error } = await useFetch({
+      url: UPDATE_REQUEST_BARANG(barang.id_trans),
+      method: 'POST',
+      data: body,
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  async function onRejectBarang() {
+    changeType('LOADING');
+
+    const { state, data, error } = await useFetch({
+      url: REJECT_REQUEST_BARANG(selectedBarang.id_trans),
+      method: 'POST',
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+    } else {
+      changeType('FAILED');
+    }
+  }
+
+  // [End Barang]
 
   function statusWording(): { text: string; color: colors } {
     switch (data?.status_approve?.toLowerCase()) {
@@ -349,62 +397,28 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
             <div className=" p-6.5 flex flex-col gap-y-6">
               <div className=" w-full">
                 <List>
-                  {barang?.map((item: any, index: number) => {
-                    // status pb
-                    const statusPB = item?.status_pb?.toLowerCase();
-                    let statusTextColor = '';
-
-                    if (statusPB == 'dibatalkan') {
-                      statusTextColor = 'text-red-500';
-                    } else if (statusPB == 'diproses') {
-                      statusTextColor = 'text-blue-500';
-                    } else if (statusPB == 'diterima') {
-                      statusTextColor = 'text-green-500';
-                    }
-
-                    return (
-                      <ListItem
-                        key={item + index}
-                        ripple={false}
-                        className="py-2 pr-1 pl-4 "
-                      >
-                        <div className=" flex flex-col">
-                          <span className=" text-base font-bold text-black mb-2">
-                            {item?.nm_barang}
-                          </span>
-                          <span className=" text-xs text-blue-gray-300">
-                            Stock: {item?.qty_stock} {item?.nm_kemasan}
-                          </span>
-                          <span className=" text-xs text-blue-gray-300">
-                            Permintaan: {item?.jml_kemasan} {item?.nm_kemasan}
-                          </span>
-                          <span className=" text-xs text-blue-gray-300">
-                            Keterangan: {item?.requestData?.keterangan || '-'}
-                          </span>
-                          <span className=" mt-4 text-xs text-blue-gray-300">
-                            Status Approve:{' '}
-                            <span className={statusTextColor}>
-                              {item?.status_pb || '-'}
-                            </span>
-                          </span>
-                          <MButton
-                            className=" mt-4"
-                            size={'sm'}
-                            variant={'outlined'}
-                            fullWidth
-                            color={'blue'}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setSelectedFile(item);
-                              setShowFile(!showFile);
-                            }}
-                          >
-                            Lihat lampiran
-                          </MButton>
-                        </div>
-                      </ListItem>
-                    );
-                  })}
+                  {barang?.map((item: any, index: number) => (
+                    <AdminBarangList
+                      item={item}
+                      index={index}
+                      selected={selectedBarang}
+                      onShowLampiran={(item: any) => {
+                        setSelectedFile(item);
+                        setShowFile(!showFile);
+                      }}
+                      onEdit={(item: any) => {
+                        setSelectedBarang(item);
+                        setShowEdit(true);
+                      }}
+                      onReject={(item: any) => {
+                        changeContext('REJBRG');
+                        changeType('CONFIRM');
+                        setSelectedBarang(item);
+                        show();
+                      }}
+                      onPress={() => setSelectedBarang(item)}
+                    />
+                  ))}
                 </List>
               </div>
             </div>
@@ -420,10 +434,27 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
         type={type}
         visible={visible}
         toggle={toggle}
-        onConfirm={() => onAdminApproval()}
+        onConfirm={() => {
+          if (context == 'ACC' || context == 'REJ') {
+            onAdminApproval();
+          }
+
+          if (context == 'REJBRG') {
+            onRejectBarang();
+          }
+        }}
         onDone={() => {
           hide();
+          if (context == 'UPDATE' || context == 'REJBRG') {
+            getDetails(id);
+          }
         }}
+      />
+      <BarangEditModal
+        data={selectedBarang}
+        visible={showEdit}
+        toggle={() => setShowEdit(!showEdit)}
+        value={(val: any) => onUpdatedBarang(val)}
       />
     </DefaultLayout>
   );
