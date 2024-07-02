@@ -873,10 +873,12 @@ const AdminDetailPengajuan: React.FC = () => {
 
             {(data?.payment_type == 'TRANSFER' &&
               ADMIN_TYPE == 'FINANCE' &&
-              isNeedBank) ||
+              isNeedBank &&
+              data?.status !== 'REJECTED') ||
             (data?.payment_type == 'TRANSFER' &&
               ADMIN_TYPE == 'MAKER' &&
-              isNeedBank) ? (
+              isNeedBank &&
+              data?.status !== 'REJECTED') ? (
               <div className="mb-full mt-2 mb-12">
                 <div>
                   <label className="mb-3 block text-black dark:text-white">
@@ -1101,10 +1103,7 @@ const AdminDetailPengajuan: React.FC = () => {
               </div>
             </form>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-9">
-          <div className="hidden sm:block">{renderStatusPersetujuan()}</div>
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">
@@ -1148,6 +1147,10 @@ const AdminDetailPengajuan: React.FC = () => {
               </div>
             </form>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-9">
+          <div className="hidden sm:block">{renderStatusPersetujuan()}</div>
 
           {/* <!-- Sign Up Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
