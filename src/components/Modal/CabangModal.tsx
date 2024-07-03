@@ -73,7 +73,7 @@ const CabangModal = ({
         <div className="mb-4.5">
           <input
             type="text"
-            placeholder="Cari Bank"
+            placeholder="Cari..."
             className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
