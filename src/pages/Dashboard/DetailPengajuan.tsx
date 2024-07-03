@@ -480,7 +480,8 @@ const DetailPengajuan: React.FC = () => {
                 </div>
               ) : null}
 
-              {data?.status == 'REJECTED' ? (
+              {data?.status == 'REJECTED' &&
+              data.jenis_reimbursement !== 'Cash Advance Report' ? (
                 <div className=" mt-4">
                   <Button
                     onClick={(e: any) => {

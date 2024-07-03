@@ -7,6 +7,7 @@ import useModal from '../../hooks/useModal';
 import ItemModal from '../../components/Modal/ItemModal';
 import {
   Card,
+  Checkbox,
   IconButton,
   List,
   ListItem,
@@ -17,6 +18,7 @@ import {
   cekAkses,
   compressImage,
   hitungTotalNominal,
+  openInNewTab,
 } from '../../common/utils';
 import BankModal from '../../components/Modal/BankModal';
 import useFetch from '../../hooks/useFetch';
@@ -36,6 +38,7 @@ import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGrou
 
 // Constant file
 import FILE_JENIS_ROP from '../../common/files/type.json';
+import FileModal from '../../components/Modal/FileModal';
 
 function TrashIcon() {
   return (
@@ -62,6 +65,8 @@ const BuatPengajuanUlang: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state;
+  const FILE = state.attachment;
+  const FILE_INFO = state.file_info;
 
   console.log('EXISTING DATA', state);
 
@@ -87,6 +92,7 @@ const BuatPengajuanUlang: React.FC = () => {
   const [selectedBank, setSelectedBank] = React.useState<any>();
   const [bankRek, setBankRek] = React.useState<string>('');
   const [bankDetail, setBankDetail] = React.useState<any>();
+  const [showFile, setShowFile] = React.useState(false);
 
   // Data Modal Satte
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
@@ -94,6 +100,8 @@ const BuatPengajuanUlang: React.FC = () => {
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
   const [showItem, setShowItem] = React.useState<boolean>(false);
   const [showSuplier, setShowSuplier] = React.useState<boolean>(false);
+  const [useSuplierList, setUseSuplierlist] = React.useState<boolean>(true);
+  const [useExtFile, setExtFile] = React.useState<boolean>(true);
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
@@ -119,6 +127,14 @@ const BuatPengajuanUlang: React.FC = () => {
     }
   };
 
+  const isNeedNewAttachment = () => {
+    if (useExtFile) {
+      return false;
+    }
+
+    return !result;
+  };
+
   const buttonDisabled =
     !jenis ||
     !coa ||
@@ -126,7 +142,7 @@ const BuatPengajuanUlang: React.FC = () => {
     !nominal ||
     !nomorWA ||
     !desc ||
-    !result ||
+    isNeedNewAttachment() ||
     !selectDate ||
     !admin ||
     !payment ||
@@ -149,7 +165,6 @@ const BuatPengajuanUlang: React.FC = () => {
     };
 
     if (file.size > maxSize) {
-      console.log('NEED COMPRESS');
       if (file.type.includes('image')) {
         compressImage(file, maxSize, handleAttachment);
         return; // Menghentikan eksekusi lebih lanjut
@@ -161,8 +176,6 @@ const BuatPengajuanUlang: React.FC = () => {
         event.target.value = null; // Mengosongkan input file
         return;
       }
-    } else {
-      console.log('AMAN');
     }
 
     reader.readAsDataURL(file);
@@ -185,11 +198,6 @@ const BuatPengajuanUlang: React.FC = () => {
     setNominal(formatRupiah(nominal, true));
   }, [item]);
 
-  // handle bank rek
-  React.useEffect(() => {
-    setBankRek('');
-  }, [payment]);
-
   // handle existing value
   React.useEffect(() => {
     // handle
@@ -211,16 +219,70 @@ const BuatPengajuanUlang: React.FC = () => {
     setAdmin(state.accepted_by[0]);
     setDesc(state.description);
     setItem(state.item);
-    setSelectedBank({
-      namaBank: state.bank_detail.bankname,
-      kodeBank: state.bank_detail.bankcode,
-    });
+    if (
+      state.payment_type == 'TRANSFER' &&
+      state.bank_detail.accountname == 'Virtual Account'
+    ) {
+      setPayment('VA');
+    } else {
+      setPayment(state.payment_type);
+    }
+
+    if (state.bank_detail.bankcode == '000') {
+      const splitSuplier = state.name.split('-');
+      const kdsp = splitSuplier[0]?.trimEnd();
+      const nmsp = splitSuplier[1]?.trimStart();
+
+      setSuplier({
+        kdsp: kdsp,
+        nmsp: nmsp,
+        nm_pemilik_rek: state.bank_detail.accountname,
+        no_rekbank: state.bank_detail.accountnumber,
+        nm_bank: state.bank_detail.bankname,
+      });
+      setUseSuplierlist(true);
+      setName(state.name);
+    } else {
+      setUseSuplierlist(false);
+      setName(state.name);
+    }
+
+    if (state.bank_detail) {
+      setSelectedBank({
+        namaBank: state.bank_detail.bankname,
+        kodeBank: state.bank_detail.bankcode,
+      });
+      setBankRek(state.bank_detail.accountnumber);
+      if (state.bank_detail.accountnumber) {
+        onCekRekExt(
+          state.bank_detail.accountnumber,
+          state.bank_detail.bankcode,
+        );
+      }
+    }
   }, []);
 
-  console.log('CABANG', cabang);
+  // on Cek REKENING
+  async function onCekRekExt(rek: any, bankCode: any) {
+    const regex = /^[0-9]+$/;
+
+    if (!regex.test(rek)) {
+      alert('Nomor rekening tidak valid!');
+      return;
+    }
+
+    const { state, data, error } = await useFetch({
+      url: GET_BANK_NAME(bankCode, rek),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setBankDetail(data);
+    }
+  }
 
   // on Cek REKENING
-  async function onCekRek(e: any) {
+  async function onCekRek(e?: any) {
     e.preventDefault();
 
     const regex = /^[0-9]+$/;
@@ -237,7 +299,6 @@ const BuatPengajuanUlang: React.FC = () => {
 
     if (state == API_STATES.OK) {
       setBankDetail(data);
-      console.log('BANK DETAIL: ', data);
     } else {
       alert('Ada kesalahan, mohon coba lagi!');
     }
@@ -268,8 +329,6 @@ const BuatPengajuanUlang: React.FC = () => {
   async function checkIsPDF() {
     pengajuanReimbursement();
   }
-
-  console.log('SELECTED BANK', selectedBank);
 
   // Pengajuan
   async function pengajuanReimbursement() {
@@ -304,11 +363,12 @@ const BuatPengajuanUlang: React.FC = () => {
       name: name,
       item: item,
       coa: coa,
-      file: fileInfo,
+      file: useExtFile ? FILE_INFO : fileInfo,
       approved_by: admin?.iduser,
       parentId: '',
       payment_type: paymentType,
       tipePembayaran: tipePembayaran,
+      uploadedFile: useExtFile ? FILE : null,
     };
 
     const { state, data, error } = await useFetch({
@@ -340,7 +400,18 @@ const BuatPengajuanUlang: React.FC = () => {
         accountname: suplier?.nm_pemilik_rek,
       });
     } else {
-      setPayment('');
+      if (state && !payment) {
+        if (
+          state.payment_type == 'TRANSFER' &&
+          state.bank_detail.accountname == 'Virtual Account'
+        ) {
+          setPayment('VA');
+        } else {
+          setPayment(state.payment_type);
+        }
+      } else {
+        setPayment('');
+      }
     }
   }, [suplier]);
 
@@ -437,12 +508,35 @@ const BuatPengajuanUlang: React.FC = () => {
                         Nama Client / Vendor
                       </label>
                       {jenis == 'PR' && hasPaymentRequest ? (
-                        <div
-                          onClick={() => setShowSuplier(!showSuplier)}
-                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        >
-                          {suplier?.nmsp || 'Pilih Suplier'}
-                        </div>
+                        <>
+                          <Checkbox
+                            id="list-on"
+                            color={'blue'}
+                            label="Pilih dari List"
+                            defaultChecked
+                            ripple={true}
+                            checked={useSuplierList}
+                            onChange={(e) =>
+                              setUseSuplierlist(e.target.checked)
+                            }
+                          />
+                          {useSuplierList ? (
+                            <div
+                              onClick={() => setShowSuplier(!showSuplier)}
+                              className="w-full mt-3 cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                            >
+                              {suplier?.nmsp || name || 'Pilih Suplier'}
+                            </div>
+                          ) : (
+                            <input
+                              type="text"
+                              placeholder="Masukan Nama Client / Vendor"
+                              className="w-full mt-3 rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                            />
+                          )}
+                        </>
                       ) : (
                         <input
                           type="text"
@@ -469,7 +563,10 @@ const BuatPengajuanUlang: React.FC = () => {
                   ) : (
                     <PaymentGroup
                       jenis={jenis}
-                      setValue={(val: any) => setPayment(val)}
+                      setValue={(val: any) => {
+                        setPayment(val);
+                        setBankRek('');
+                      }}
                       value={payment}
                     />
                   )}
@@ -477,15 +574,44 @@ const BuatPengajuanUlang: React.FC = () => {
 
                 <div className="mb-4.5">
                   <div>
-                    <label className="mb-3 block text-black dark:text-white">
+                    <label className=" block text-black dark:text-white">
                       Lampirkan File ( Maks. 1MB )
                     </label>
-                    <input
-                      type="file"
-                      className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      accept=".pdf,image/*"
-                      onChange={handleAttachment}
-                    />
+                    <div className=" my-2">
+                      <Checkbox
+                        id="file-on"
+                        color={'blue'}
+                        label="Gunakan lampiran sebelumnya"
+                        defaultChecked
+                        ripple={true}
+                        checked={useExtFile}
+                        onChange={(e) => setExtFile(e.target.checked)}
+                      />
+                    </div>
+                    {useExtFile ? (
+                      <div className=" flex flex-col gap-4">
+                        <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                          {state?.file_info?.name}
+                        </div>
+                        <Button
+                          onClick={(e: any) => {
+                            e.preventDefault();
+                            state?.file_info?.type !== 'application/pdf'
+                              ? setShowFile(!showFile)
+                              : openInNewTab(state?.attachment);
+                          }}
+                        >
+                          Lihat Lampiran
+                        </Button>
+                      </div>
+                    ) : (
+                      <input
+                        type="file"
+                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        accept=".pdf,image/*"
+                        onChange={handleAttachment}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -764,6 +890,12 @@ const BuatPengajuanUlang: React.FC = () => {
           hide();
           type == 'SUCCESS' ? navigate('/', { replace: true }) : null;
         }}
+      />
+      <FileModal
+        type={state?.file_info?.type}
+        data={state?.attachment}
+        visible={showFile}
+        toggle={() => setShowFile(!showFile)}
       />
     </DefaultLayout>
   );

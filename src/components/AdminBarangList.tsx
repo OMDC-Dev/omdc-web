@@ -73,7 +73,7 @@ export default function AdminBarangList({
           Lihat lampiran
         </Button>
         {item?.status_pb == 'Menunggu Disetujui' &&
-          selected.id_trans == item.id_trans && (
+          selected?.id_trans == item?.id_trans && (
             <div className=" gap-y-2 flex flex-col lg:flex lg:flex-row mt-2 gap-x-2">
               <Button
                 size={'sm'}

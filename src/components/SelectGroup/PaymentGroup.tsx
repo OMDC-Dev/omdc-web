@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DATAS from '../../common/files/jenisPembayaran.json';
 
 const PaymentGroup = ({
   setValue,
@@ -9,23 +10,18 @@ const PaymentGroup = ({
   value: any;
   jenis?: any;
 }) => {
-  let TYPE = [
-    {
-      label: 'Transfer',
-      value: 'TRANSFER',
-    },
-    {
-      label: 'Virtual Account',
-      value: 'VA',
-    },
-    {
-      label: 'Cash',
-      value: 'CASH',
-    },
-  ];
+  const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
+
+  const changeTextColor = () => {
+    setIsOptionSelected(true);
+  };
+
+  let LIST = DATAS;
 
   if (jenis !== 'PR') {
-    TYPE = TYPE.filter((item) => item.value !== 'VA');
+    LIST = DATAS.filter((item) => item.value !== 'VA');
+  } else {
+    LIST = DATAS;
   }
 
   return (
@@ -39,15 +35,16 @@ const PaymentGroup = ({
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
+            changeTextColor();
           }}
           className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
-            value ? 'text-black dark:text-white' : ''
+            isOptionSelected ? 'text-black dark:text-white' : ''
           }`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
             Pilih Jenis
           </option>
-          {TYPE.map((item, index) => {
+          {LIST.map((item, index) => {
             return (
               <option
                 value={item.value}
