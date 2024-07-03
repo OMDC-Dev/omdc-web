@@ -9,7 +9,7 @@ type TApiResponse = {
 };
 
 async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
-  const userToken = localStorage.getItem('token');
+  const userToken = await localStorage.getItem('token');
 
   let headers: any = {};
 
@@ -18,6 +18,8 @@ async function useFetch(props: AxiosRequestConfig): Promise<TApiResponse> {
 
     headers.Authorization = `Bearer ${userToken}`;
   }
+
+  console.log(`Hitinnn -> ${props.url}`);
 
   return axios({
     ...props,

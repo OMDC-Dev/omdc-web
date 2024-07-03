@@ -25,6 +25,8 @@ import Modal from '../../components/Modal/Modal';
 import moment from 'moment';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import PaymentGroup from '../../components/SelectGroup/PaymentGroup';
+import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
 
 function TrashIcon() {
   return (
@@ -68,6 +70,8 @@ const BuatReport: React.FC = () => {
   const [selectDate, setSelectDate] = React.useState<Date>();
   const [item, setItem] = React.useState<any>([]);
   const [admin, setAdmin] = React.useState<any>();
+  const [payment, setPayment] = React.useState<any>();
+  const [tipePembayaran, setTipePembayaran] = React.useState<any>('');
 
   // Bank Modal State
   const [needBank, setNeedBank] = React.useState(false);
@@ -93,9 +97,15 @@ const BuatReport: React.FC = () => {
   };
 
   const disabledByBank = () => {
-    if (needBank) {
+    if (jenis == 'CAR' && !needBank) {
+      return false;
+    }
+
+    if (payment == 'TRANSFER') {
       return !bankDetail;
     }
+
+    return !payment;
   };
 
   const buttonDisabled =
@@ -108,9 +118,13 @@ const BuatReport: React.FC = () => {
     !result ||
     !selectDate ||
     !admin ||
-    !item.length ||
+    !item?.length ||
+    !tipePembayaran ||
     disabledByBank() ||
     disabledByType();
+
+  console.log('BUTTON DISABLED ' + buttonDisabled);
+  console.log('DISABLED BY BANNK', disabledByBank());
 
   // handle attachment
   function handleAttachment(event: any) {
@@ -168,7 +182,15 @@ const BuatReport: React.FC = () => {
       setNeedBank(true);
       console.log('Need Bank');
     }
+
+    setPayment(null);
+    setSelectedBank(null);
   }, [nominal]);
+
+  // handle bank rek
+  React.useEffect(() => {
+    setBankRek('');
+  }, [payment]);
 
   // on Cek REKENING
   async function onCekRek(e: any) {
@@ -194,6 +216,15 @@ const BuatReport: React.FC = () => {
     }
   }
 
+  // on Cek REKENING
+  async function onResetRek(e: any) {
+    e.preventDefault();
+
+    setBankDetail({});
+    setBankRek('');
+    setSelectedBank(null);
+  }
+
   // delete item by ID
   function hapusDataById(id: number) {
     let data = item;
@@ -213,13 +244,29 @@ const BuatReport: React.FC = () => {
     // formated date
     const formattedDate = moment(selectDate).format('YYYY-MM-DD');
 
+    const paymentType = payment == 'CASH' ? 'CASH' : 'TRANSFER';
+    let bankData;
+
+    if (payment == 'TRANSFER') {
+      bankData = bankDetail;
+    } else if (payment == 'VA') {
+      bankData = {
+        bankcode: selectedBank.kodeBank,
+        bankname: selectedBank.namaBank,
+        accountnumber: bankRek,
+        accountname: 'Virtual Account',
+      };
+    } else {
+      bankData = {};
+    }
+
     const body = {
       type: jenis,
       date: formattedDate,
-      cabang: cabang?.value,
+      cabang: cabang,
       description: desc,
       attachment: result,
-      bank_detail: bankDetail || {},
+      bank_detail: bankData,
       nominal: nominal,
       name: name,
       item: item,
@@ -227,6 +274,8 @@ const BuatReport: React.FC = () => {
       file: fileInfo,
       approved_by: admin?.iduser,
       parentId: stateData?.id || '',
+      payment_type: paymentType || stateData.payment_type,
+      tipePembayaran: tipePembayaran,
     };
 
     const { state, data, error } = await useFetch({
@@ -241,6 +290,15 @@ const BuatReport: React.FC = () => {
       changeType('FAILED');
     }
   }
+
+  React.useEffect(() => {
+    if (state) {
+      setCabang(state?.kode_cabang.split('-')[0].trim());
+      setCoa(state?.coa);
+    }
+  }, [state]);
+
+  console.log(payment);
 
   return (
     <DefaultLayout>
@@ -259,12 +317,19 @@ const BuatReport: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Jenis Reimbursement
+                        Jenis Request of Payment
                       </label>
                       <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
                         {'Cash Advance Report'}
                       </div>
                     </div>
+                  </div>
+
+                  <div className="w-full">
+                    <TipePembayaranGroup
+                      value={tipePembayaran}
+                      setValue={(val: any) => setTipePembayaran(val)}
+                    />
                   </div>
 
                   <div className="w-full">
@@ -281,13 +346,10 @@ const BuatReport: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        COA
+                        COA / Grup Biaya
                       </label>
-                      <div
-                        onClick={() => setShowCoa(!showCoa)}
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {coa || 'Pilih COA'}
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {stateData?.coa}
                       </div>
                     </div>
                   </div>
@@ -301,11 +363,8 @@ const BuatReport: React.FC = () => {
                       <label className="mb-3 block text-black dark:text-white">
                         Cabang
                       </label>
-                      <div
-                        onClick={() => setShowCabang(!showCabang)}
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {cabang?.label || 'Pilih Cabang'}
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {stateData?.kode_cabang}
                       </div>
                     </div>
                   </div>
@@ -319,7 +378,7 @@ const BuatReport: React.FC = () => {
                         onClick={() => setShowAdmin(!showAdmin)}
                         className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
                       >
-                        {admin?.nm_user || 'Pilih Admin'}
+                        {admin?.nm_user || 'Pilih Approval'}
                       </div>
                     </div>
                   </div>
@@ -340,7 +399,7 @@ const BuatReport: React.FC = () => {
                   {isNeedName ? (
                     <div className="w-full">
                       <label className="mb-2.5 block text-black dark:text-white">
-                        Nama Reimbursement
+                        Nama Suplier / Client
                       </label>
                       <input
                         type="text"
@@ -386,73 +445,132 @@ const BuatReport: React.FC = () => {
 
         <div className="flex flex-col gap-9">
           {/* <!-- Sign In Form --> */}
-          {needBank ? (
+          {needBank && (
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
               <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
                 <h3 className="font-medium text-black dark:text-white">
-                  Data Bank
+                  Data Pembayaran
                 </h3>
               </div>
               <form action="#">
                 <div className="p-6.5">
-                  <div className="mb-4.5">
-                    <div>
-                      <label className="mb-3 block text-black dark:text-white">
-                        Bank
-                      </label>
-                      <div
-                        onClick={() =>
-                          bankDetail?.accountname?.length
-                            ? null
-                            : setShowBank(!showBank)
-                        }
-                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      >
-                        {selectedBank?.namaBank || 'Pilih Bank'}
-                      </div>
-                    </div>
-                  </div>
-
                   <div className="w-full mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Nomor Rekening
-                    </label>
-                    <div className=" flex gap-x-4">
-                      <input
-                        type="text"
-                        disabled={bankDetail?.accountname?.length}
-                        placeholder="Masukan Nomor Rekening"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={bankRek}
-                        onChange={(e) => setBankRek(e.target.value)}
-                      />
-                      <Button
-                        disabled={bankDetail?.accountname?.length}
-                        onClick={onCekRek}
-                      >
-                        Cek Nomor
-                      </Button>
-                    </div>
+                    <PaymentGroup
+                      jenis={jenis}
+                      setValue={(val: any) => setPayment(val)}
+                      value={payment}
+                    />
                   </div>
+                  {payment && payment == 'TRANSFER' ? (
+                    <>
+                      <div className="mb-4.5">
+                        <div>
+                          <label className="mb-3 block text-black dark:text-white">
+                            Bank
+                          </label>
+                          <div
+                            onClick={() =>
+                              bankDetail?.accountname?.length
+                                ? null
+                                : setShowBank(!showBank)
+                            }
+                            className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                          >
+                            {selectedBank?.namaBank || 'Pilih Bank'}
+                          </div>
+                        </div>
+                      </div>
 
-                  {bankDetail?.accountname ? (
-                    <div className="w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Nama Pemilik Rekening
-                      </label>
-                      <input
-                        type="text"
-                        disabled
-                        placeholder="Nama Pemilik Rekening"
-                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                        value={bankDetail?.accountname}
-                      />
+                      <div className="w-full mb-4.5">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          Nomor Rekening
+                        </label>
+                        <div className=" flex gap-x-4">
+                          <input
+                            type="text"
+                            disabled={bankDetail?.accountname?.length}
+                            placeholder="Masukan Nomor Rekening"
+                            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            value={bankRek}
+                            onChange={(e) => setBankRek(e.target.value)}
+                          />
+                          <Button
+                            onClick={(e: any) =>
+                              bankDetail?.accountname?.length
+                                ? onResetRek(e)
+                                : onCekRek(e)
+                            }
+                          >
+                            {bankDetail?.accountname?.length
+                              ? 'Reset'
+                              : 'Cek Nomor'}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {bankDetail?.accountname ? (
+                        <div className="w-full">
+                          <label className="mb-2.5 block text-black dark:text-white">
+                            Nama Pemilik Rekening
+                          </label>
+                          <input
+                            type="text"
+                            disabled
+                            placeholder="Nama Pemilik Rekening"
+                            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                            value={bankDetail?.accountname}
+                          />
+                        </div>
+                      ) : null}
+                    </>
+                  ) : null}
+
+                  {jenis !== 'PC' && payment && payment == 'VA' ? (
+                    <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                      <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                        <h3 className="font-medium text-black dark:text-white">
+                          Data Bank
+                        </h3>
+                      </div>
+                      <div>
+                        <div className="p-6.5">
+                          <div className="mb-4.5">
+                            <div>
+                              <label className="mb-3 block text-black dark:text-white">
+                                Bank
+                              </label>
+                              <div
+                                onClick={() => setShowBank(!showBank)}
+                                className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                              >
+                                {selectedBank?.namaBank || 'Pilih Bank'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="w-full mb-4.5">
+                            <label className="mb-2.5 block text-black dark:text-white">
+                              Nomor VA
+                            </label>
+                            <div className=" flex flex-col xl:flex-row gap-4">
+                              <input
+                                disabled={!selectedBank}
+                                type="text"
+                                placeholder="Masukan Nomor VA"
+                                className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                value={bankRek}
+                                onChange={(e) => setBankRek(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ) : null}
                 </div>
               </form>
             </div>
-          ) : null}
+          )}
 
           {/* <!-- Sign Up Form --> */}
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -472,7 +590,7 @@ const BuatReport: React.FC = () => {
                               ripple={false}
                               className="py-1 pr-1 pl-4"
                             >
-                              {item?.name}
+                              {item?.invoice || '-'} - {item?.name}
                               <ListItemSuffix className="flex gap-x-4">
                                 {formatRupiah(item.nominal, true)}
                                 <IconButton
@@ -535,7 +653,6 @@ const BuatReport: React.FC = () => {
                     changeType('CONFIRM');
                     show();
                   }}
-                  isLoading
                   disabled={buttonDisabled}
                 >
                   Buat Pengajuan
@@ -550,7 +667,8 @@ const BuatReport: React.FC = () => {
       <ItemModal
         visible={showItem}
         toggle={() => setShowItem(!showItem)}
-        value={(cb: any) => setItem([...item, { ...cb, id: item.length + 1 }])}
+        value={(cb: any) => setItem([...item, { ...cb, id: item?.length + 1 }])}
+        includeData={item}
       />
       <BankModal
         visible={showBank}

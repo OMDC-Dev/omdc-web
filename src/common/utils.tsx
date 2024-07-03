@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useAuth } from '../hooks/useAuth';
 import formatRupiah from './formatRupiah';
 
@@ -43,6 +44,19 @@ export const downloadPDF = (base64Data: string, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
+export const downloadPDFDirect = (url: string, fileName: string) => {
+  // Membuat link untuk mengunduh file PDF
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName || 'document.pdf';
+
+  // Klik link secara otomatis untuk memicu unduhan
+  a.click();
+
+  // Menghapus URL objek setelah digunakan
+  URL.revokeObjectURL(url);
+};
+
 export function getDataById(data: any, id: any, idKey: string, key: string) {
   for (var i = 0; i < data?.length; i++) {
     if (data[i][idKey] === id) {
@@ -61,6 +75,12 @@ export const cekAkses = (akses: string) => {
    * REIMBURSEMENT -> 1170 -> #1
    * PERMINTAAN BARANG -> 1157 -> #2
    * PENGUMUMAN -> 1171 -> #3
+   * EXPORT EXCELL -> 1175 -> #4
+   * PAYMENT REQUEST -> 1176 -> #5
+   * NO PB NEED ATTACHMENT -> 1179 -> #6
+   * ADMIN PB -> 999123 -> #7
+   * NO NEED APPROVAL -> 1177 -> #8
+   * MASTER BARANG -> 1128 -> #9
    */
   const { user } = useAuth();
 
@@ -76,6 +96,30 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#3') {
     return kd.findIndex((item: string) => item == '1171') !== -1;
+  }
+
+  if (akses == '#4') {
+    return kd.findIndex((item: string) => item == '1175') !== -1;
+  }
+
+  if (akses == '#5') {
+    return kd.findIndex((item: string) => item == '1176') !== -1;
+  }
+
+  if (akses == '#6') {
+    return kd.findIndex((item: string) => item == '1179') !== -1;
+  }
+
+  if (akses == '#7') {
+    return kd.findIndex((item: string) => item == '999123') !== -1;
+  }
+
+  if (akses == '#8') {
+    return kd.findIndex((item: string) => item == '1177') !== -1;
+  }
+
+  if (akses == '#9') {
+    return kd.findIndex((item: string) => item == '1128') !== -1;
   }
 };
 
@@ -139,4 +183,48 @@ export const calculateSaldo = (nominal = '', realisasi = '') => {
   const saldo = intNominal - intRealisasi;
 
   return 'Rp. ' + formatRupiah(saldo, false);
+};
+
+export function hitungSelisihHari(tanggalAwal: Date, tanggalAkhir: Date) {
+  // Menggunakan moment untuk membuat objek tanggal dari string atau tipe data tanggal JavaScript
+  const awal = moment(tanggalAwal);
+  const akhir = moment(tanggalAkhir);
+
+  // Menghitung selisih dalam hari
+  const selisih = akhir.diff(awal, 'days');
+
+  return selisih;
+}
+
+export function formatAmount(amountString: string) {
+  // Hapus 'Rp.', spasi, dan koma dari string
+  const cleanedString = amountString.replace(/Rp\.|\s|,/g, '');
+  // Parse string menjadi bilangan bulat
+  const amount = parseInt(cleanedString, 10);
+  return amount;
+}
+
+export function formatCurrencyToNumber(currencyString: string) {
+  if (!currencyString) return 0;
+  // Hapus karakter non-digit dari string dan konversi menjadi angka
+  const number = parseInt(currencyString.replace(/\D/g, ''), 10);
+  return number;
+}
+
+function convertToPreviewLink(downloadLink: string) {
+  const downloadPrefix = 'https://drive.google.com/uc?export=download&id=';
+  const previewPrefix = 'https://drive.google.com/file/d/';
+  const previewSuffix = '/preview';
+
+  if (downloadLink.startsWith(downloadPrefix)) {
+    const fileId = downloadLink.slice(downloadPrefix.length);
+    return `${previewPrefix}${fileId}${previewSuffix}`;
+  } else {
+    return 'Invalid download link format';
+  }
+}
+
+export const openInNewTab = (url: string) => {
+  const previewUrl = convertToPreviewLink(url);
+  window.open(previewUrl, '_blank', 'noreferrer');
 };

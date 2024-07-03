@@ -20,8 +20,6 @@ import {
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
-import formatRupiah from '../../common/formatRupiah';
 import Button from '../../components/Button';
 import BarangModal from '../../components/Modal/BarangModal';
 import CabangModal from '../../components/Modal/CabangModal';
@@ -29,6 +27,8 @@ import AnakCabangModal from '../../components/Modal/AnakCabangModal';
 import ListBarangModal from '../../components/Modal/ListBarangModal';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import AdminPBModal from '../../components/Modal/AdminPBModal';
+import { cekAkses } from '../../common/utils';
 
 const TABLE_HEAD = [
   'Kode Barang',
@@ -36,7 +36,6 @@ const TABLE_HEAD = [
   'Grup Barang',
   'Kategori Barang',
   'Nama Satuan',
-  'Harga Barang',
   'Nama Perusahaan',
   'Tanggal Dibuat',
   '',
@@ -49,6 +48,7 @@ function ListBarang() {
   const [limit, setLimit] = React.useState<number>(5);
   const [page, setPage] = React.useState<number>(1);
   const [loading, setLoading] = React.useState(false);
+  const [admin, setAdmin] = React.useState<any>('');
 
   // item
   const [cabang, setCabang] = React.useState<any>();
@@ -63,10 +63,15 @@ function ListBarang() {
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showAnakCabang, setShowAnakCabang] = React.useState<boolean>(false);
   const [showList, setShowList] = React.useState<boolean>(false);
+  const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
 
   const { show, hide, toggle, visible, type, changeType } = useModal();
 
-  console.log(barangs);
+  const noNeedAttachmentAdmin = cekAkses('#6');
+  const noNeedApproval = cekAkses('#8');
+  const buttonDisabledByAkses = !noNeedApproval ? !admin?.iduser : false;
+
+  console.log('Barangs', barangs);
 
   const navigate = useNavigate();
 
@@ -123,6 +128,7 @@ function ListBarang() {
       kodeIndukCabang: cabang?.value,
       kodeAnakCabang: anakCabang?.value,
       barang: barangs,
+      adminId: admin?.iduser || null,
     };
 
     const { state, data, error } = await useFetch({
@@ -151,6 +157,8 @@ function ListBarang() {
     setBarangs(datas);
   }
 
+  console.log('admin', admin);
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9">
@@ -161,6 +169,24 @@ function ListBarang() {
             </h3>
           </div>
           <div className="flex flex-col gap-6 p-4.5">
+            {!noNeedApproval && (
+              <div className="w-full">
+                <div>
+                  <label className="mb-3 block text-black dark:text-white">
+                    Approval Ke
+                  </label>
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowAdmin(!showAdmin);
+                    }}
+                    className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                  >
+                    {admin?.nm_user || 'Pilih Approval Ke'}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="w-full">
               <div>
                 <label className="mb-3 block text-black dark:text-white">
@@ -213,11 +239,11 @@ function ListBarang() {
           </div>
         </div>
 
-        <Card className="h-full w-full bg-boxdark">
+        <Card className="h-full w-full">
           <CardHeader floated={false} shadow={false} className="rounded-none">
-            <div className="flex items-center justify-between gap-8 bg-boxdark">
+            <div className="flex items-center justify-between gap-8">
               <div>
-                <Typography variant="h5" color="white">
+                <Typography variant="h5" color="black">
                   Daftar Barang
                 </Typography>
                 <Typography color="gray" className="mt-1 font-normal">
@@ -225,7 +251,7 @@ function ListBarang() {
                 </Typography>
               </div>
             </div>
-            <div className="w-full bg-boxdark">
+            <div className="w-full ">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -241,7 +267,7 @@ function ListBarang() {
                 />
               </form>
             </div>
-            <div className="w-full bg-boxdark flex-col flex sm:flex-row sm:items-center pt-4 gap-4">
+            <div className="w-full  flex-col flex sm:flex-row sm:items-center pt-4 gap-4">
               <div
                 onClick={(e: any) => {
                   e.preventDefault();
@@ -258,7 +284,12 @@ function ListBarang() {
                   changeType('CONFIRM');
                   show();
                 }}
-                disabled={!barangs?.length || !cabang || !anakCabang}
+                disabled={
+                  !barangs?.length ||
+                  !cabang ||
+                  !anakCabang ||
+                  buttonDisabledByAkses
+                }
               >
                 Buat Permintaan Barang
               </Button>
@@ -266,7 +297,7 @@ function ListBarang() {
           </CardHeader>
           {!list.length ? (
             <CardBody>
-              <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm text-center">
+              <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm text-center">
                 {keyword
                   ? 'Tidak ditemukan barang yang sesuai, mohon periksa kembali!'
                   : 'Mulai cari untuk memunculkan list barang'}
@@ -281,11 +312,12 @@ function ListBarang() {
                       {TABLE_HEAD.map((head) => (
                         <th
                           key={head}
-                          className="border-y border-blue-gray-800 bg-strokedark p-4"
+                          className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                         >
                           <Typography
                             variant="small"
-                            className="font-normal leading-none opacity-70 text-whiten"
+                            color="blue-gray"
+                            className="font-normal leading-none opacity-70"
                           >
                             {head}
                           </Typography>
@@ -298,7 +330,7 @@ function ListBarang() {
                       const isLast = index === list.length - 1;
                       const classes = isLast
                         ? 'p-4'
-                        : 'p-4 border-b border-blue-gray-800';
+                        : 'p-4 border-b border-blue-gray-50';
 
                       return (
                         <tr key={item?.kd_brg}>
@@ -346,11 +378,6 @@ function ListBarang() {
                           </td>
                           <td className={classes}>
                             <Typography variant="small" className="font-normal">
-                              {formatRupiah(item?.hrga_satuan, true)}
-                            </Typography>
-                          </td>
-                          <td className={classes}>
-                            <Typography variant="small" className="font-normal">
                               {item?.nm_comp}
                             </Typography>
                           </td>
@@ -382,7 +409,7 @@ function ListBarang() {
               <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
                 <Typography
                   variant="small"
-                  color="white"
+                  color="black"
                   className="font-normal"
                 >
                   Halaman {page} dari {pageInfo?.pageCount}
@@ -392,6 +419,7 @@ function ListBarang() {
                     disabled={page < 2 || loading}
                     variant="outlined"
                     size="sm"
+                    color="blue"
                     onClick={(e) => {
                       e.preventDefault();
                       setPage(page - 1);
@@ -403,6 +431,7 @@ function ListBarang() {
                     disabled={page == pageInfo?.pageCount || loading}
                     variant="outlined"
                     size="sm"
+                    color="blue"
                     onClick={(e) => {
                       e.preventDefault();
                       setPage(page + 1);
@@ -418,6 +447,7 @@ function ListBarang() {
         <BarangModal
           data={selectedBarang}
           visible={barangModal}
+          needLampiran={!noNeedAttachmentAdmin}
           toggle={() => setBarangModal(!barangModal)}
           value={(val: any) =>
             setBarangs([...barangs, { ...val, id: barangs + 1 }])
@@ -446,6 +476,11 @@ function ListBarang() {
           toggle={toggle}
           onConfirm={() => createRequest()}
           onDone={() => navigate('/request-barang')}
+        />
+        <AdminPBModal
+          visible={showAdmin}
+          toggle={() => setShowAdmin(!showAdmin)}
+          value={(val: any) => setAdmin(val)}
         />
       </div>
     </DefaultLayout>

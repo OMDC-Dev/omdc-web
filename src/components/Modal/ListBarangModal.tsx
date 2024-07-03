@@ -72,12 +72,9 @@ const ListBarangModal = ({
             onFiltered(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem
-                    ripple={false}
-                    className=" cursor-default hover:bg-black"
-                  >
+                  <ListItem ripple={false} className=" cursor-default ">
                     <div className=" flex flex-col">
-                      <span className=" text-base font-bold text-white mb-2">
+                      <span className=" text-base font-bold text-black mb-2">
                         {item?.nm_barang}
                       </span>
                       <span className=" text-xs text-blue-gray-300">

@@ -1,8 +1,8 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import useFetch from '../../hooks/useFetch';
-import { LOGIN, USER_COMPLETE } from '../../api/routes';
+import { GET_ICON, LOGIN, USER_COMPLETE } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/Button';
@@ -40,7 +40,7 @@ const UpdateProfile: React.FC = () => {
     };
 
     const { state, data, error } = await useFetch({
-      url: USER_COMPLETE,
+      url: USER_COMPLETE + `/${USER_S.iduser}`,
       method: 'POST',
       data: body,
       headers: {
@@ -59,17 +59,36 @@ const UpdateProfile: React.FC = () => {
     }
   }
 
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
+  }
+
   return (
     <>
-      <div className=" xl:grid xl:place-items-center h-full sm:h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className=" xl:grid xl:place-items-center h-full sm:h-[100dvh] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div>
           <div className=" grid min-h-screen w-full place-items-center">
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
                   <img
-                    className="hidden dark:block h-20 w-20"
-                    src={Logo}
+                    className="block h-40 w-40 object-contain"
+                    src={`data:image/png;base64,${icon.icon}`}
                     alt="Logo"
                   />
                 </div>
@@ -78,7 +97,7 @@ const UpdateProfile: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-white p-6 shadow-lg">
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
@@ -99,8 +118,8 @@ const UpdateProfile: React.FC = () => {
 
                   <div className="mb-6">
                     <DeptGroup
-                      value={(val) => setDept(val)}
-                      defaultValue={USER_S?.departemen}
+                      onChange={(e: any) => setDept(e.target.value)}
+                      value={dept}
                     />
                   </div>
                 </form>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import IconBarang from '../../images/sidebar/IconBarang';
 import IconSidebar from '../../images/sidebar/IconSidebar';
 import IconArrow from '../../images/sidebar/IconArrow';
@@ -12,6 +12,10 @@ import {
   RectangleGroupIcon,
   BellAlertIcon,
 } from '@heroicons/react/24/outline';
+import useFetch from '../../hooks/useFetch';
+import { GET_ICON } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
+import useLogo from '../../store/useLogo';
 
 // Icon
 
@@ -32,13 +36,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
   );
 
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  const { logo, setLogo } = useLogo();
+
   const { user } = useAuth();
   const IS_ADMIN = user?.isAdmin;
   const IS_SUPER_ADMIN = user?.type == 'SUPERADMIN';
 
   // check akses
   const hasRequestBarangAkses = cekAkses('#2');
+  const hasMasterBarangAkses = cekAkses('#9');
   const hasPengumumanAkses = cekAkses('#3');
+  const hasExportExcell = cekAkses('#4');
+  const isAdminPB = cekAkses('#7');
 
   // close on click outside
   useEffect(() => {
@@ -75,18 +86,42 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     }
   }, [sidebarExpanded]);
 
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+      setLogo(data.icon);
+    } else {
+      setIcon(null);
+    }
+  }
+
   return (
     <aside
       ref={sidebar}
-      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
+      className={`absolute left-0 top-0 z-9999 flex h-[100dvh] w-72.5 flex-col overflow-y-hidden bg-boxdark duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink className={' flex items-center gap-x-4'} to="/">
-          <img className=" h-10 w-10" src={Logo} alt="Logo" />
-          <span className=" text-title-sm font-bold">OMDC V.0.5</span>
+          <img
+            className=" h-10 w-10 object-contain"
+            src={`data:image/png;base64,${logo}`}
+            alt="Logo"
+          />
+          <span className=" text-title-sm font-bold text-white">
+            OMDC v0.9.5
+          </span>
         </NavLink>
 
         <button
@@ -116,12 +151,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   <NavLink
                     to="/"
                     className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                      !pathname.includes('/departemen') &&
+                      pathname == '/' && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Admin R.O.P
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/adminpb"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/adminpb') &&
                       'bg-graydark dark:bg-meta-4'
                     }`}
                   >
                     <IconBarang />
-                    Super Admin
+                    Admin PB
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/reimbursement"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/reimbursement') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Request of Payment
                   </NavLink>
                 </li>
                 <li>
@@ -134,6 +192,40 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   >
                     <IconBarang />
                     Departemen
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/coa"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/coa') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    COA
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/request-barang"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/request-barang') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Permintaan Barang
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/icon"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/icon') && 'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Ganti Icon
                   </NavLink>
                 </li>
               </ul>
@@ -175,7 +267,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }}
                         >
                           <BanknotesIcon className=" h-5 w-5" />
-                          Reimbursement
+                          Request of Payment
                           <IconArrow open={open} />
                         </NavLink>
                         {/* <!-- Dropdown Menu Start --> */}
@@ -196,6 +288,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 Riwayat Pengajuan
                               </NavLink>
                             </li>
+                            {hasExportExcell ? (
+                              <li>
+                                <NavLink
+                                  to="/report-reimbursement"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Report R.O.P
+                                </NavLink>
+                              </li>
+                            ) : null}
                             {/* ------ BUAT PENGAJUAN --------- */}
                             {IS_ADMIN ? (
                               <li>
@@ -225,12 +330,41 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <NavLink
                       to="/request-barang"
                       className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                        pathname.includes('calendar') &&
+                        pathname.includes('request-barang') &&
+                        !pathname.includes('admin') &&
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >
                       <RectangleGroupIcon className=" h-5 w-5" />
                       Permintaan Barang
+                    </NavLink>
+                  </li>
+                ) : null}
+                {hasMasterBarangAkses ? (
+                  <li>
+                    <NavLink
+                      to="/master-barang"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('master-barang') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <RectangleGroupIcon className=" h-5 w-5" />
+                      Master Barang
+                    </NavLink>
+                  </li>
+                ) : null}
+                {isAdminPB ? (
+                  <li>
+                    <NavLink
+                      to="/admin-request-barang"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('admin-request-barang') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <RectangleGroupIcon className=" h-5 w-5" />
+                      Pengajuan Permintaan Barang
                     </NavLink>
                   </li>
                 ) : null}
@@ -240,7 +374,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <NavLink
                       to="/pengumuman"
                       className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                        pathname.includes('calendar') &&
+                        pathname.includes('pengumuman') &&
                         'bg-graydark dark:bg-meta-4'
                       }`}
                     >

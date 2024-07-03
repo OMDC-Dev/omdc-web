@@ -16,7 +16,7 @@ function App() {
   // }, [pathname]);
 
   useEffect(() => {
-    const className = 'dark';
+    const className = 'light';
     const bodyClass = window.document.body.classList;
 
     bodyClass.add(className);

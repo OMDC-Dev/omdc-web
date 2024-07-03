@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DocumentTextIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardHeader,
@@ -21,8 +21,6 @@ import moment from 'moment';
 const TABLE_HEAD = [
   'ID PB',
   'ID User',
-  'Kode Pengiriman',
-  'Kode Cabang',
   'Kirim ke',
   'Cabang',
   'Tanggal Disetujui',
@@ -38,6 +36,7 @@ function PermintaanBarang() {
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
 
   const navigate = useNavigate();
 
@@ -45,10 +44,12 @@ function PermintaanBarang() {
     getList();
   }, [page]);
 
-  async function getList() {
+  async function getList(clear?: boolean) {
     setLoading(true);
     const { state, data, error } = await useFetch({
-      url: LIST_REQUEST_BARANG + `?limit=${limit}&page=${page}`,
+      url:
+        LIST_REQUEST_BARANG +
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}`,
       method: 'GET',
     });
 
@@ -63,32 +64,24 @@ function PermintaanBarang() {
   }
 
   function statusChip(status: string) {
-    switch (status) {
-      case 'WAITING':
-        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
-        break;
-      case 'APPROVED':
-        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
-        break;
-      case 'REJECTED':
-        return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
-        break;
-      case 'DONE':
-        return <Chip variant={'outlined'} color="green" value={'Selesai'} />;
-        break;
-      default:
-        return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
-        break;
+    if (status == 'Disetujui') {
+      return <Chip variant={'outlined'} color="green" value={'Diterima'} />;
     }
+
+    if (status == 'Ditolak') {
+      return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
+    }
+
+    return <Chip variant={'outlined'} color="amber" value={status} />;
   }
 
   return (
     <DefaultLayout>
-      <Card className="h-full w-full bg-boxdark">
+      <Card className="h-full w-full">
         <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="flex-col flex sm:flex-row sm:items-center justify-between gap-8 bg-boxdark">
+          <div className="flex-col flex sm:flex-row sm:items-center justify-between gap-8">
             <div>
-              <Typography variant="h5" color="white">
+              <Typography variant="h5" color="black">
                 Riwayat Permintaan Barang
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
@@ -106,10 +99,42 @@ function PermintaanBarang() {
               </Button>
             </div>
           </div>
+          <div className="relative w-full">
+            <form
+              className="w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                // getReimbursementList();
+                getList();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Cari ID PB, cabang, kode cabang..."
+                className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && ( // Tampilkan tombol X jika nilai input tidak kosong
+                <button
+                  type="button"
+                  className="absolute h-11 inset-y-0 top-4 right-0 px-3 flex items-center "
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSearch('');
+                    //getReimbursementList(true);
+                    getList(true);
+                  }}
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              )}
+            </form>
+          </div>
         </CardHeader>
         {!list?.length ? (
           <CardBody>
-            <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm">
+            <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm">
               Belum ada pengajuan
             </div>
           </CardBody>
@@ -122,11 +147,12 @@ function PermintaanBarang() {
                     {TABLE_HEAD.map((head) => (
                       <th
                         key={head}
-                        className="border-y border-blue-gray-800 bg-strokedark p-4"
+                        className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                       >
                         <Typography
                           variant="small"
-                          className="font-normal leading-none opacity-70 text-whiten"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
                         >
                           {head}
                         </Typography>
@@ -139,7 +165,7 @@ function PermintaanBarang() {
                     const isLast = index === list?.length - 1;
                     const classes = isLast
                       ? 'p-4'
-                      : 'p-4 border-b border-blue-gray-800';
+                      : 'p-4 border-b border-blue-gray-50';
 
                     return (
                       <tr key={item?.id}>
@@ -161,16 +187,6 @@ function PermintaanBarang() {
                               {item?.iduser}
                             </Typography>
                           </div>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.kd_cabang}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography variant="small" className="font-normal">
-                            {item?.kd_induk}
-                          </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant="small" className="font-normal">
@@ -206,7 +222,7 @@ function PermintaanBarang() {
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
-                          {statusChip(item?.status_approve)}
+                          {statusChip(item?.status_pb)}
                         </td>
                         <td className={classes}>
                           <Tooltip content="Detail">
@@ -231,7 +247,7 @@ function PermintaanBarang() {
               </table>
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-              <Typography variant="small" color="white" className="font-normal">
+              <Typography variant="small" color="black" className="font-normal">
                 Halaman {page} dari {pageInfo?.pageCount}
               </Typography>
               <div className="flex gap-2">
@@ -239,6 +255,7 @@ function PermintaanBarang() {
                   disabled={page < 2 || loading}
                   variant="outlined"
                   size="sm"
+                  color="blue"
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(page - 1);
@@ -250,6 +267,7 @@ function PermintaanBarang() {
                   disabled={page == pageInfo.pageCount || loading}
                   variant="outlined"
                   size="sm"
+                  color="blue"
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(page + 1);

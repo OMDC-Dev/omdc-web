@@ -9,12 +9,16 @@ const AdminModal = ({
   visible,
   toggle,
   dismissOnBackdrop,
+  requesterId,
   value,
+  rid,
 }: {
   visible: boolean;
   toggle: any;
   dismissOnBackdrop?: boolean;
+  requesterId?: string;
   value?: any;
+  rid?: number;
 }) => {
   if (!visible) return null;
 
@@ -29,8 +33,18 @@ const AdminModal = ({
   }, [visible]);
 
   async function getList() {
+    console.log(requesterId);
+    let param = '';
+    if (requesterId) {
+      param += `&exceptId=${requesterId}`;
+    }
+
+    if (rid) {
+      param += `&rid=${rid}`;
+    }
+
     const { state, data, error } = await useFetch({
-      url: SUPERUSER + '?limit=100',
+      url: SUPERUSER + `?limit=100${param}`,
       method: 'GET',
     });
 
@@ -63,7 +77,7 @@ const AdminModal = ({
     <Dialog className="bg-transparent" open={visible} handler={toggle}>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-full">
         <div className=" flex flex-row items-center border-b border-blue-gray-800 pt-2 pb-4 mb-4.5">
-          <div className=" flex-1">Pilih Admin</div>
+          <div className=" flex-1">Pilih Approval</div>
           <XMarkIcon className=" w-5 h-5 cursor-pointer" onClick={toggle} />
         </div>
         <div className="mb-4.5">
@@ -80,7 +94,7 @@ const AdminModal = ({
             onFilteredBank(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem className=" text-white">{item?.nm_user}</ListItem>
+                  <ListItem className=" text-black">{item?.nm_user}</ListItem>
                 </div>
               );
             })}

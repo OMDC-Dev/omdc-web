@@ -24,13 +24,31 @@ import SuperAdmin from '../pages/SuperAdmin/SuperAdmin';
 import Departemen from '../pages/SuperAdmin/Departemen';
 import { cekAkses } from '../common/utils';
 import UpdateProfile from '../pages/Authentication/UpdateProfile';
+import AboutUs from '../pages/Other/AboutUs';
+import SuperReimbursement from '../pages/SuperAdmin/Reimbursement';
+import DetailReimbursement from '../pages/SuperAdmin/DetailReimbursement';
+import SuperCOA from '../pages/SuperAdmin/COA';
+import SuperCOAUpdate from '../pages/SuperAdmin/COAUpdate';
+import PermintaanBarangAdmin from '../pages/PermintaanBarang/PermintaanBarangAdmin';
+import ReportReimbursement from '../pages/Dashboard/ReportReimbursement';
+import SuperIcon from '../pages/SuperAdmin/Icon';
+import DownloadReport from '../pages/Dashboard/DownloadReport';
+import AdminPB from '../pages/SuperAdmin/AdminPB';
+import PermintaanBarangApproval from '../pages/PermintaanBarang/PermintaanBarangAdminApproval';
+import DetailPermintaanBarangAdmin from '../pages/PermintaanBarang/DetailPermintaanBarangAdmin';
+import ReportPermintaanBarang from '../pages/PermintaanBarang/ReportPermintaanBarang';
+import ListMasterBarang from '../pages/MasterBarang/ListBarang';
+import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
+import BuatPengajuanUlang from '../pages/Dashboard/BuatPengajuanUlang';
 
 const Routes = () => {
   const { token, user } = useAuth();
 
   // cek akses
   const hasRequestBarangAkses = token ? cekAkses('#2') : null;
+  const hasMasterBarangAkses = token ? cekAkses('#9') : null;
   const hasPengumumanAkses = token ? cekAkses('#3') : null;
+  const isAdminPB = token ? cekAkses('#7') : null;
 
   // TITLE
   const TITLE = 'OMDC - ';
@@ -63,11 +81,38 @@ const Routes = () => {
           ),
         },
         {
+          path: '/report-reimbursement',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Reimbursement'} />
+              <SuperReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/report-reimbursement/create',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Report Reimbursement'} />
+              <ReportReimbursement />
+            </>
+          ),
+        },
+        {
           path: '/reimbursement/ajukan',
           element: (
             <>
               <PageTitle title={TITLE + 'Buat Pengajuan'} />
               <BuatPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/ajukan-ulang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Buat Pengajuan'} />
+              <BuatPengajuanUlang />
             </>
           ),
         },
@@ -86,6 +131,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Detail Pengajuan'} />
               <DetailPengajuan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/:id/download',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Download Report'} />
+              <DownloadReport />
             </>
           ),
         },
@@ -150,6 +204,15 @@ const Routes = () => {
       ),
     },
     {
+      path: '/about',
+      element: (
+        <>
+          <PageTitle title={TITLE + 'About Us'} />
+          <AboutUs />
+        </>
+      ),
+    },
+    {
       path: '*',
       element: <Navigate to="/login" replace />,
     },
@@ -176,6 +239,38 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Ubah Profile'} />
               <UpdateProfile />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
+  const routesForAdminPB: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/admin-request-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Approval Permintaan Barang'} />
+              <PermintaanBarangApproval />
+            </>
+          ),
+        },
+        {
+          path: '/admin-request-barang/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Approval Permintaan Barang'} />
+              <DetailPermintaanBarangAdmin />
             </>
           ),
         },
@@ -217,6 +312,47 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Permintaan Barang'} />
               <DetailPermintaanBarang />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang/:id/report',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Report Permintaan Barang'} />
+              <ReportPermintaanBarang />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
+  const routesForMasterBarang: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/master-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Master Barang'} />
+              <ListMasterBarang />
+            </>
+          ),
+        },
+        {
+          path: '/master-barang/add',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Add Master Barang'} />
+              <ListMasterBarangInput />
             </>
           ),
         },
@@ -267,11 +403,92 @@ const Routes = () => {
           ),
         },
         {
+          path: '/adminpb',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Admin PB'} />
+              <AdminPB />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Reimbursement'} />
+              <SuperReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/report-reimbursement/create',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Report Reimbursement'} />
+              <ReportReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Detail Pengajuan'} />
+              <DetailReimbursement />
+            </>
+          ),
+        },
+        {
           path: '/departemen',
           element: (
             <>
               <PageTitle title={TITLE + 'Departemen'} />
               <Departemen />
+            </>
+          ),
+        },
+        {
+          path: '/coa',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'SuperAdmin'} />
+              <SuperCOA />
+            </>
+          ),
+        },
+        {
+          path: '/coa/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'COA'} />
+              <SuperCOAUpdate />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <PermintaanBarangAdmin />
+            </>
+          ),
+        },
+        {
+          path: '/request-barang/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <DetailPermintaanBarang />
+            </>
+          ),
+        },
+        {
+          path: '/icon',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Icon'} />
+              <SuperIcon />
             </>
           ),
         },
@@ -289,7 +506,9 @@ const Routes = () => {
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
     ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
+    ...(hasMasterBarangAkses ? routesForMasterBarang : []),
     ...(hasPengumumanAkses ? routesForPengumuman : []),
+    ...(isAdminPB ? routesForAdminPB : []),
   ]);
 
   const routerSa = createBrowserRouter([

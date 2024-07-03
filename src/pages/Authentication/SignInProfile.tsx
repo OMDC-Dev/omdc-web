@@ -1,19 +1,22 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import useFetch from '../../hooks/useFetch';
-import { LOGIN, USER_COMPLETE } from '../../api/routes';
+import { GET_ICON, LOGIN, USER_COMPLETE } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
 import Modal from '../../components/Modal/Modal';
 import DeptGroup from '../../components/SelectGroup/DeptGroup';
+import useLogo from '../../store/useLogo';
 
 const SignInProfile: React.FC = () => {
   const [errorMessage, setErrorMessage] = React.useState<string | any>('');
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
   const { toggle, visible, hide, show } = useModal();
   const { setToken, setUser } = useAuth();
+  const { setLogo } = useLogo();
 
   // state
   const [nomorWa, setNomorWa] = React.useState<string>('');
@@ -24,8 +27,6 @@ const SignInProfile: React.FC = () => {
   const { state } = useLocation();
 
   const USER_S = state;
-
-  console.log(USER_S);
 
   function onNomorWaChange(event: any) {
     setNomorWa(event.target.value);
@@ -44,17 +45,20 @@ const SignInProfile: React.FC = () => {
     };
 
     const { state, data, error } = await useFetch({
-      url: USER_COMPLETE,
+      url: USER_COMPLETE + `/${USER_S.iduser}`,
       method: 'POST',
       data: body,
-      headers: {
-        Authorization: `Bearer ${USER_S.userToken}`,
-      },
     });
 
     if (state == API_STATES.OK) {
-      setToken(USER_S.userToken);
-      setUser(USER_S);
+      setLogo(icon.icon);
+      setToken(data.userToken);
+      setUser({
+        ...USER_S,
+        userToken: data.userToken,
+        nomorwa: nomorWa,
+        departemen: dept,
+      });
       hide();
       navigate('/', { replace: true });
     } else {
@@ -63,17 +67,34 @@ const SignInProfile: React.FC = () => {
     }
   }
 
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
+  }
+
   return (
     <>
-      <div className=" xl:grid xl:place-items-center h-full sm:h-screen rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className=" xl:grid xl:place-items-center h-full sm:h-[100dvh] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedar">
         <div>
           <div className=" grid min-h-screen w-full place-items-center">
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
                   <img
-                    className="hidden dark:block h-20 w-20"
-                    src={Logo}
+                    className="block h-40 w-40 object-contain"
+                    src={`data:image/png;base64,${icon.icon}`}
                     alt="Logo"
                   />
                 </div>
@@ -82,7 +103,7 @@ const SignInProfile: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-white p-6 shadow-lg">
                 <form onSubmit={(e) => e.preventDefault()}>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
@@ -102,7 +123,10 @@ const SignInProfile: React.FC = () => {
                   </div>
 
                   <div className="mb-6">
-                    <DeptGroup value={(val) => setDept(val)} />
+                    <DeptGroup
+                      onChange={(e: any) => setDept(e.target.value)}
+                      value={dept}
+                    />
                   </div>
                 </form>
                 <div className="mb-4">

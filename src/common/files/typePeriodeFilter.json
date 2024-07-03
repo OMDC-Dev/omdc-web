@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Semua",
+    "value": "all"
+  },
+  {
+    "label": "Pengajuan User",
+    "value": "USER"
+  },
+  {
+    "label": "Finance",
+    "value": "MAKER"
+  }
+]

@@ -3,6 +3,11 @@ import DropdownNotification from './DropdownNotification';
 import DropdownUser from './DropdownUser';
 import LogoIcon from '../../images/logo/logo.jpg';
 import { useAuth } from '../../hooks/useAuth';
+import useLogo from '../../store/useLogo';
+import React from 'react';
+import useFetch from '../../hooks/useFetch';
+import { GET_ICON } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -10,6 +15,27 @@ const Header = (props: {
 }) => {
   const { user } = useAuth();
   const IS_SA = user?.type == 'SUPERADMIN';
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  const { logo, setLogo } = useLogo();
+
+  // React.useEffect(() => {
+  //   getIcon();
+  // }, []);
+
+  // async function getIcon() {
+  //   const { state, data, error } = await useFetch({
+  //     url: GET_ICON,
+  //     method: 'GET',
+  //   });
+
+  //   if (state == API_STATES.OK) {
+  //     setIcon(data);
+  //     setLogo(data.icon);
+  //   } else {
+  //     setIcon(null);
+  //   }
+  // }
 
   return (
     <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
@@ -59,7 +85,11 @@ const Header = (props: {
           {/* <!-- Hamburger Toggle BTN --> */}
 
           <Link className="block flex-shrink-0 lg:hidden" to="/">
-            <img className=" h-8 w-8" src={LogoIcon} alt="Logo" />
+            <img
+              className=" h-8 w-8 object-contain"
+              src={`data:image/png;base64,${logo}`}
+              alt="Logo"
+            />
           </Link>
         </div>
 

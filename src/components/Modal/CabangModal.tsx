@@ -84,7 +84,7 @@ const CabangModal = ({
             onFilteredBank(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
-                  <ListItem className=" text-white">{item?.label}</ListItem>
+                  <ListItem className=" text-black">{item?.label}</ListItem>
                 </div>
               );
             })}

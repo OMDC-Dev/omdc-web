@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DocumentTextIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardHeader,
@@ -13,16 +13,24 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT } from '../../api/routes';
+import { REIMBURSEMENT, USER_KODE_AKSES } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import 'moment/locale/id'; // without this line it didn't work
+moment.locale('id');
 import { cekAkses } from '../../common/utils';
+import { useAuth } from '../../hooks/useAuth';
+import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
+import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
+import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
 
 const TABLE_HEAD = [
   'Pengajuan',
   'No. Doc.',
-  'Tanggal',
+  'Kategori Permintaan',
+  'Pembayaran',
+  'Tanggal Invoice',
   'Cabang',
   'Diajukan Oleh',
   'Nama Client / Vendor',
@@ -30,6 +38,7 @@ const TABLE_HEAD = [
   'Nominal',
   'Tanggal Disetujui',
   'Tanggal Pengajuan',
+  'Keterangan Status',
   'Status',
   '',
 ];
@@ -40,20 +49,61 @@ function Reimbursement() {
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
+  const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  const [caFilter, setCaFilter] = React.useState<string>('');
+  const [ropFilter, setROPFilter] = React.useState<string>('');
 
   const navigate = useNavigate();
 
   // reimbursement akses
   const hasReimbursementAkses = cekAkses('#1');
 
+  const { user, setUser } = useAuth();
+
+  console.log('USER DATA X', user);
+
   React.useEffect(() => {
     getReimbursementList();
   }, [page]);
 
-  async function getReimbursementList() {
-    setLoading(true);
+  React.useEffect(() => {
+    updateKodeKases();
+  }, []);
+
+  async function updateKodeKases() {
     const { state, data, error } = await useFetch({
-      url: REIMBURSEMENT + `?limit=${limit}&page=${page}`,
+      url: USER_KODE_AKSES(user.iduser),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setUser({ ...user, kodeAkses: data.kodeAkses });
+    }
+
+    console.log('UPDTED USER', user);
+  }
+
+  async function getReimbursementList(
+    clear?: boolean,
+    type?: string,
+    ca?: string,
+    rop?: string,
+  ) {
+    setLoading(true);
+    const typeParam =
+      type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
+    const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
+    const ropParam =
+      rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
+
+    const filterParam = typeParam + caParam + ropParam;
+
+    const { state, data, error } = await useFetch({
+      url:
+        REIMBURSEMENT +
+        `?limit=${limit}&page=${page}&cari=${clear ? '' : search}` +
+        filterParam,
       method: 'GET',
     });
 
@@ -68,13 +118,19 @@ function Reimbursement() {
     }
   }
 
-  function statusChip(status: string) {
+  function statusChip(status: string, finance: string) {
     switch (status) {
       case 'WAITING':
         return <Chip variant={'outlined'} color="amber" value={'Menunggu'} />;
         break;
       case 'APPROVED':
-        return <Chip variant={'outlined'} color="green" value={'Disetujui'} />;
+        return (
+          <Chip
+            variant={'outlined'}
+            color="green"
+            value={finance == 'DONE' ? 'Selesai' : 'Disetujui'}
+          />
+        );
         break;
       case 'REJECTED':
         return <Chip variant={'outlined'} color="red" value={'Ditolak'} />;
@@ -88,13 +144,33 @@ function Reimbursement() {
     }
   }
 
+  function keteranganStatus(item: any) {
+    if (
+      item.jenis_reimbursement !== 'Cash Advance' ||
+      item.status_finance !== 'DONE' ||
+      item.status !== 'APPROVED'
+    ) {
+      return '-';
+    }
+
+    if (
+      item.realisasi?.length > 1 &&
+      item.childId &&
+      item.status_finance_child == 'DONE'
+    ) {
+      return 'Sudah Dikembalikan';
+    } else {
+      return item.childId ? 'Belum dikembalikan' : 'Perlu laporan realisasi';
+    }
+  }
+
   return (
     <DefaultLayout>
-      <Card className="h-full w-full bg-boxdark">
+      <Card className="h-full w-full">
         <CardHeader floated={false} shadow={false} className="rounded-none">
-          <div className="flex-col flex sm:flex-row sm:items-center  justify-between gap-8 bg-boxdark">
+          <div className="flex-col flex sm:flex-row sm:items-center  justify-between gap-8">
             <div>
-              <Typography variant="h5" color="white">
+              <Typography variant="h5" color="black">
                 Riwayat Pengajuan
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
@@ -116,10 +192,66 @@ function Reimbursement() {
               ) : null}
             </div>
           </div>
+          <div className="relative w-full">
+            <form
+              className="w-full relative"
+              onSubmit={(e) => {
+                e.preventDefault();
+                getReimbursementList();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Cari No. dokumen, coa, kode cabang..."
+                className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && ( // Tampilkan tombol X jika nilai input tidak kosong
+                <button
+                  type="button"
+                  className="absolute inset-y-0 top-4 right-0 px-3 flex items-center"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSearch('');
+                    getReimbursementList(true);
+                  }}
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              )}
+            </form>
+          </div>
+          <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
+            <TipeFilterGroup
+              className="w-full lg:w-1/3 mt-2"
+              setValue={(val: string) => {
+                setTipeFilter(val);
+                getReimbursementList(false, val, caFilter, ropFilter);
+              }}
+              value={tipeFilter}
+            />
+            <CashAdvanceFilterGroup
+              className="w-full lg:w-1/3"
+              setValue={(val: string) => {
+                setCaFilter(val);
+                getReimbursementList(false, tipeFilter, val, ropFilter);
+              }}
+              value={caFilter}
+            />
+            <StatusROPFilterGroup
+              className="w-full lg:w-1/3"
+              setValue={(val: string) => {
+                setROPFilter(val);
+                getReimbursementList(false, tipeFilter, caFilter, val);
+              }}
+              value={ropFilter}
+            />
+          </div>
         </CardHeader>
         {!rList?.length ? (
           <CardBody>
-            <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm">
+            <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm">
               Belum ada pengajuan
             </div>
           </CardBody>
@@ -132,11 +264,12 @@ function Reimbursement() {
                     {TABLE_HEAD.map((head) => (
                       <th
                         key={head}
-                        className="border-y border-blue-gray-800 bg-strokedark p-4"
+                        className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                       >
                         <Typography
                           variant="small"
-                          className="font-normal leading-none opacity-70 text-whiten"
+                          color="blue-gray"
+                          className="font-normal leading-none opacity-70"
                         >
                           {head}
                         </Typography>
@@ -149,7 +282,7 @@ function Reimbursement() {
                     const isLast = index === rList?.length - 1;
                     const classes = isLast
                       ? 'p-4'
-                      : 'p-4 border-b border-blue-gray-800';
+                      : 'p-4 border-b border-blue-gray-50';
 
                     return (
                       <tr key={item?.id}>
@@ -173,6 +306,30 @@ function Reimbursement() {
                                 className="font-normal"
                               >
                                 {item?.no_doc}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.tipePembayaran}
+                              </Typography>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Typography
+                                variant="small"
+                                className="font-normal"
+                              >
+                                {item?.payment_type}
                               </Typography>
                             </div>
                           </div>
@@ -228,7 +385,13 @@ function Reimbursement() {
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
-                          {statusChip(item?.status)}
+                          {keteranganStatus(item)}
+                        </td>
+                        <td className={classes}>
+                          {/* <Typography variant="small" className="font-normal">
+                            {item?.status}
+                          </Typography> */}
+                          {statusChip(item?.status, item?.status_finance)}
                         </td>
                         <td className={classes}>
                           <Tooltip content="Detail">
@@ -253,7 +416,7 @@ function Reimbursement() {
               </table>
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-              <Typography variant="small" color="white" className="font-normal">
+              <Typography variant="small" color="black" className="font-normal">
                 Page {page} of {pageInfo?.pageCount}
               </Typography>
               <div className="flex gap-2">
@@ -261,6 +424,7 @@ function Reimbursement() {
                   disabled={page < 2 || loading}
                   variant="outlined"
                   size="sm"
+                  color="blue"
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(page - 1);
@@ -272,6 +436,7 @@ function Reimbursement() {
                   disabled={page == pageInfo?.pageCount || loading}
                   variant="outlined"
                   size="sm"
+                  color="blue"
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(page + 1);

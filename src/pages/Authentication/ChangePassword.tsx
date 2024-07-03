@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../images/logo/logo.jpg';
+import Logo from '../../images/logo/logo-tp.png';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/Button';
 import useModal from '../../hooks/useModal';
@@ -12,7 +12,7 @@ import {
   DialogHeader,
 } from '@material-tailwind/react';
 import useFetch from '../../hooks/useFetch';
-import { UPDATE_PASSWORD } from '../../api/routes';
+import { GET_ICON, LOGOUT, UPDATE_PASSWORD } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 
 const ChangePassword: React.FC = () => {
@@ -90,22 +90,55 @@ const ChangePassword: React.FC = () => {
   }
 
   // on logout
-  function onLogout() {
-    setToken();
-    navigate('/', { replace: true });
+  async function onLogout() {
+    const { state, data, error } = await useFetch({
+      url: LOGOUT,
+      method: 'POST',
+    });
+    if (state == API_STATES.OK) {
+      setToken();
+      navigate('/', { replace: true });
+    } else if (
+      error == 'User Unauthenticated!' ||
+      error == 'User Token Invalid!'
+    ) {
+      setToken();
+      navigate('/', { replace: true });
+    } else {
+      alert(`Ada sesuatu yang tidak beres, mohon coba lagi.`);
+    }
+  }
+
+  const [icon, setIcon] = React.useState<any>({ icon: '', iconMobile: '' });
+
+  React.useEffect(() => {
+    getIcon();
+  }, []);
+
+  async function getIcon() {
+    const { state, data, error } = await useFetch({
+      url: GET_ICON,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIcon(data);
+    } else {
+      setIcon(null);
+    }
   }
 
   return (
-    <div className=" bg-boxdark h-screen flex flex-col justify-center">
-      <div className=" xl:grid xl:place-items-center  rounded-sm bg-boxdark dark:bg-boxdark">
+    <div className=" bg-white h-[100dvh] flex flex-col justify-center">
+      <div className=" xl:grid xl:place-items-center  rounded-sm bg-white">
         <div className="flex flex-wrap items-center">
           <div className=" grid min-h-screen w-full place-items-center">
             <div>
               <div className="grid place-items-center p-4 mb-4">
                 <div className=" mb-4">
                   <img
-                    className="hidden dark:block h-20 w-20"
-                    src={Logo}
+                    className="block h-40 w-40 object-contain"
+                    src={`data:image/png;base64,${icon.icon}`}
                     alt="Logo"
                   />
                 </div>
@@ -114,7 +147,7 @@ const ChangePassword: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="w-96 rounded-md bg-graydark p-6 shadow-lg">
+              <div className="w-96 rounded-md bg-white p-6 shadow-lg">
                 <form>
                   <div className="mb-4">
                     <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">

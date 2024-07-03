@@ -3,30 +3,21 @@ import useFetch from '../../hooks/useFetch';
 import { DEPT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 
-const DeptGroup = ({
-  value,
-  defaultValue,
-}: {
-  value: (arg0: string) => void;
-  defaultValue?: string;
-}) => {
+const DeptGroup = ({ value, onChange }: { value: any; onChange: any }) => {
   const [list, setList] = React.useState<any>([]);
-  const [selectedOption, setSelectedOption] = useState<string>('');
-  const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
+  // const [selectedOption, setSelectedOption] = useState<string>('');
+  // const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
-  const changeTextColor = () => {
-    setIsOptionSelected(true);
-  };
+  // const changeTextColor = () => {
+  //   setIsOptionSelected(true);
+  // };
 
-  React.useEffect(() => {
-    value(selectedOption);
-  }, [selectedOption]);
+  // React.useEffect(() => {
+  //   value(selectedOption);
+  // }, [selectedOption]);
 
   React.useEffect(() => {
     getList();
-    if (defaultValue) {
-      setSelectedOption(defaultValue);
-    }
   }, []);
 
   async function getList() {
@@ -50,14 +41,9 @@ const DeptGroup = ({
 
       <div className="relative z-20">
         <select
-          value={selectedOption}
-          onChange={(e) => {
-            setSelectedOption(e.target.value);
-            changeTextColor();
-          }}
-          className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input ${
-            isOptionSelected ? 'text-black dark:text-white' : ''
-          }`}
+          value={value}
+          onChange={onChange}
+          className={`relative z-20 w-full appearance-none rounded-lg border border-stroke bg-transparent py-2 pl-4 pr-6 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input`}
         >
           <option value="" disabled className="text-body dark:text-bodydark">
             Pilih Departemen
