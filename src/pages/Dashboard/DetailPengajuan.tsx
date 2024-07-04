@@ -53,6 +53,8 @@ const DetailPengajuan: React.FC = () => {
 
   const state = location.state;
 
+  console.log('DATA', state);
+
   const IS_REPORT = state?.isReport;
   const IS_PUSHED = state?.pushed;
 

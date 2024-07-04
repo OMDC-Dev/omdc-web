@@ -299,6 +299,7 @@ const BuatPengajuan: React.FC = () => {
       parentId: '',
       payment_type: paymentType,
       tipePembayaran: tipePembayaran,
+      kdsp: suplier?.kdsp || '',
     };
 
     const { state, data, error } = await useFetch({

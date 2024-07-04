@@ -222,6 +222,8 @@ const BuatPengajuanUlang: React.FC = () => {
     setAdmin(state?.accepted_by[0]);
     setDesc(state?.description);
     setItem(state?.item);
+
+    // VA
     if (
       state.payment_type == 'TRANSFER' &&
       state.bank_detail.accountname == 'Virtual Account'
@@ -231,26 +233,16 @@ const BuatPengajuanUlang: React.FC = () => {
       setPayment(state.payment_type);
     }
 
-    if (state.bank_detail.bankcode == '000') {
-      const splitSuplier = state.name.split('-');
-      const kdsp = splitSuplier[0]?.trimEnd();
-      const nmsp = splitSuplier[1]?.trimStart();
-
-      setSuplier({
-        kdsp: kdsp,
-        nmsp: nmsp,
-        nm_pemilik_rek: state.bank_detail.accountname,
-        no_rekbank: state.bank_detail.accountnumber,
-        nm_bank: state.bank_detail.bankname,
-      });
+    if (state.jenis_reimbursement == 'Payment Request' && state.kdsp) {
+      setSuplier(state.suplierDetail);
       setUseSuplierlist(true);
-      setName(state.name);
+      setName(`${state.suplierDetail.kdsp} - ${state.suplierDetail.nmsp}`);
     } else {
       setUseSuplierlist(false);
       setName(state.name);
     }
 
-    if (state.bank_detail) {
+    if (state.bank_detail && state.payment_type == 'TRANSFER') {
       setSelectedBank({
         namaBank: state.bank_detail.bankname,
         kodeBank: state.bank_detail.bankcode,
@@ -264,6 +256,8 @@ const BuatPengajuanUlang: React.FC = () => {
       }
     }
   }, []);
+
+  console.log('SUPLIER', suplier);
 
   // on Cek REKENING
   async function onCekRekExt(rek: any, bankCode: any) {
@@ -294,6 +288,8 @@ const BuatPengajuanUlang: React.FC = () => {
       alert('Nomor rekening tidak valid!');
       return;
     }
+
+    console.log(selectedBank?.kodeBank, bankRek);
 
     const { state, data, error } = await useFetch({
       url: GET_BANK_NAME(selectedBank?.kodeBank, bankRek),
@@ -372,6 +368,7 @@ const BuatPengajuanUlang: React.FC = () => {
       payment_type: paymentType,
       tipePembayaran: tipePembayaran,
       uploadedFile: useExtFile ? FILE : null,
+      kdsp: suplier?.kdsp || '',
     };
 
     const { state, data, error } = await useFetch({
@@ -402,19 +399,6 @@ const BuatPengajuanUlang: React.FC = () => {
         accountnumber: suplier?.no_rekbank,
         accountname: suplier?.nm_pemilik_rek,
       });
-    } else {
-      if (state && !payment) {
-        if (
-          state.payment_type == 'TRANSFER' &&
-          state.bank_detail.accountname == 'Virtual Account'
-        ) {
-          setPayment('VA');
-        } else {
-          setPayment(state.payment_type);
-        }
-      } else {
-        setPayment('');
-      }
     }
   }, [suplier]);
 
@@ -425,6 +409,37 @@ const BuatPengajuanUlang: React.FC = () => {
       setBankRek('');
     }
   }, [jenis]);
+
+  React.useEffect(() => {
+    if (payment == state.payment_type) {
+      if (
+        state.payment_type == 'TRANSFER' &&
+        state.bank_detail.accountname == 'Virtual Account'
+      ) {
+        setSelectedBank({
+          namaBank: state.bank_detail.bankname,
+          kodeBank: state.bank_detail.bankcode,
+        });
+        setBankRek(state.bank_detail.accountnumber);
+      } else {
+        setSelectedBank({
+          namaBank: state.bank_detail.bankname,
+          kodeBank: state.bank_detail.bankcode,
+        });
+        setBankRek(state.bank_detail.accountnumber);
+        if (state.bank_detail.accountnumber) {
+          onCekRekExt(
+            state.bank_detail.accountnumber,
+            state.bank_detail.bankcode,
+          );
+        }
+      }
+    } else {
+      setSelectedBank('');
+      setBankDetail({});
+      setBankRek('');
+    }
+  }, [payment]);
 
   return (
     <DefaultLayout>
@@ -444,8 +459,8 @@ const BuatPengajuanUlang: React.FC = () => {
                     <JenisGroup
                       setValue={(val: any) => {
                         setJenis(val);
-                        if (isFirstLoad) {
-                          setIsFirstLoad(false);
+                        if (!isFirstLoad) {
+                          setIsFirstLoad(true);
                         }
                       }}
                       value={jenis}
@@ -884,7 +899,9 @@ const BuatPengajuanUlang: React.FC = () => {
       <SuplierModal
         visible={showSuplier}
         toggle={() => setShowSuplier(!showSuplier)}
-        value={(val: any) => setSuplier(val)}
+        value={(val: any) => {
+          setSuplier(val);
+        }}
       />
       <CabangModal
         visible={showCabang}
