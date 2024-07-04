@@ -118,7 +118,6 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
     changeContext('UPDATE');
     changeType('LOADING');
     const body = {
-      stock: barang.stock,
       request: barang.request,
     };
 
