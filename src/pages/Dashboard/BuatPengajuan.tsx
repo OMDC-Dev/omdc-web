@@ -174,6 +174,12 @@ const BuatPengajuan: React.FC = () => {
     setFileInfo(fileInfo);
   }
 
+  React.useEffect(() => {
+    setBankRek('');
+    setSelectedBank('');
+    setPayment('');
+  }, [jenis]);
+
   // handle nominal
   React.useEffect(() => {
     const nominal = hitungTotalNominal(item);

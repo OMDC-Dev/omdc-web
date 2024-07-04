@@ -65,9 +65,8 @@ const BuatPengajuanUlang: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state;
-  const FILE = state.attachment;
-  const FILE_INFO = state.file_info;
-
+  const FILE = state?.attachment;
+  const FILE_INFO = state?.file_info;
   console.log('EXISTING DATA', state);
 
   // state
@@ -102,6 +101,7 @@ const BuatPengajuanUlang: React.FC = () => {
   const [showSuplier, setShowSuplier] = React.useState<boolean>(false);
   const [useSuplierList, setUseSuplierlist] = React.useState<boolean>(true);
   const [useExtFile, setExtFile] = React.useState<boolean>(true);
+  const [isFirstLoad, setIsFirstLoad] = React.useState(true);
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
@@ -200,25 +200,28 @@ const BuatPengajuanUlang: React.FC = () => {
 
   // handle existing value
   React.useEffect(() => {
+    if (!state) {
+      navigate('/', { replace: true });
+    }
     // handle
     const jenisROP = FILE_JENIS_ROP.find(
-      (item) => item.label == state.jenis_reimbursement,
+      (item) => item.label == state?.jenis_reimbursement,
     )?.value;
 
     // handle cabang
-    const cabangSplit = state.kode_cabang.split('-');
+    const cabangSplit = state?.kode_cabang.split('-');
 
     // assign
     setJenis(jenisROP);
-    setTipePembayaran(state.tipePembayaran);
+    setTipePembayaran(state?.tipePembayaran);
     setCoa(state.coa);
     setCabang({
       label: cabangSplit[1].trimStart(),
       value: cabangSplit[0].trimEnd(),
     });
-    setAdmin(state.accepted_by[0]);
-    setDesc(state.description);
-    setItem(state.item);
+    setAdmin(state?.accepted_by[0]);
+    setDesc(state?.description);
+    setItem(state?.item);
     if (
       state.payment_type == 'TRANSFER' &&
       state.bank_detail.accountname == 'Virtual Account'
@@ -415,6 +418,14 @@ const BuatPengajuanUlang: React.FC = () => {
     }
   }, [suplier]);
 
+  React.useEffect(() => {
+    if (!isFirstLoad) {
+      setSelectedBank('');
+      setPayment('');
+      setBankRek('');
+    }
+  }, [jenis]);
+
   return (
     <DefaultLayout>
       <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
@@ -431,7 +442,12 @@ const BuatPengajuanUlang: React.FC = () => {
                 <div className="mb-4.5 flex flex-col gap-6">
                   <div className="w-full">
                     <JenisGroup
-                      setValue={(val: any) => setJenis(val)}
+                      setValue={(val: any) => {
+                        setJenis(val);
+                        if (isFirstLoad) {
+                          setIsFirstLoad(false);
+                        }
+                      }}
                       value={jenis}
                     />
                   </div>
