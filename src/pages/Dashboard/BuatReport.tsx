@@ -12,7 +12,7 @@ import {
   ListItemSuffix,
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
-import { hitungTotalNominal } from '../../common/utils';
+import { compressImage, hitungTotalNominal } from '../../common/utils';
 import BankModal from '../../components/Modal/BankModal';
 import useFetch from '../../hooks/useFetch';
 import { GET_BANK_NAME, REIMBURSEMENT } from '../../api/routes';
@@ -139,13 +139,21 @@ const BuatReport: React.FC = () => {
       type: file.type,
     };
 
-    // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
     if (file.size > maxSize) {
-      alert(
-        'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
-      );
-      event.target.value = null; // Mengosongkan input file
-      return; // Menghentikan eksekusi lebih lanjut
+      console.log('NEED COMPRESS');
+      if (file.type.includes('image')) {
+        compressImage(file, maxSize, handleAttachment);
+        return; // Menghentikan eksekusi lebih lanjut
+      } else {
+        // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
+        alert(
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+        );
+        event.target.value = null; // Mengosongkan input file
+        return;
+      }
+    } else {
+      console.log('AMAN');
     }
 
     reader.readAsDataURL(file);
