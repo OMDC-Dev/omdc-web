@@ -831,7 +831,9 @@ const DetailPengajuan: React.FC = () => {
 
                   <div className="w-full mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Nomor Rekening
+                      {data?.bank_detail?.accountname == 'Virtual Account'
+                        ? 'Nomor Virtual Account'
+                        : 'Nomor Rekening'}
                     </label>
                     <input
                       disabled
@@ -842,9 +844,11 @@ const DetailPengajuan: React.FC = () => {
                     />
                   </div>
 
-                  <div className="w-full mb-4.5">
+                  <div className="w-full">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Nama Pemilik Rekening
+                      {data?.bank_detail?.accountname == 'Virtual Account'
+                        ? 'Tipe'
+                        : 'Nama Pemilik Rekening'}
                     </label>
                     <input
                       type="text"

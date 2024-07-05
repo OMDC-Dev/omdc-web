@@ -90,6 +90,7 @@ const BuatPengajuanUlang: React.FC = () => {
   const [showBank, setShowBank] = React.useState<boolean>(false);
   const [selectedBank, setSelectedBank] = React.useState<any>();
   const [bankRek, setBankRek] = React.useState<string>('');
+  const [bankHolder, setBankHolder] = React.useState<string>('');
   const [bankDetail, setBankDetail] = React.useState<any>();
   const [showFile, setShowFile] = React.useState(false);
 
@@ -102,6 +103,7 @@ const BuatPengajuanUlang: React.FC = () => {
   const [useSuplierList, setUseSuplierlist] = React.useState<boolean>(true);
   const [useExtFile, setExtFile] = React.useState<boolean>(true);
   const [isFirstLoad, setIsFirstLoad] = React.useState(true);
+  const [isFirstSuplier, setIsFirstSuplier] = React.useState(true);
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
@@ -119,7 +121,10 @@ const BuatPengajuanUlang: React.FC = () => {
 
   const isNeedBank = () => {
     if (jenis !== 'PC' && payment && payment == 'TRANSFER') {
-      return !bankDetail?.accountname;
+      if (IS_PRE_BANK) {
+        return false;
+      }
+      return !bankRek || !bankHolder;
     }
 
     if (jenis !== 'PC' && payment && payment == 'VA') {
@@ -229,6 +234,12 @@ const BuatPengajuanUlang: React.FC = () => {
       state.bank_detail.accountname == 'Virtual Account'
     ) {
       setPayment('VA');
+      setSelectedBank({
+        namaBank: state.bank_detail.bankname,
+        kodeBank: state.bank_detail.bankcode,
+      });
+      setBankRek(state.bank_detail.accountnumber);
+      setBankHolder(state.bank_detail.accountname);
     } else {
       setPayment(state.payment_type);
     }
@@ -248,69 +259,9 @@ const BuatPengajuanUlang: React.FC = () => {
         kodeBank: state.bank_detail.bankcode,
       });
       setBankRek(state.bank_detail.accountnumber);
-      if (state.bank_detail.accountnumber) {
-        onCekRekExt(
-          state.bank_detail.accountnumber,
-          state.bank_detail.bankcode,
-        );
-      }
+      setBankHolder(state.bank_detail.accountname);
     }
   }, []);
-
-  console.log('SUPLIER', suplier);
-
-  // on Cek REKENING
-  async function onCekRekExt(rek: any, bankCode: any) {
-    const regex = /^[0-9]+$/;
-
-    if (!regex.test(rek)) {
-      alert('Nomor rekening tidak valid!');
-      return;
-    }
-
-    const { state, data, error } = await useFetch({
-      url: GET_BANK_NAME(bankCode, rek),
-      method: 'GET',
-    });
-
-    if (state == API_STATES.OK) {
-      setBankDetail(data);
-    }
-  }
-
-  // on Cek REKENING
-  async function onCekRek(e?: any) {
-    e.preventDefault();
-
-    const regex = /^[0-9]+$/;
-
-    if (!regex.test(bankRek)) {
-      alert('Nomor rekening tidak valid!');
-      return;
-    }
-
-    console.log(selectedBank?.kodeBank, bankRek);
-
-    const { state, data, error } = await useFetch({
-      url: GET_BANK_NAME(selectedBank?.kodeBank, bankRek),
-      method: 'GET',
-    });
-
-    if (state == API_STATES.OK) {
-      setBankDetail(data);
-    } else {
-      alert('Ada kesalahan, mohon coba lagi!');
-    }
-  }
-
-  // on Cek REKENING
-  async function onResetRek(e: any) {
-    e.preventDefault();
-
-    setBankDetail({});
-    setBankRek('');
-    setSelectedBank(null);
-  }
 
   // delete item by ID
   function hapusDataById(id: number) {
@@ -338,8 +289,15 @@ const BuatPengajuanUlang: React.FC = () => {
     const paymentType = payment == 'CASH' ? 'CASH' : 'TRANSFER';
     let bankData;
 
-    if (payment == 'TRANSFER') {
+    if (useSuplierList && bankDetail?.bankcode == '000') {
       bankData = bankDetail;
+    } else if (payment == 'TRANSFER') {
+      bankData = {
+        bankcode: selectedBank.kodeBank,
+        bankname: selectedBank.namaBank,
+        accountnumber: bankRek,
+        accountname: bankHolder,
+      };
     } else if (payment == 'VA') {
       bankData = {
         bankcode: selectedBank.kodeBank,
@@ -384,9 +342,28 @@ const BuatPengajuanUlang: React.FC = () => {
     }
   }
 
+  React.useEffect(() => {
+    if (!useSuplierList && suplier && name) {
+      setName('');
+      setSuplier({});
+      setBankDetail({});
+      setBankRek('');
+      setBankHolder('');
+      setSelectedBank({});
+    } else {
+      if (state?.name) {
+        setName(state?.name);
+      }
+
+      if (state?.kdsp) {
+        setSuplier(state?.suplierDetail);
+      }
+    }
+  }, [useSuplierList]);
+
   // set name and bank to suplier on payment request
   React.useEffect(() => {
-    if (suplier) {
+    if (suplier && useSuplierList) {
       setBankDetail({});
       setName(`${suplier?.kdsp} - ${suplier?.nmsp}`);
     }
@@ -399,6 +376,8 @@ const BuatPengajuanUlang: React.FC = () => {
         accountnumber: suplier?.no_rekbank,
         accountname: suplier?.nm_pemilik_rek,
       });
+    } else {
+      setBankDetail({});
     }
   }, [suplier]);
 
@@ -407,37 +386,39 @@ const BuatPengajuanUlang: React.FC = () => {
       setSelectedBank('');
       setPayment('');
       setBankRek('');
+      setBankHolder('');
     }
   }, [jenis]);
 
   React.useEffect(() => {
+    console.log(payment, state.payment_type);
+
     if (payment == state.payment_type) {
-      if (
-        state.payment_type == 'TRANSFER' &&
-        state.bank_detail.accountname == 'Virtual Account'
-      ) {
+      console.log('Pembayaran TRANSFER');
+
+      if (state.payment_type == 'TRANSFER') {
         setSelectedBank({
           namaBank: state.bank_detail.bankname,
           kodeBank: state.bank_detail.bankcode,
         });
         setBankRek(state.bank_detail.accountnumber);
-      } else {
-        setSelectedBank({
-          namaBank: state.bank_detail.bankname,
-          kodeBank: state.bank_detail.bankcode,
-        });
-        setBankRek(state.bank_detail.accountnumber);
-        if (state.bank_detail.accountnumber) {
-          onCekRekExt(
-            state.bank_detail.accountnumber,
-            state.bank_detail.bankcode,
-          );
-        }
+        setBankHolder(state.bank_detail.accountname);
       }
     } else {
-      setSelectedBank('');
-      setBankDetail({});
-      setBankRek('');
+      if (payment == 'VA' && state.payment_type == 'TRANSFER') {
+        console.log('Pembayaran Ext VA');
+
+        setSelectedBank({
+          namaBank: state.bank_detail.bankname,
+          kodeBank: state.bank_detail.bankcode,
+        });
+        setBankRek(state.bank_detail.accountnumber);
+        setBankHolder(state.bank_detail.accountname);
+      } else {
+        setSelectedBank('');
+        setBankRek('');
+        setBankHolder('');
+      }
     }
   }, [payment]);
 
@@ -582,7 +563,7 @@ const BuatPengajuanUlang: React.FC = () => {
                 </div>
 
                 <div className="w-full my-4.5">
-                  {IS_PRE_BANK ? (
+                  {IS_PRE_BANK && useSuplierList ? (
                     <>
                       <label className="mb-2.5 block text-black dark:text-white">
                         Jenis Pembayaran
@@ -597,6 +578,7 @@ const BuatPengajuanUlang: React.FC = () => {
                       setValue={(val: any) => {
                         setPayment(val);
                         setBankRek('');
+                        setBankHolder('');
                       }}
                       value={payment}
                     />
@@ -708,47 +690,35 @@ const BuatPengajuanUlang: React.FC = () => {
                       <div className=" flex flex-col xl:flex-row gap-4">
                         <input
                           type="text"
-                          disabled={bankDetail?.accountname?.length}
+                          disabled={!selectedBank}
                           placeholder="Masukan Nomor Rekening"
                           className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                           value={bankRek}
                           onChange={(e) => setBankRek(e.target.value)}
                         />
-                        <Button
-                          onClick={(e: any) =>
-                            bankDetail?.accountname?.length
-                              ? onResetRek(e)
-                              : onCekRek(e)
-                          }
-                        >
-                          {bankDetail?.accountname?.length
-                            ? 'Reset'
-                            : 'Cek Nomor'}
-                        </Button>
                       </div>
                     )}
                   </div>
 
-                  {bankDetail?.accountname || suplier?.nm_pemilik_rek ? (
-                    <div className="w-full">
-                      <label className="mb-2.5 block text-black dark:text-white">
-                        Nama Pemilik Rekening
-                      </label>
-                      {IS_PRE_BANK ? (
-                        <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                          {suplier?.nm_pemilik_rek}
-                        </div>
-                      ) : (
-                        <input
-                          type="text"
-                          disabled
-                          placeholder="Nama Pemilik Rekening"
-                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                          value={bankDetail?.accountname}
-                        />
-                      )}
-                    </div>
-                  ) : null}
+                  <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Nama Pemilik Rekening
+                    </label>
+                    {IS_PRE_BANK ? (
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {suplier?.nm_pemilik_rek}
+                      </div>
+                    ) : (
+                      <input
+                        disabled={!selectedBank}
+                        type="text"
+                        placeholder="Nama Pemilik Rekening"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        value={bankHolder}
+                        onChange={(e: any) => setBankHolder(e.target.value)}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -791,6 +761,18 @@ const BuatPengajuanUlang: React.FC = () => {
                         onChange={(e) => setBankRek(e.target.value)}
                       />
                     </div>
+                  </div>
+
+                  <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">
+                      Tipe
+                    </label>
+                    <input
+                      disabled={true}
+                      type="text"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                      defaultValue={'Virtual Account'}
+                    />
                   </div>
                 </div>
               </div>
@@ -888,7 +870,7 @@ const BuatPengajuanUlang: React.FC = () => {
         value={(val: any) => {
           setSelectedBank(val);
           setBankRek('');
-          setBankDetail({});
+          setBankHolder('');
         }}
       />
       <COAModal
@@ -901,6 +883,9 @@ const BuatPengajuanUlang: React.FC = () => {
         toggle={() => setShowSuplier(!showSuplier)}
         value={(val: any) => {
           setSuplier(val);
+          if (isFirstSuplier) {
+            setIsFirstSuplier(false);
+          }
         }}
       />
       <CabangModal
