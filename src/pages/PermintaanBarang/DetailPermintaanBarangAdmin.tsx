@@ -444,7 +444,12 @@ const DetailPermintaanBarangAdmin: React.FC = () => {
         }}
         onDone={() => {
           hide();
-          if (context == 'UPDATE' || context == 'REJBRG') {
+          if (
+            context == 'UPDATE' ||
+            context == 'REJBRG' ||
+            context == 'ACC' ||
+            context == 'REJ'
+          ) {
             getDetails(id);
           }
         }}
