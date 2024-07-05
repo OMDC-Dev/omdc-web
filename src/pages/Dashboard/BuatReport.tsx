@@ -70,15 +70,15 @@ const BuatReport: React.FC = () => {
   const [selectDate, setSelectDate] = React.useState<Date>();
   const [item, setItem] = React.useState<any>([]);
   const [admin, setAdmin] = React.useState<any>();
-  const [payment, setPayment] = React.useState<any>();
+  const [payment, setPayment] = React.useState<any>('');
   const [tipePembayaran, setTipePembayaran] = React.useState<any>('');
+  const [bankHolder, setBankHolder] = React.useState<string>('');
 
   // Bank Modal State
   const [needBank, setNeedBank] = React.useState(false);
   const [showBank, setShowBank] = React.useState<boolean>(false);
   const [selectedBank, setSelectedBank] = React.useState<any>();
   const [bankRek, setBankRek] = React.useState<string>('');
-  const [bankDetail, setBankDetail] = React.useState<any>();
 
   // Data Modal Satte
   const [showCoa, setShowCoa] = React.useState<boolean>(false);
@@ -102,7 +102,7 @@ const BuatReport: React.FC = () => {
     }
 
     if (payment == 'TRANSFER') {
-      return !bankDetail;
+      return !bankHolder || !bankRek;
     }
 
     return !payment;
@@ -125,6 +125,7 @@ const BuatReport: React.FC = () => {
 
   console.log('BUTTON DISABLED ' + buttonDisabled);
   console.log('DISABLED BY BANNK', disabledByBank());
+  console.log('PAYMENT', payment);
 
   // handle attachment
   function handleAttachment(event: any) {
@@ -191,47 +192,15 @@ const BuatReport: React.FC = () => {
       console.log('Need Bank');
     }
 
-    setPayment(null);
-    setSelectedBank(null);
+    setPayment('');
+    setSelectedBank({});
   }, [nominal]);
 
   // handle bank rek
   React.useEffect(() => {
     setBankRek('');
+    setBankHolder('');
   }, [payment]);
-
-  // on Cek REKENING
-  async function onCekRek(e: any) {
-    e.preventDefault();
-
-    const regex = /^[0-9]+$/;
-
-    if (!regex.test(bankRek)) {
-      alert('Nomor rekening tidak valid!');
-      return;
-    }
-
-    const { state, data, error } = await useFetch({
-      url: GET_BANK_NAME(selectedBank?.kodeBank, bankRek),
-      method: 'GET',
-    });
-
-    if (state == API_STATES.OK) {
-      setBankDetail(data);
-      console.log(data);
-    } else {
-      alert('Ada kesalahan, mohon coba lagi!');
-    }
-  }
-
-  // on Cek REKENING
-  async function onResetRek(e: any) {
-    e.preventDefault();
-
-    setBankDetail({});
-    setBankRek('');
-    setSelectedBank(null);
-  }
 
   // delete item by ID
   function hapusDataById(id: number) {
@@ -256,7 +225,12 @@ const BuatReport: React.FC = () => {
     let bankData;
 
     if (payment == 'TRANSFER') {
-      bankData = bankDetail;
+      bankData = {
+        bankcode: selectedBank.kodeBank,
+        bankname: selectedBank.namaBank,
+        accountnumber: bankRek,
+        accountname: bankHolder,
+      };
     } else if (payment == 'VA') {
       bankData = {
         bankcode: selectedBank.kodeBank,
@@ -477,11 +451,7 @@ const BuatReport: React.FC = () => {
                             Bank
                           </label>
                           <div
-                            onClick={() =>
-                              bankDetail?.accountname?.length
-                                ? null
-                                : setShowBank(!showBank)
-                            }
+                            onClick={() => setShowBank(!showBank)}
                             className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
                           >
                             {selectedBank?.namaBank || 'Pilih Bank'}
@@ -493,43 +463,30 @@ const BuatReport: React.FC = () => {
                         <label className="mb-2.5 block text-black dark:text-white">
                           Nomor Rekening
                         </label>
-                        <div className=" flex gap-x-4">
+                        <div className=" flex flex-col xl:flex-row gap-4">
                           <input
+                            disabled={!selectedBank}
                             type="text"
-                            disabled={bankDetail?.accountname?.length}
                             placeholder="Masukan Nomor Rekening"
                             className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                             value={bankRek}
                             onChange={(e) => setBankRek(e.target.value)}
                           />
-                          <Button
-                            onClick={(e: any) =>
-                              bankDetail?.accountname?.length
-                                ? onResetRek(e)
-                                : onCekRek(e)
-                            }
-                          >
-                            {bankDetail?.accountname?.length
-                              ? 'Reset'
-                              : 'Cek Nomor'}
-                          </Button>
                         </div>
                       </div>
-
-                      {bankDetail?.accountname ? (
-                        <div className="w-full">
-                          <label className="mb-2.5 block text-black dark:text-white">
-                            Nama Pemilik Rekening
-                          </label>
-                          <input
-                            type="text"
-                            disabled
-                            placeholder="Nama Pemilik Rekening"
-                            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                            value={bankDetail?.accountname}
-                          />
-                        </div>
-                      ) : null}
+                      <div className="w-full">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          Nama Pemilik Rekening
+                        </label>
+                        <input
+                          disabled={!selectedBank}
+                          type="text"
+                          placeholder="Nama Pemilik Rekening"
+                          className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-6 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                          value={bankHolder}
+                          onChange={(e: any) => setBankHolder(e.target.value)}
+                        />
+                      </div>
                     </>
                   ) : null}
 
@@ -684,7 +641,6 @@ const BuatReport: React.FC = () => {
         value={(val: any) => {
           setSelectedBank(val);
           setBankRek('');
-          setBankDetail({});
         }}
       />
       <COAModal
