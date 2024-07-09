@@ -141,7 +141,7 @@ const BuatPengajuan: React.FC = () => {
   function handleAttachment(event: any) {
     const file = event.target.files[0];
     const reader = new FileReader();
-    const maxSize = 1048576;
+    const maxSize = 5242880;
 
     // handle file type
     const fileInfo = {

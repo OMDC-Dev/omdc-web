@@ -4,7 +4,7 @@ const LOCAL = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = DEV;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -117,6 +117,8 @@ export const REIMBURSEMENT_ACCEPTANCE_EXTRA = (id: number) => {
 };
 export const REIMBURSEMENT_REUPLOAD_FILE = (id: string) =>
   `reimbursement/reupload-file/${id}`;
+export const REIMBURSEMENT_REUPLOAD_FILE_BY_DOC = (id: string) =>
+  `reimbursement/reupload?no_doc=${id}`;
 
 // ADMIN PB
 export const GET_ADMIN_PB = '/adminpb';

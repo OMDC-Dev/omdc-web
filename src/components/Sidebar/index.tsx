@@ -120,7 +120,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.5 rev 1
+            OMDC v0.9.5 rev 2
           </span>
         </NavLink>
 
@@ -180,6 +180,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   >
                     <IconBarang />
                     Request of Payment
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/rop-attachment"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/rop-attachment') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Upload Manual Attachment ROP
                   </NavLink>
                 </li>
                 <li>

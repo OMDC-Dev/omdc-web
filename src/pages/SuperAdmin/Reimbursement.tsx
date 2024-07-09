@@ -44,7 +44,7 @@ const TABLE_HEAD = [
 
 function SuperReimbursement() {
   const [rList, setRList] = React.useState([]);
-  const [limit, setLimit] = React.useState<number>(5);
+  const [limit, setLimit] = React.useState<number>(20);
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
