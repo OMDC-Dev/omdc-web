@@ -26,6 +26,8 @@ import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
+import useModal from '../../hooks/useModal';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 const TABLE_HEAD = [
   '',
@@ -74,6 +76,7 @@ function RiwayatDiajukan() {
   const [caFilter, setCaFilter] = React.useState<string>('');
   const [ropFilter, setROPFilter] = React.useState<string>('');
 
+  const { toggle, visible, type, changeType, hide, show } = useModal();
   const { user } = useAuth();
 
   const ADMIN_TYPE = user?.type;
@@ -86,7 +89,7 @@ function RiwayatDiajukan() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    getReimbursementList();
+    getReimbursementList(false, tipeFilter, caFilter, ropFilter);
   }, [page]);
 
   console.log('ADMIN TYPE', ADMIN_TYPE);
@@ -97,6 +100,8 @@ function RiwayatDiajukan() {
     ca?: string,
     rop?: string,
   ) {
+    changeType('LOADING');
+    show();
     const typeParam = (key: string) =>
       type && type !== 'all' ? `&${key}=${type?.toUpperCase()}` : '';
 
@@ -143,14 +148,12 @@ function RiwayatDiajukan() {
     });
 
     if (state == API_STATES.OK) {
-      console.log('DATAS', data.rows);
-
+      hide();
       setRList(data?.rows);
       setPageInfo(data?.pageInfo);
-      console.log(data?.pageInfo);
     } else {
       setRList([]);
-      console.log(error);
+      hide();
     }
   }
 
@@ -514,6 +517,7 @@ function RiwayatDiajukan() {
           </>
         )}
       </Card>
+      <ModalSelector type={type} visible={visible} toggle={toggle} />
     </DefaultLayout>
   );
 }

@@ -533,7 +533,7 @@ const BuatPengajuan: React.FC = () => {
                         {suplier?.no_rekbank}
                       </div>
                     ) : (
-                      <div className=" flex flex-col xl:flex-row gap-4">
+                      <div className="flex flex-col xl:flex-row gap-4">
                         <input
                           disabled={!selectedBank}
                           type="text"

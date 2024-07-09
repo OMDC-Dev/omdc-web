@@ -24,6 +24,8 @@ import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
+import useModal from '../../hooks/useModal';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -60,11 +62,12 @@ function Reimbursement() {
   const hasReimbursementAkses = cekAkses('#1');
 
   const { user, setUser } = useAuth();
+  const { toggle, visible, type, changeType, hide, show } = useModal();
 
   console.log('USER DATA X', user);
 
   React.useEffect(() => {
-    getReimbursementList();
+    getReimbursementList(false, tipeFilter, caFilter, ropFilter);
   }, [page]);
 
   React.useEffect(() => {
@@ -90,6 +93,8 @@ function Reimbursement() {
     ca?: string,
     rop?: string,
   ) {
+    changeType('LOADING');
+    show();
     setLoading(true);
     const typeParam =
       type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
@@ -111,10 +116,12 @@ function Reimbursement() {
       setLoading(false);
       setRList(data?.rows);
       setPageInfo(data?.pageInfo);
+      hide();
     } else {
       setLoading(false);
       setRList([]);
       console.log(error);
+      hide();
     }
   }
 
@@ -449,6 +456,7 @@ function Reimbursement() {
           </>
         )}
       </Card>
+      <ModalSelector type={type} visible={visible} toggle={toggle} />
     </DefaultLayout>
   );
 }
