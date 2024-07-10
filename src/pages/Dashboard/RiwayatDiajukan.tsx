@@ -28,6 +28,8 @@ import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilt
 import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import DateRange from '../../components/DateRange';
+import PeriodeModal from '../../components/Modal/PeriodeModal';
 
 const TABLE_HEAD = [
   '',
@@ -75,6 +77,10 @@ function RiwayatDiajukan() {
   const [tipeFilter, setTipeFilter] = React.useState<string>('');
   const [caFilter, setCaFilter] = React.useState<string>('');
   const [ropFilter, setROPFilter] = React.useState<string>('');
+  const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
+
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   const { toggle, visible, type, changeType, hide, show } = useModal();
   const { user } = useAuth();
@@ -89,8 +95,15 @@ function RiwayatDiajukan() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    getReimbursementList(false, tipeFilter, caFilter, ropFilter);
-  }, [page]);
+    getReimbursementList(
+      false,
+      tipeFilter,
+      caFilter,
+      ropFilter,
+      startDate,
+      endDate,
+    );
+  }, [page, startDate, endDate]);
 
   console.log('ADMIN TYPE', ADMIN_TYPE);
 
@@ -99,6 +112,8 @@ function RiwayatDiajukan() {
     type?: string,
     ca?: string,
     rop?: string,
+    startDate?: any,
+    endDate?: any,
   ) {
     changeType('LOADING');
     show();
@@ -108,6 +123,19 @@ function RiwayatDiajukan() {
     const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
     const ropParam =
       rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
+    const startDateParam = startDate
+      ? `&periodeStart=${moment(startDate)
+          .utc()
+          .endOf('day')
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
+      : '';
+    const endDateParam = endDate
+      ? `&periodeEnd=${moment(endDate)
+          .utc()
+          .add(1, 'day')
+          .endOf('day')
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
+      : '';
 
     let param = '';
     let URL = '';
@@ -117,24 +145,32 @@ function RiwayatDiajukan() {
       param += '&sort=ADMIN&web=true';
       param += caParam;
       param += ropParam;
+      param += startDateParam;
+      param += endDateParam;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
       param += '&sort=FINANCE';
       param += caParam;
       param += ropParam;
+      param += startDateParam;
+      param += endDateParam;
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
       param += '&sort=REVIEWER';
       param += caParam;
       param += ropParam;
+      param += startDateParam;
+      param += endDateParam;
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
       param += '&sort=MAKER';
       param += caParam;
       param += ropParam;
+      param += startDateParam;
+      param += endDateParam;
     }
 
     console.log('URL', URL);
@@ -285,7 +321,14 @@ function RiwayatDiajukan() {
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val, caFilter, ropFilter);
+                getReimbursementList(
+                  false,
+                  val,
+                  caFilter,
+                  ropFilter,
+                  startDate,
+                  endDate,
+                );
               }}
               value={tipeFilter}
             />
@@ -293,7 +336,14 @@ function RiwayatDiajukan() {
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setCaFilter(val);
-                getReimbursementList(false, tipeFilter, val, ropFilter);
+                getReimbursementList(
+                  false,
+                  tipeFilter,
+                  val,
+                  ropFilter,
+                  startDate,
+                  endDate,
+                );
               }}
               value={caFilter}
             />
@@ -301,9 +351,27 @@ function RiwayatDiajukan() {
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setROPFilter(val);
-                getReimbursementList(false, tipeFilter, caFilter, val);
+                getReimbursementList(
+                  false,
+                  tipeFilter,
+                  caFilter,
+                  val,
+                  startDate,
+                  endDate,
+                );
               }}
               value={ropFilter}
+            />
+          </div>
+          <div className=" mt-2">
+            <DateRange
+              onShowButtonPress={() => setShowPeriode(!showPeriode)}
+              periodeStart={startDate}
+              periodeEnd={endDate}
+              onResetButtonPress={() => {
+                setStartDate(null);
+                setEndDate(null);
+              }}
             />
           </div>
         </CardHeader>
@@ -518,6 +586,16 @@ function RiwayatDiajukan() {
         )}
       </Card>
       <ModalSelector type={type} visible={visible} toggle={toggle} />
+      <PeriodeModal
+        visible={showPeriode}
+        startDate={startDate}
+        endDate={endDate}
+        toggle={() => setShowPeriode(!showPeriode)}
+        value={(cb: any) => {
+          setStartDate(cb.startDate);
+          setEndDate(cb.endDate);
+        }}
+      />
     </DefaultLayout>
   );
 }
