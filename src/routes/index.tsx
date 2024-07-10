@@ -144,6 +144,15 @@ const Routes = () => {
             </>
           ),
         },
+        {
+          path: '/rop-attachment',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Reimbursement'} />
+              <ManualUploadFile />
+            </>
+          ),
+        },
       ],
     },
     {

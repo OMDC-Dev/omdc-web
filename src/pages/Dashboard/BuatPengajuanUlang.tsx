@@ -588,7 +588,7 @@ const BuatPengajuanUlang: React.FC = () => {
                 <div className="mb-4.5">
                   <div>
                     <label className=" block text-black dark:text-white">
-                      Lampirkan File ( Maks. 1MB )
+                      Lampirkan File ( Maks. 5MB )
                     </label>
                     <div className=" my-2">
                       <Checkbox

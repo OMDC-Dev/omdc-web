@@ -465,7 +465,7 @@ const BuatPengajuan: React.FC = () => {
                 <div className="mb-4.5">
                   <div>
                     <label className="mb-3 block text-black dark:text-white">
-                      Lampirkan File ( Maks. 1MB )
+                      Lampirkan File ( Maks. 5MB )
                     </label>
                     <input
                       type="file"

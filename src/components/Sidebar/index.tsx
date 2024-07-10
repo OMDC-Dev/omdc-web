@@ -43,6 +43,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const { user } = useAuth();
   const IS_ADMIN = user?.isAdmin;
   const IS_SUPER_ADMIN = user?.type == 'SUPERADMIN';
+  const IS_REVIEWER = user?.type == 'REVIEWER';
 
   // check akses
   const hasRequestBarangAkses = cekAkses('#2');
@@ -380,6 +381,20 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </NavLink>
                   </li>
                 ) : null}
+                {IS_REVIEWER && (
+                  <li>
+                    <NavLink
+                      to="/rop-attachment"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname.includes('/rop-attachment') &&
+                        'bg-graydark dark:bg-meta-4'
+                      }`}
+                    >
+                      <IconBarang />
+                      Upload Manual Attachment ROP
+                    </NavLink>
+                  </li>
+                )}
                 {/* <!-- Menu Item Calendar --> */}
                 {hasPengumumanAkses ? (
                   <li>
