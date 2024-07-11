@@ -14,12 +14,14 @@ const ModalSelector = ({
   type,
   onConfirm,
   onDone,
+  code,
 }: {
   visible: boolean;
   toggle: any;
   type?: string;
   onConfirm?: any;
   onDone?: any;
+  code?: string;
 }) => {
   if (!visible) return null;
 
@@ -56,6 +58,34 @@ const ModalSelector = ({
       >
         <DialogHeader>Sukses</DialogHeader>
         <DialogBody>Permintaan anda telah sukses dilakukan!</DialogBody>
+        <DialogFooter>
+          <Button
+            onClick={(e: any) => {
+              e.preventDefault();
+              toggle();
+              onDone();
+            }}
+          >
+            Ok
+          </Button>
+        </DialogFooter>
+      </Dialog>
+    );
+  }
+
+  if (type == 'SUCCESSCODE') {
+    return (
+      <Dialog
+        open={visible}
+        size={'xs'}
+        handler={toggle}
+        dismiss={{ enabled: false }}
+      >
+        <DialogHeader>Sukses</DialogHeader>
+        <DialogBody>
+          Permintaan anda telah sukses dilakukan dengan nomor pengajuan
+          <div className="text-black font-bold">{code}</div>
+        </DialogBody>
         <DialogFooter>
           <Button
             onClick={(e: any) => {

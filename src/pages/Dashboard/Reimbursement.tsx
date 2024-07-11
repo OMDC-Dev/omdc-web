@@ -24,6 +24,10 @@ import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
+import useModal from '../../hooks/useModal';
+import ModalSelector from '../../components/Modal/ModalSelctor';
+import DateRange from '../../components/DateRange';
+import PeriodeModal from '../../components/Modal/PeriodeModal';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -45,7 +49,7 @@ const TABLE_HEAD = [
 
 function Reimbursement() {
   const [rList, setRList] = React.useState([]);
-  const [limit, setLimit] = React.useState<number>(5);
+  const [limit, setLimit] = React.useState<number>(20);
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -54,18 +58,31 @@ function Reimbursement() {
   const [caFilter, setCaFilter] = React.useState<string>('');
   const [ropFilter, setROPFilter] = React.useState<string>('');
 
+  const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
+
+  const [startDate, setStartDate] = React.useState<Date | null>(null);
+  const [endDate, setEndDate] = React.useState<Date | null>(null);
+
   const navigate = useNavigate();
 
   // reimbursement akses
   const hasReimbursementAkses = cekAkses('#1');
 
   const { user, setUser } = useAuth();
+  const { toggle, visible, type, changeType, hide, show } = useModal();
 
   console.log('USER DATA X', user);
 
   React.useEffect(() => {
-    getReimbursementList();
-  }, [page]);
+    getReimbursementList(
+      false,
+      tipeFilter,
+      caFilter,
+      ropFilter,
+      startDate,
+      endDate,
+    );
+  }, [page, startDate, endDate]);
 
   React.useEffect(() => {
     updateKodeKases();
@@ -89,15 +106,33 @@ function Reimbursement() {
     type?: string,
     ca?: string,
     rop?: string,
+    startDate?: any,
+    endDate?: any,
   ) {
+    changeType('LOADING');
+    show();
     setLoading(true);
     const typeParam =
       type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
     const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
     const ropParam =
       rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
+    const startDateParam = startDate
+      ? `&periodeStart=${moment(startDate)
+          .utc()
+          .endOf('day')
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
+      : '';
+    const endDateParam = endDate
+      ? `&periodeEnd=${moment(endDate)
+          .utc()
+          .add(1, 'day')
+          .endOf('day')
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
+      : '';
 
-    const filterParam = typeParam + caParam + ropParam;
+    const filterParam =
+      typeParam + caParam + ropParam + startDateParam + endDateParam;
 
     const { state, data, error } = await useFetch({
       url:
@@ -111,10 +146,12 @@ function Reimbursement() {
       setLoading(false);
       setRList(data?.rows);
       setPageInfo(data?.pageInfo);
+      hide();
     } else {
       setLoading(false);
       setRList([]);
       console.log(error);
+      hide();
     }
   }
 
@@ -227,7 +264,14 @@ function Reimbursement() {
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
                 setTipeFilter(val);
-                getReimbursementList(false, val, caFilter, ropFilter);
+                getReimbursementList(
+                  false,
+                  val,
+                  caFilter,
+                  ropFilter,
+                  startDate,
+                  endDate,
+                );
               }}
               value={tipeFilter}
             />
@@ -235,7 +279,14 @@ function Reimbursement() {
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setCaFilter(val);
-                getReimbursementList(false, tipeFilter, val, ropFilter);
+                getReimbursementList(
+                  false,
+                  tipeFilter,
+                  val,
+                  ropFilter,
+                  startDate,
+                  endDate,
+                );
               }}
               value={caFilter}
             />
@@ -243,9 +294,27 @@ function Reimbursement() {
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setROPFilter(val);
-                getReimbursementList(false, tipeFilter, caFilter, val);
+                getReimbursementList(
+                  false,
+                  tipeFilter,
+                  caFilter,
+                  val,
+                  startDate,
+                  endDate,
+                );
               }}
               value={ropFilter}
+            />
+          </div>
+          <div className=" mt-2">
+            <DateRange
+              onShowButtonPress={() => setShowPeriode(!showPeriode)}
+              periodeStart={startDate}
+              periodeEnd={endDate}
+              onResetButtonPress={() => {
+                setStartDate(null);
+                setEndDate(null);
+              }}
             />
           </div>
         </CardHeader>
@@ -449,6 +518,17 @@ function Reimbursement() {
           </>
         )}
       </Card>
+      <ModalSelector type={type} visible={visible} toggle={toggle} />
+      <PeriodeModal
+        visible={showPeriode}
+        startDate={startDate}
+        endDate={endDate}
+        toggle={() => setShowPeriode(!showPeriode)}
+        value={(cb: any) => {
+          setStartDate(cb.startDate);
+          setEndDate(cb.endDate);
+        }}
+      />
     </DefaultLayout>
   );
 }

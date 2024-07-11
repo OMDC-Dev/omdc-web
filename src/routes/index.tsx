@@ -40,6 +40,7 @@ import ReportPermintaanBarang from '../pages/PermintaanBarang/ReportPermintaanBa
 import ListMasterBarang from '../pages/MasterBarang/ListBarang';
 import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
 import BuatPengajuanUlang from '../pages/Dashboard/BuatPengajuanUlang';
+import ManualUploadFile from '../pages/SuperAdmin/ManualUploadFIle';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -140,6 +141,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Download Report'} />
               <DownloadReport />
+            </>
+          ),
+        },
+        {
+          path: '/rop-attachment',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Reimbursement'} />
+              <ManualUploadFile />
             </>
           ),
         },
@@ -417,6 +427,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Reimbursement'} />
               <SuperReimbursement />
+            </>
+          ),
+        },
+        {
+          path: '/rop-attachment',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Reimbursement'} />
+              <ManualUploadFile />
             </>
           ),
         },

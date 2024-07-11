@@ -117,6 +117,8 @@ export const REIMBURSEMENT_ACCEPTANCE_EXTRA = (id: number) => {
 };
 export const REIMBURSEMENT_REUPLOAD_FILE = (id: string) =>
   `reimbursement/reupload-file/${id}`;
+export const REIMBURSEMENT_REUPLOAD_FILE_BY_DOC = (id: string) =>
+  `reimbursement/reupload?no_doc=${id}`;
 
 // ADMIN PB
 export const GET_ADMIN_PB = '/adminpb';

@@ -13,18 +13,17 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT, SUPERUSER_REIMBURSEMENT } from '../../api/routes';
+import { SUPERUSER_REIMBURSEMENT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
-import { cekAkses } from '../../common/utils';
-import { exportToExcell } from '../../common/exportToExcell';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
-import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
 import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
+import useModal from '../../hooks/useModal';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -45,7 +44,7 @@ const TABLE_HEAD = [
 
 function SuperReimbursement() {
   const [rList, setRList] = React.useState([]);
-  const [limit, setLimit] = React.useState<number>(5);
+  const [limit, setLimit] = React.useState<number>(20);
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -55,10 +54,12 @@ function SuperReimbursement() {
   const [caFilter, setCaFilter] = React.useState<string>('');
   const [ropFilter, setROPFilter] = React.useState<string>('');
 
+  const { toggle, visible, type, changeType, hide, show } = useModal();
+
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    getReimbursementList();
+    getReimbursementList(false, tipeFilter, caFilter, ropFilter);
   }, [page]);
 
   async function getReimbursementList(
@@ -67,6 +68,8 @@ function SuperReimbursement() {
     ca?: string,
     rop?: string,
   ) {
+    changeType('LOADING');
+    show();
     setLoading(true);
     const typeParam =
       type && type !== 'all' ? `&type=${type?.toUpperCase()}` : '';
@@ -88,9 +91,11 @@ function SuperReimbursement() {
       setLoading(false);
       setRList(data?.rows);
       setPageInfo(data?.pageInfo);
+      hide();
     } else {
       setLoading(false);
       setRList([]);
+      hide();
       console.log(error);
     }
   }
@@ -422,6 +427,7 @@ function SuperReimbursement() {
           </>
         )}
       </Card>
+      <ModalSelector type={type} visible={visible} toggle={toggle} />
     </DefaultLayout>
   );
 }

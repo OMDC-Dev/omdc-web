@@ -4,6 +4,7 @@ const useModal = () => {
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState('LOADING');
   const [context, setContext] = useState('');
+  const [code, setCode] = useState('');
 
   function toggle() {
     setVisible(!visible);
@@ -25,6 +26,10 @@ const useModal = () => {
     setContext(context);
   }
 
+  function changeCode(code: string) {
+    setCode(code);
+  }
+
   return {
     toggle,
     visible,
@@ -34,6 +39,8 @@ const useModal = () => {
     changeType,
     context,
     changeContext,
+    changeCode,
+    code,
   };
 };
 

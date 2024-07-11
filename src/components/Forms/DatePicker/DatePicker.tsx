@@ -5,10 +5,14 @@ const DatePicker = ({
   onChange,
   title,
   id,
+  showTitle = true,
+  placeholder = 'Pilih Tanggal',
 }: {
   onChange: (arg0: Date) => void;
   title?: string;
   id?: string;
+  showTitle?: boolean;
+  placeholder?: string;
 }) => {
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -40,15 +44,17 @@ const DatePicker = ({
 
   return (
     <div>
-      <label className="mb-3 block text-md text-black dark:text-white">
-        {title || 'Tanggal Invoice'}
-      </label>
+      {showTitle && (
+        <label className="mb-3 block text-md text-black dark:text-white">
+          {title || 'Tanggal Invoice'}
+        </label>
+      )}
       <div className="relative">
         <input
           ref={inputRef}
           id={id}
           className="form-datepicker w-full rounded-md border-[1.5px] border-stroke bg-transparent px-5 py-2 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-          placeholder="mm/dd/yyyy"
+          placeholder={placeholder}
           data-class="flatpickr-right"
         />
       </div>
