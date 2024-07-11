@@ -263,6 +263,7 @@ function Reimbursement() {
             <TipeFilterGroup
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
+                setPage(1);
                 setTipeFilter(val);
                 getReimbursementList(
                   false,
@@ -278,6 +279,7 @@ function Reimbursement() {
             <CashAdvanceFilterGroup
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
+                setPage(1);
                 setCaFilter(val);
                 getReimbursementList(
                   false,
@@ -292,7 +294,9 @@ function Reimbursement() {
             />
             <StatusROPFilterGroup
               className="w-full lg:w-1/3"
+              isUser={true}
               setValue={(val: string) => {
+                setPage(1);
                 setROPFilter(val);
                 getReimbursementList(
                   false,

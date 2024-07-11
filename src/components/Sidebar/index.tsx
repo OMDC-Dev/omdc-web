@@ -298,7 +298,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   (isActive && '!text-white')
                                 }
                               >
-                                Riwayat Pengajuan
+                                Riwayat Pengajuan Saya
                               </NavLink>
                             </li>
                             {hasExportExcell ? (
@@ -316,17 +316,30 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             ) : null}
                             {/* ------ BUAT PENGAJUAN --------- */}
                             {IS_ADMIN ? (
-                              <li>
-                                <NavLink
-                                  to="/reimbursement/diajukan"
-                                  className={({ isActive }) =>
-                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                    (isActive && '!text-white')
-                                  }
-                                >
-                                  Diajukan ke Saya
-                                </NavLink>
-                              </li>
+                              <>
+                                <li>
+                                  <NavLink
+                                    to="/reimbursement/diajukan/waiting"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Pengajuan Perlu Diproses
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/reimbursement/diajukan/done"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Pengajuan Selesai Diproses
+                                  </NavLink>
+                                </li>
+                              </>
                             ) : null}
                           </ul>
                         </div>

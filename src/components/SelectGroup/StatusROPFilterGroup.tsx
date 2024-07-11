@@ -6,11 +6,13 @@ const StatusROPFilterGroup = ({
   setValue,
   className,
   typeOnly,
+  isUser,
 }: {
   value: string;
   setValue: any;
   className?: string;
   typeOnly?: boolean;
+  isUser?: boolean;
 }) => {
   const [isOptionSelected, setIsOptionSelected] = useState<boolean>(false);
 
@@ -18,9 +20,18 @@ const StatusROPFilterGroup = ({
     setIsOptionSelected(true);
   };
 
-  const LIST = typeOnly
-    ? DATAS.filter((item: any) => item.value != 'all')
-    : DATAS;
+  let LIST = DATAS;
+
+  if (typeOnly) {
+    LIST = DATAS.filter((item: any) => item.value != 'all');
+  } else if (isUser) {
+  }
+
+  if (!isUser) {
+    LIST = DATAS.filter(
+      (item: any) => item.value != 'WAITING' && item.value != 'APPROVED',
+    );
+  }
 
   return (
     <div className={className || ' w-full lg:w-1/3 mt-4 lg:mx-4'}>
