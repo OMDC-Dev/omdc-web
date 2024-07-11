@@ -177,7 +177,7 @@ const Routes = () => {
           ),
         },
         {
-          path: '/reimbursement/diajukan',
+          path: '/reimbursement/diajukan/:statusType',
           element: (
             <>
               <PageTitle title={TITLE + 'Pengajuan'} />

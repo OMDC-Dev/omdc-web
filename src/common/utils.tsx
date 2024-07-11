@@ -1,4 +1,6 @@
-import moment from 'moment';
+import moment from 'moment/min/moment-with-locales';
+import 'moment/locale/id'; // without this line it didn't work
+moment.locale('id');
 import { useAuth } from '../hooks/useAuth';
 import formatRupiah from './formatRupiah';
 
@@ -227,4 +229,12 @@ function convertToPreviewLink(downloadLink: string) {
 export const openInNewTab = (url: string) => {
   const previewUrl = convertToPreviewLink(url);
   window.open(previewUrl, '_blank', 'noreferrer');
+};
+
+export const getFormattedDateTable = (date: any) => {
+  if (!date) {
+    return '-';
+  }
+
+  return moment(date).format('LL');
 };

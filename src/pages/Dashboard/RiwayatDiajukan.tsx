@@ -20,7 +20,7 @@ import {
   PENGAJUAN,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
@@ -30,6 +30,7 @@ import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
+import { getFormattedDateTable } from '../../common/utils';
 
 const TABLE_HEAD = [
   '',
@@ -68,6 +69,9 @@ const TABLE_HEAD_FINANCE = [
 ];
 
 function RiwayatDiajukan() {
+  const location = useLocation();
+  const { statusType } = useParams();
+
   const [rList, setRList] = React.useState([]);
   const [limit, setLimit] = React.useState<number>(20);
   const [page, setPage] = React.useState<number>(1);
@@ -105,6 +109,23 @@ function RiwayatDiajukan() {
     );
   }, [page, startDate, endDate]);
 
+  React.useEffect(() => {
+    setTipeFilter('');
+    setCaFilter('');
+    setROPFilter('');
+    setStartDate(null);
+    setEndDate(null);
+
+    getReimbursementList(
+      false,
+      tipeFilter,
+      caFilter,
+      ropFilter,
+      startDate,
+      endDate,
+    );
+  }, [location.key]);
+
   console.log('ADMIN TYPE', ADMIN_TYPE);
 
   async function getReimbursementList(
@@ -137,6 +158,8 @@ function RiwayatDiajukan() {
           .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
       : '';
 
+    const statusTypeParam = `&statusType=${statusType}`;
+
     let param = '';
     let URL = '';
     if (ADMIN_TYPE == 'ADMIN') {
@@ -147,6 +170,7 @@ function RiwayatDiajukan() {
       param += ropParam;
       param += startDateParam;
       param += endDateParam;
+      param += statusTypeParam;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
@@ -155,6 +179,7 @@ function RiwayatDiajukan() {
       param += ropParam;
       param += startDateParam;
       param += endDateParam;
+      param += statusTypeParam;
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
@@ -163,6 +188,7 @@ function RiwayatDiajukan() {
       param += ropParam;
       param += startDateParam;
       param += endDateParam;
+      param += statusTypeParam;
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
@@ -171,6 +197,7 @@ function RiwayatDiajukan() {
       param += ropParam;
       param += startDateParam;
       param += endDateParam;
+      param += statusTypeParam;
     }
 
     console.log('URL', URL);
@@ -320,6 +347,7 @@ function RiwayatDiajukan() {
             <TipeFilterGroup
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
+                setPage(1);
                 setTipeFilter(val);
                 getReimbursementList(
                   false,
@@ -332,36 +360,43 @@ function RiwayatDiajukan() {
               }}
               value={tipeFilter}
             />
-            <CashAdvanceFilterGroup
-              className="w-full lg:w-1/3"
-              setValue={(val: string) => {
-                setCaFilter(val);
-                getReimbursementList(
-                  false,
-                  tipeFilter,
-                  val,
-                  ropFilter,
-                  startDate,
-                  endDate,
-                );
-              }}
-              value={caFilter}
-            />
-            <StatusROPFilterGroup
-              className="w-full lg:w-1/3"
-              setValue={(val: string) => {
-                setROPFilter(val);
-                getReimbursementList(
-                  false,
-                  tipeFilter,
-                  caFilter,
-                  val,
-                  startDate,
-                  endDate,
-                );
-              }}
-              value={ropFilter}
-            />
+            {statusType != 'waiting' && (
+              <CashAdvanceFilterGroup
+                className="w-full lg:w-1/3"
+                setValue={(val: string) => {
+                  setPage(1);
+                  setCaFilter(val);
+                  getReimbursementList(
+                    false,
+                    tipeFilter,
+                    val,
+                    ropFilter,
+                    startDate,
+                    endDate,
+                  );
+                }}
+                value={caFilter}
+              />
+            )}
+            {statusType != 'waiting' && (
+              <StatusROPFilterGroup
+                className="w-full lg:w-1/3"
+                isUser={false}
+                setValue={(val: string) => {
+                  setPage(1);
+                  setROPFilter(val);
+                  getReimbursementList(
+                    false,
+                    tipeFilter,
+                    caFilter,
+                    val,
+                    startDate,
+                    endDate,
+                  );
+                }}
+                value={ropFilter}
+              />
+            )}
           </div>
           <div className=" mt-2">
             <DateRange
@@ -530,12 +565,12 @@ function RiwayatDiajukan() {
                         </td>
                         <td className={classes}>
                           <Typography variant="small" className="font-normal">
-                            {item?.accepted_date || '-'}
+                            {getFormattedDateTable(item?.accepted_date)}
                           </Typography>
                         </td>
                         <td className={classes}>
                           <Typography variant="small" className="font-normal">
-                            {moment(item?.createdAt).format('lll') || '-'}
+                            {getFormattedDateTable(item?.createdAt)}
                           </Typography>
                         </td>
                         {ADMIN_TYPE !== 'FINANCE' ? (
