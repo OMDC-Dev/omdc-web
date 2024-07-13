@@ -31,6 +31,7 @@ import ModalSelector from '../../components/Modal/ModalSelctor';
 import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
 import { getFormattedDateTable } from '../../common/utils';
+import KategoriFilterGroup from '../../components/SelectGroup/KategoriFilterGroup';
 
 const TABLE_HEAD = [
   '',
@@ -86,6 +87,8 @@ function RiwayatDiajukan() {
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
 
+  const [kategoriFilter, setKategoriFilter] = React.useState<string>('');
+
   const { toggle, visible, type, changeType, hide, show } = useModal();
   const { user } = useAuth();
 
@@ -106,6 +109,7 @@ function RiwayatDiajukan() {
       ropFilter,
       startDate,
       endDate,
+      kategoriFilter,
     );
   }, [page, startDate, endDate]);
 
@@ -113,6 +117,7 @@ function RiwayatDiajukan() {
     setTipeFilter('');
     setCaFilter('');
     setROPFilter('');
+    setKategoriFilter('');
     setStartDate(null);
     setEndDate(null);
 
@@ -123,6 +128,7 @@ function RiwayatDiajukan() {
       ropFilter,
       startDate,
       endDate,
+      kategoriFilter,
     );
   }, [location.key]);
 
@@ -135,6 +141,7 @@ function RiwayatDiajukan() {
     rop?: string,
     startDate?: any,
     endDate?: any,
+    kategori?: any,
   ) {
     changeType('LOADING');
     show();
@@ -160,6 +167,11 @@ function RiwayatDiajukan() {
 
     const statusTypeParam = `&statusType=${statusType}`;
 
+    const kategoriParam =
+      kategori && kategori !== 'all'
+        ? `&kategori=${kategori?.toUpperCase()}`
+        : '';
+
     let param = '';
     let URL = '';
     if (ADMIN_TYPE == 'ADMIN') {
@@ -171,6 +183,7 @@ function RiwayatDiajukan() {
       param += startDateParam;
       param += endDateParam;
       param += statusTypeParam;
+      param += kategoriParam;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
@@ -180,6 +193,7 @@ function RiwayatDiajukan() {
       param += startDateParam;
       param += endDateParam;
       param += statusTypeParam;
+      param += kategoriParam;
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
@@ -189,6 +203,7 @@ function RiwayatDiajukan() {
       param += startDateParam;
       param += endDateParam;
       param += statusTypeParam;
+      param += kategoriParam;
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
@@ -198,6 +213,7 @@ function RiwayatDiajukan() {
       param += startDateParam;
       param += endDateParam;
       param += statusTypeParam;
+      param += kategoriParam;
     }
 
     console.log('URL', URL);
@@ -348,7 +364,7 @@ function RiwayatDiajukan() {
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
                 setPage(1);
-                setTipeFilter(val);
+                val == 'all' ? setTipeFilter('') : setTipeFilter(val);
                 getReimbursementList(
                   false,
                   val,
@@ -356,16 +372,17 @@ function RiwayatDiajukan() {
                   ropFilter,
                   startDate,
                   endDate,
+                  kategoriFilter,
                 );
               }}
               value={tipeFilter}
             />
-            {statusType != 'waiting' && (
+            {statusType != 'waiting' ? (
               <CashAdvanceFilterGroup
                 className="w-full lg:w-1/3"
                 setValue={(val: string) => {
                   setPage(1);
-                  setCaFilter(val);
+                  val == 'ALL' ? setCaFilter('') : setCaFilter(val);
                   getReimbursementList(
                     false,
                     tipeFilter,
@@ -373,9 +390,32 @@ function RiwayatDiajukan() {
                     ropFilter,
                     startDate,
                     endDate,
+                    kategoriFilter,
                   );
                 }}
                 value={caFilter}
+              />
+            ) : (
+              <KategoriFilterGroup
+                className="w-full lg:w-1/3"
+                setValue={(val: string) => {
+                  if (val == 'all') {
+                    setKategoriFilter('');
+                  } else {
+                    setKategoriFilter(val);
+                  }
+                  setPage(1);
+                  getReimbursementList(
+                    false,
+                    tipeFilter,
+                    caFilter,
+                    ropFilter,
+                    startDate,
+                    endDate,
+                    val,
+                  );
+                }}
+                value={kategoriFilter}
               />
             )}
             {statusType != 'waiting' && (
@@ -384,7 +424,7 @@ function RiwayatDiajukan() {
                 isUser={false}
                 setValue={(val: string) => {
                   setPage(1);
-                  setROPFilter(val);
+                  val == 'ALL' ? setROPFilter('') : setROPFilter(val);
                   getReimbursementList(
                     false,
                     tipeFilter,
@@ -392,9 +432,33 @@ function RiwayatDiajukan() {
                     val,
                     startDate,
                     endDate,
+                    kategoriFilter,
                   );
                 }}
                 value={ropFilter}
+              />
+            )}
+            {statusType != 'waiting' && (
+              <KategoriFilterGroup
+                className="w-full lg:w-1/3"
+                setValue={(val: string) => {
+                  if (val == 'all') {
+                    setKategoriFilter('');
+                  } else {
+                    setKategoriFilter(val);
+                  }
+                  setPage(1);
+                  getReimbursementList(
+                    false,
+                    tipeFilter,
+                    caFilter,
+                    ropFilter,
+                    startDate,
+                    endDate,
+                    val,
+                  );
+                }}
+                value={kategoriFilter}
               />
             )}
           </div>
