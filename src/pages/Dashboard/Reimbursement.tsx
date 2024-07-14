@@ -13,9 +13,14 @@ import {
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
-import { REIMBURSEMENT, USER_KODE_AKSES } from '../../api/routes';
+import {
+  LOGOUT,
+  REIMBURSEMENT,
+  USER_KODE_AKSES,
+  USER_STATUS,
+} from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
@@ -64,11 +69,12 @@ function Reimbursement() {
   const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // reimbursement akses
   const hasReimbursementAkses = cekAkses('#1');
 
-  const { user, setUser } = useAuth();
+  const { user, setUser, setToken } = useAuth();
   const { toggle, visible, type, changeType, hide, show } = useModal();
 
   console.log('USER DATA X', user);
@@ -85,8 +91,42 @@ function Reimbursement() {
   }, [page, startDate, endDate]);
 
   React.useEffect(() => {
+    cekUserStatus();
     updateKodeKases();
-  }, []);
+  }, [location.key]);
+
+  // on logout
+  async function onLogout() {
+    const { state, data, error } = await useFetch({
+      url: LOGOUT + '?isWeb=true',
+      method: 'POST',
+    });
+    if (state == API_STATES.OK) {
+      setToken();
+      navigate('/', { replace: true });
+    } else if (
+      error == 'User Unauthenticated!' ||
+      error == 'User Token Invalid!'
+    ) {
+      setToken();
+      navigate('/', { replace: true });
+    } else {
+      alert(`Ada sesuatu yang tidak beres, mohon coba lagi.`);
+    }
+  }
+
+  async function cekUserStatus() {
+    const { state, data, error } = await useFetch({
+      url: USER_STATUS(user.iduser),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      if (data.status !== 'Aktif') {
+        onLogout();
+      }
+    }
+  }
 
   async function updateKodeKases() {
     const { state, data, error } = await useFetch({

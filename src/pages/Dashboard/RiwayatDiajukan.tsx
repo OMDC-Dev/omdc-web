@@ -10,6 +10,7 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  Checkbox,
 } from '@material-tailwind/react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
@@ -18,6 +19,7 @@ import {
   GET_MAKER_REIMBURSEMENT,
   GET_UNREVIEW_REIMBURSEMENT,
   PENGAJUAN,
+  REIMBURSEMENT_ACCEPTANCE_MULTI,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -30,7 +32,7 @@ import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
-import { getFormattedDateTable } from '../../common/utils';
+import { cekAkses, getFormattedDateTable } from '../../common/utils';
 import KategoriFilterGroup from '../../components/SelectGroup/KategoriFilterGroup';
 
 const TABLE_HEAD = [
@@ -86,11 +88,26 @@ function RiwayatDiajukan() {
 
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
+  const [selectedIds, setSelectedIds] = React.useState<any>([]);
 
   const [kategoriFilter, setKategoriFilter] = React.useState<string>('');
 
-  const { toggle, visible, type, changeType, hide, show } = useModal();
+  const {
+    toggle,
+    visible,
+    type,
+    changeType,
+    hide,
+    show,
+    context,
+    changeContext,
+  } = useModal();
   const { user } = useAuth();
+
+  const hasMultipleAccept = cekAkses('#10');
+
+  const SHOW_CHECKBOX =
+    user.type == 'ADMIN' && hasMultipleAccept && statusType == 'waiting';
 
   const ADMIN_TYPE = user?.type;
 
@@ -114,6 +131,10 @@ function RiwayatDiajukan() {
   }, [page, startDate, endDate]);
 
   React.useEffect(() => {
+    onClearList();
+  }, [location.key]);
+
+  function onClearList() {
     setTipeFilter('');
     setCaFilter('');
     setROPFilter('');
@@ -122,7 +143,7 @@ function RiwayatDiajukan() {
     setEndDate(null);
 
     getReimbursementList(
-      false,
+      true,
       tipeFilter,
       caFilter,
       ropFilter,
@@ -130,7 +151,7 @@ function RiwayatDiajukan() {
       endDate,
       kategoriFilter,
     );
-  }, [location.key]);
+  }
 
   console.log('ADMIN TYPE', ADMIN_TYPE);
 
@@ -315,6 +336,38 @@ function RiwayatDiajukan() {
     }
   }
 
+  const isFromExtraAcceptance = (item: any) => {
+    return (
+      item.needExtraAcceptance && item.extraAcceptance.iduser == user.iduser
+    );
+  };
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedIds((prevSelectedIds: any) =>
+      prevSelectedIds.includes(id)
+        ? prevSelectedIds.filter((selectedId: any) => selectedId !== id)
+        : [...prevSelectedIds, id],
+    );
+  };
+
+  async function onAcceptMulti() {
+    changeType('LOADING');
+
+    const { state, data, error } = await useFetch({
+      url: REIMBURSEMENT_ACCEPTANCE_MULTI,
+      method: 'POST',
+      data: {
+        ids: selectedIds,
+      },
+    });
+
+    if (state == API_STATES.OK) {
+      changeType('SUCCESS');
+    } else {
+      changeType('FAILED');
+    }
+  }
+
   return (
     <DefaultLayout>
       <Card className="h-full w-full">
@@ -473,6 +526,22 @@ function RiwayatDiajukan() {
               }}
             />
           </div>
+          {selectedIds?.length > 0 && (
+            <div className=" w-full mt-8">
+              <Button
+                className=" w-full"
+                color={'blue'}
+                onClick={(e: any) => {
+                  e.preventDefault();
+                  changeContext('ACCMULTI');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Setujui Semua Pengajuan Terpilih
+              </Button>
+            </div>
+          )}
         </CardHeader>
 
         {!rList?.length ? (
@@ -512,6 +581,16 @@ function RiwayatDiajukan() {
 
                     return (
                       <tr key={item?.id}>
+                        {SHOW_CHECKBOX && (
+                          <td className={classes}>
+                            <Checkbox
+                              disabled={isFromExtraAcceptance(item)}
+                              checked={selectedIds.includes(item.id)}
+                              onChange={() => handleCheckboxChange(item.id)}
+                              color={'blue'}
+                            />
+                          </td>
+                        )}
                         <td className={classes}>
                           <Tooltip content="Detail">
                             <IconButton
@@ -684,7 +763,21 @@ function RiwayatDiajukan() {
           </>
         )}
       </Card>
-      <ModalSelector type={type} visible={visible} toggle={toggle} />
+      <ModalSelector
+        type={type}
+        visible={visible}
+        toggle={toggle}
+        onConfirm={() => {
+          if (context == 'ACCMULTI') {
+            onAcceptMulti();
+          }
+        }}
+        onDone={() => {
+          if (context == 'ACCMULTI') {
+            onClearList();
+          }
+        }}
+      />
       <PeriodeModal
         visible={showPeriode}
         startDate={startDate}
