@@ -10,6 +10,7 @@ export const BASE_URL = DEV;
 export const LOGIN = 'user/login';
 export const LOGOUT = 'user/logout';
 export const USER_KODE_AKSES = (id: number) => `user/kodeakses/${id}`;
+export const USER_STATUS = (id: number) => `user/status/${id}`;
 export const USER_COMPLETE = 'user/complete';
 export const UPDATE_PASSWORD = 'user/update-password';
 export const GET_NOTIFICATION = 'pengumuman';
