@@ -30,6 +30,7 @@ export const REIMBURSEMENT_DETAIL = (id: number) => {
 export const REIMBURSEMENT_ACCEPTANCE = (id: number) => {
   return `reimbursement/status/${id}`;
 };
+export const REIMBURSEMENT_ACCEPTANCE_MULTI = `reimbursement/status-multi`;
 export const REIMBURSEMENT_UPDATE_ADMIN = (id: string, adminId: string) =>
   `reimbursement/update-admin/${id}?adminId=${adminId}`;
 

@@ -184,7 +184,7 @@ const BuatReport: React.FC = () => {
 
     const _sal = parseInt(_fnom) - parseInt(_frel);
 
-    if (_sal > 0) {
+    if (_sal >= 0) {
       setNeedBank(false);
       console.log('No Need Bank');
     } else {
