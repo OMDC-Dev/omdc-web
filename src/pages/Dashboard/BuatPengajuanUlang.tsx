@@ -58,7 +58,8 @@ function TrashIcon() {
 }
 
 const BuatPengajuanUlang: React.FC = () => {
-  const { show, hide, toggle, visible, type, changeType } = useModal();
+  const { show, hide, toggle, visible, type, changeType, changeCode, code } =
+    useModal();
   const { user } = useAuth();
 
   // use nav
@@ -336,7 +337,8 @@ const BuatPengajuanUlang: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
-      changeType('SUCCESS');
+      changeCode(data.no_doc);
+      changeType('SUCCESSCODE');
     } else {
       changeType('FAILED');
     }
@@ -900,13 +902,14 @@ const BuatPengajuanUlang: React.FC = () => {
         value={(val: any) => setAdmin(val)}
       />
       <ModalSelector
+        code={code}
         type={type}
         visible={visible}
         toggle={toggle}
         onConfirm={() => checkIsPDF()}
         onDone={() => {
           hide();
-          type == 'SUCCESS' ? navigate('/', { replace: true }) : null;
+          type == 'SUCCESSCODE' ? navigate('/', { replace: true }) : null;
         }}
       />
       <FileModal
