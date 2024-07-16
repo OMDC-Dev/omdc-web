@@ -5,15 +5,11 @@ import Routes from './routes';
 import AuthProvider from './hooks/useAuth';
 import NotifModal from './components/Modal/NotifModal';
 import useNotif from './store/useNotif';
+import withClearCache from './ClearCache';
 
-function App() {
+function MainApp() {
   const [loading, setLoading] = useState<boolean>(true);
   const { visible, toggle, data } = useNotif();
-  // const { pathname } = useLocation();
-
-  // useEffect(() => {
-  //   window.scrollTo(0, 0);
-  // }, [pathname]);
 
   useEffect(() => {
     const className = 'light';
@@ -34,6 +30,12 @@ function App() {
       <NotifModal data={data} visible={visible} toggle={toggle} />
     </AuthProvider>
   );
+}
+
+function App() {
+  const ClearCacheComponent = withClearCache(MainApp);
+
+  return <ClearCacheComponent />;
 }
 
 export default App;

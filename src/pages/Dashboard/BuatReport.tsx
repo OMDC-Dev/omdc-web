@@ -46,7 +46,8 @@ function TrashIcon() {
 }
 
 const BuatReport: React.FC = () => {
-  const { show, hide, toggle, visible, type, changeType } = useModal();
+  const { show, hide, toggle, visible, type, changeType, changeCode, code } =
+    useModal();
   const { user } = useAuth();
   const { state } = useLocation();
   // use nav
@@ -267,7 +268,8 @@ const BuatReport: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
-      changeType('SUCCESS');
+      changeCode(data.no_doc);
+      changeType('SUCCESSCODE');
     } else {
       changeType('FAILED');
     }
@@ -659,13 +661,14 @@ const BuatReport: React.FC = () => {
         value={(val: any) => setAdmin(val)}
       />
       <ModalSelector
+        code={code}
         type={type}
         visible={visible}
         toggle={toggle}
         onConfirm={() => pengajuanReimbursement()}
         onDone={() => {
           hide();
-          type == 'SUCCESS' ? navigate('/', { replace: true }) : null;
+          type == 'SUCCESSCODE' ? navigate('/', { replace: true }) : null;
         }}
       />
     </DefaultLayout>
