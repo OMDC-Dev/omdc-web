@@ -121,7 +121,6 @@ function ReportReimbursement() {
         attachment,
         maker_approve,
         reviewer_approve,
-        jenis_reimbursement,
         pengajuan_ca,
         ...rest
       }: any = itemCol;
@@ -148,11 +147,13 @@ function ReportReimbursement() {
 
       const formatedNominal = formatCurrencyToNumber(nominal);
 
+      const formatCANominal = formatCurrencyToNumber(pengajuan_ca);
+
       const parsedAttachment = isValidURL(attachment) ? attachment : '';
 
       let saldo = 0;
 
-      if (jenis_reimbursement == 'Cash Advance Report') {
+      if (rest.jenis_reimbursement == 'Cash Advance Report') {
         const intNominal = parseInt(
           pengajuan_ca.replace('Rp. ', '').replace(/\./g, ''),
         );
@@ -170,10 +171,11 @@ function ReportReimbursement() {
         accepted_by: parsedAcceptedBy,
         finance_by: parsedFinanceBy,
         nominal: formatedNominal,
-        saldo: saldo,
         lampiran: parsedAttachment,
         makerApprove: maker_approve,
         reviewerApprove: reviewer_approve,
+        pengajuan_ca: formatCANominal,
+        saldo: saldo,
       };
     });
 
@@ -200,10 +202,11 @@ function ReportReimbursement() {
       'Daftar Penyetuju',
       'Nama Finance',
       'Nominal Pengajuan',
-      'Sisa Saldo',
       'Lampiran',
       'Tanggal Disetujui Maker',
       'Tanggal Disetujui Reviewer',
+      'Nominal Pengajuan Cash Advance',
+      'Sisa Saldo',
     ];
 
     const title = `Report${startDate}-${endDate}`;

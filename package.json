@@ -1,7 +1,7 @@
 {
   "name": "tailadmin-react-free",
   "private": true,
-  "version": "1.3.0",
+  "version": "1.3.1",
   "type": "module",
   "scripts": {
     "dev": "node ./update-build.js && vite",
@@ -52,5 +52,5 @@
     "vite": "^4.4.7",
     "webpack": "^5.88.2"
   },
-  "buildDate": 1721124134196
+  "buildDate": 1722584089972
 }
