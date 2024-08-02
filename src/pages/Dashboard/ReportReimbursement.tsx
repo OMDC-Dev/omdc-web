@@ -121,6 +121,8 @@ function ReportReimbursement() {
         attachment,
         maker_approve,
         reviewer_approve,
+        jenis_reimbursement,
+        pengajuan_ca,
         ...rest
       }: any = itemCol;
 
@@ -148,6 +150,19 @@ function ReportReimbursement() {
 
       const parsedAttachment = isValidURL(attachment) ? attachment : '';
 
+      let saldo = 0;
+
+      if (jenis_reimbursement == 'Cash Advance Report') {
+        const intNominal = parseInt(
+          pengajuan_ca.replace('Rp. ', '').replace(/\./g, ''),
+        );
+        const intRealisasi = parseInt(
+          nominal.replace('Rp. ', '').replace(/\./g, ''),
+        );
+
+        saldo = intNominal - intRealisasi;
+      }
+
       return {
         ...rest,
         item: parsedItem,
@@ -155,6 +170,7 @@ function ReportReimbursement() {
         accepted_by: parsedAcceptedBy,
         finance_by: parsedFinanceBy,
         nominal: formatedNominal,
+        saldo: saldo,
         lampiran: parsedAttachment,
         makerApprove: maker_approve,
         reviewerApprove: reviewer_approve,
@@ -184,6 +200,7 @@ function ReportReimbursement() {
       'Daftar Penyetuju',
       'Nama Finance',
       'Nominal Pengajuan',
+      'Sisa Saldo',
       'Lampiran',
       'Tanggal Disetujui Maker',
       'Tanggal Disetujui Reviewer',
