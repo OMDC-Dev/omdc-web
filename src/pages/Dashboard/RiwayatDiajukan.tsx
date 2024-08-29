@@ -22,7 +22,12 @@ import {
   REIMBURSEMENT_ACCEPTANCE_MULTI,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useNavigationType,
+  useParams,
+} from 'react-router-dom';
 import moment from 'moment';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
@@ -119,6 +124,7 @@ function RiwayatDiajukan() {
       : TABLE_HEAD_FINANCE;
 
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
 
   // filter store
   const {
@@ -146,7 +152,9 @@ function RiwayatDiajukan() {
   }, [tipeFilter, caFilter, ropFilter, startDate, endDate, cabangFilter, page]);
 
   React.useEffect(() => {
-    onClearList();
+    if (navigationType !== 'POP') {
+      onClearList();
+    }
   }, [location.key]);
 
   function onClearList() {
