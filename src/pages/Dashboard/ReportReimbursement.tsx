@@ -122,6 +122,8 @@ function ReportReimbursement() {
         maker_approve,
         reviewer_approve,
         pengajuan_ca,
+        parentDoc,
+        childDoc,
         ...rest
       }: any = itemCol;
 
@@ -176,6 +178,8 @@ function ReportReimbursement() {
         reviewerApprove: reviewer_approve,
         pengajuan_ca: formatCANominal,
         saldo: saldo,
+        parentDoc: parentDoc,
+        childDoc: childDoc,
       };
     });
 
@@ -207,6 +211,8 @@ function ReportReimbursement() {
       'Tanggal Disetujui Reviewer',
       'Nominal Pengajuan Cash Advance',
       'Sisa Saldo',
+      'No. Dokumen Cash Advance',
+      'No. Dokumen Cash Advance Report',
     ];
 
     const title = `Report${startDate}-${endDate}`;

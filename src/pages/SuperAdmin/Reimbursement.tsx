@@ -15,7 +15,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REIMBURSEMENT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
@@ -24,6 +24,10 @@ import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilt
 import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
 import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
+import useReportFilter from '../../hooks/useReportFilter';
+import DateRange from '../../components/DateRange';
+import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
+import PeriodeModal from '../../components/Modal/PeriodeModal';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -49,24 +53,49 @@ function SuperReimbursement() {
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
-  const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  //const [tipeFilter, setTipeFilter] = React.useState<string>('');
   const [financeFilter, setFinanceFilter] = React.useState<string>('');
-  const [caFilter, setCaFilter] = React.useState<string>('');
-  const [ropFilter, setROPFilter] = React.useState<string>('');
+  // const [caFilter, setCaFilter] = React.useState<string>('');
+  // const [ropFilter, setROPFilter] = React.useState<string>('');
+
+  const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
 
   const { toggle, visible, type, changeType, hide, show } = useModal();
 
   const navigate = useNavigate();
 
+  // filter store
+  const {
+    tipeFilter,
+    caFilter,
+    ropFilter,
+    cabangFilter,
+    startDate,
+    endDate,
+    setFilters,
+    resetFilters,
+  } = useReportFilter();
+
   React.useEffect(() => {
-    getReimbursementList(false, tipeFilter, caFilter, ropFilter);
-  }, [page]);
+    getReimbursementList(
+      false,
+      tipeFilter,
+      caFilter,
+      ropFilter,
+      startDate,
+      endDate,
+      cabangFilter,
+    );
+  }, [tipeFilter, caFilter, ropFilter, startDate, endDate, cabangFilter, page]);
 
   async function getReimbursementList(
     clear?: boolean,
     type?: string,
     ca?: string,
     rop?: string,
+    startDate?: any,
+    endDate?: any,
+    cabang?: any,
   ) {
     changeType('LOADING');
     show();
@@ -76,8 +105,28 @@ function SuperReimbursement() {
     const caParam = ca && ca !== 'ALL' ? `&statusCA=${ca?.toUpperCase()}` : '';
     const ropParam =
       rop && rop !== 'ALL' ? `&statusROP=${rop?.toUpperCase()}` : '';
+    const startDateParam = startDate
+      ? `&periodeStart=${moment(startDate)
+          .utc()
+          .endOf('day')
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
+      : '';
+    const endDateParam = endDate
+      ? `&periodeEnd=${moment(endDate)
+          .utc()
+          .add(1, 'day')
+          .endOf('day')
+          .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
+      : '';
+    const cabangParam = cabang ? `&cabang=${cabang}` : '';
 
-    const filterParam = typeParam + caParam + ropParam;
+    const filterParam =
+      typeParam +
+      caParam +
+      ropParam +
+      startDateParam +
+      endDateParam +
+      cabangParam;
 
     const { state, data, error } = await useFetch({
       url:
@@ -95,8 +144,8 @@ function SuperReimbursement() {
     } else {
       setLoading(false);
       setRList([]);
-      hide();
       console.log(error);
+      hide();
     }
   }
 
@@ -182,7 +231,7 @@ function SuperReimbursement() {
               </Button> */}
             </div>
           </div>
-          <div className="relative w-full">
+          <div className="w-full flex flex-row items-center gap-x-2">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -211,31 +260,93 @@ function SuperReimbursement() {
                 </button>
               )}
             </form>
+            <CabangFilterGroup
+              className=" w-full mt-4"
+              value={cabangFilter}
+              setValue={(val: string) => {
+                setPage(1);
+                setFilters({ cabangFilter: val });
+                //setCabangFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   caFilter,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   val,
+                // );
+              }}
+            />
           </div>
+
           <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
             <TipeFilterGroup
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
-                setTipeFilter(val);
-                getReimbursementList(false, val, caFilter, ropFilter);
+                setPage(1);
+                setFilters({ tipeFilter: val });
+                //setTipeFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   val,
+                //   caFilter,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   cabangFilter,
+                // );
               }}
               value={tipeFilter}
             />
             <CashAdvanceFilterGroup
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
-                setCaFilter(val);
-                getReimbursementList(false, tipeFilter, val, ropFilter);
+                setPage(1);
+                setFilters({ caFilter: val });
+                //setCaFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   val,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   cabangFilter,
+                // );
               }}
               value={caFilter}
             />
             <StatusROPFilterGroup
               className="w-full lg:w-1/3"
+              isUser={true}
               setValue={(val: string) => {
-                setROPFilter(val);
-                getReimbursementList(false, tipeFilter, caFilter, val);
+                setPage(1);
+                setFilters({ ropFilter: val });
+                //setROPFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   caFilter,
+                //   val,
+                //   startDate,
+                //   endDate,
+                //   cabangFilter,
+                // );
               }}
               value={ropFilter}
+            />
+          </div>
+          <div className=" mt-2">
+            <DateRange
+              onShowButtonPress={() => setShowPeriode(!showPeriode)}
+              periodeStart={startDate}
+              periodeEnd={endDate}
+              onResetButtonPress={() => {
+                setFilters({ startDate: null, endDate: null });
+                //setStartDate(null);
+                //setEndDate(null);
+              }}
             />
           </div>
         </CardHeader>
@@ -428,6 +539,20 @@ function SuperReimbursement() {
         )}
       </Card>
       <ModalSelector type={type} visible={visible} toggle={toggle} />
+      <PeriodeModal
+        visible={showPeriode}
+        startDate={startDate}
+        endDate={endDate}
+        toggle={() => setShowPeriode(!showPeriode)}
+        value={(cb: any) => {
+          setFilters({
+            startDate: cb.startDate,
+            endDate: cb.endDate,
+          });
+          // setStartDate(cb.startDate);
+          // setEndDate(cb.endDate);
+        }}
+      />
     </DefaultLayout>
   );
 }

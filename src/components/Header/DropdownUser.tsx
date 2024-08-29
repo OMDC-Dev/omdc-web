@@ -6,6 +6,9 @@ import { useAuth } from '../../hooks/useAuth';
 import useFetch from '../../hooks/useFetch';
 import { LOGOUT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
+import useRiwayatSayaFilter from '../../hooks/useRiwayatSayaFilter';
+import useReportFilter from '../../hooks/useReportFilter';
+import useAdminFilter from '../../hooks/useAdminFilter';
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -17,6 +20,10 @@ const DropdownUser = () => {
   const navigate = useNavigate();
 
   const IS_SA = user?.type == 'SUPERADMIN';
+
+  const riwayatFilter = useRiwayatSayaFilter();
+  const reportFilter = useReportFilter();
+  const adminFilter = useAdminFilter();
 
   // close on click outside
   useEffect(() => {
@@ -53,6 +60,10 @@ const DropdownUser = () => {
     if (state == API_STATES.OK) {
       setToken();
       navigate('/', { replace: true });
+
+      riwayatFilter.resetFilters();
+      adminFilter.resetFilters();
+      reportFilter.resetFilters();
     } else if (
       error == 'User Unauthenticated!' ||
       error == 'User Token Invalid!'
