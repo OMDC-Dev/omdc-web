@@ -456,75 +456,80 @@ function RiwayatDiajukan() {
             />
           </div>
 
-          <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
-            <TipeFilterGroup
-              className="w-full lg:w-1/3 mt-2"
-              setValue={(val: string) => {
-                setPage(1);
-                setFilters({ tipeFilter: val });
-                //setTipeFilter(val);
-                // getReimbursementList(
-                //   false,
-                //   val,
-                //   caFilter,
-                //   ropFilter,
-                //   startDate,
-                //   endDate,
-                //   cabangFilter,
-                // );
-              }}
-              value={tipeFilter}
-            />
-            <CashAdvanceFilterGroup
-              className="w-full lg:w-1/3"
-              setValue={(val: string) => {
-                setPage(1);
-                setFilters({ caFilter: val });
-                //setCaFilter(val);
-                // getReimbursementList(
-                //   false,
-                //   tipeFilter,
-                //   val,
-                //   ropFilter,
-                //   startDate,
-                //   endDate,
-                //   cabangFilter,
-                // );
-              }}
-              value={caFilter}
-            />
-            <StatusROPFilterGroup
-              className="w-full lg:w-1/3"
-              isUser={true}
-              setValue={(val: string) => {
-                setPage(1);
-                setFilters({ ropFilter: val });
-                //setROPFilter(val);
-                // getReimbursementList(
-                //   false,
-                //   tipeFilter,
-                //   caFilter,
-                //   val,
-                //   startDate,
-                //   endDate,
-                //   cabangFilter,
-                // );
-              }}
-              value={ropFilter}
-            />
-          </div>
-          <div className=" mt-2">
-            <DateRange
-              onShowButtonPress={() => setShowPeriode(!showPeriode)}
-              periodeStart={startDate}
-              periodeEnd={endDate}
-              onResetButtonPress={() => {
-                setFilters({ startDate: null, endDate: null });
-                //setStartDate(null);
-                //setEndDate(null);
-              }}
-            />
-          </div>
+          {statusType !== 'waiting' && (
+            <div>
+              <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
+                <TipeFilterGroup
+                  className="w-full lg:w-1/3 mt-2"
+                  setValue={(val: string) => {
+                    setPage(1);
+                    setFilters({ tipeFilter: val });
+                    //setTipeFilter(val);
+                    // getReimbursementList(
+                    //   false,
+                    //   val,
+                    //   caFilter,
+                    //   ropFilter,
+                    //   startDate,
+                    //   endDate,
+                    //   cabangFilter,
+                    // );
+                  }}
+                  value={tipeFilter}
+                />
+                <CashAdvanceFilterGroup
+                  className="w-full lg:w-1/3"
+                  setValue={(val: string) => {
+                    setPage(1);
+                    setFilters({ caFilter: val });
+                    //setCaFilter(val);
+                    // getReimbursementList(
+                    //   false,
+                    //   tipeFilter,
+                    //   val,
+                    //   ropFilter,
+                    //   startDate,
+                    //   endDate,
+                    //   cabangFilter,
+                    // );
+                  }}
+                  value={caFilter}
+                />
+                <StatusROPFilterGroup
+                  className="w-full lg:w-1/3"
+                  isUser={true}
+                  setValue={(val: string) => {
+                    setPage(1);
+                    setFilters({ ropFilter: val });
+                    //setROPFilter(val);
+                    // getReimbursementList(
+                    //   false,
+                    //   tipeFilter,
+                    //   caFilter,
+                    //   val,
+                    //   startDate,
+                    //   endDate,
+                    //   cabangFilter,
+                    // );
+                  }}
+                  value={ropFilter}
+                />
+              </div>
+              <div className=" mt-2">
+                <DateRange
+                  onShowButtonPress={() => setShowPeriode(!showPeriode)}
+                  periodeStart={startDate}
+                  periodeEnd={endDate}
+                  onResetButtonPress={() => {
+                    setFilters({ startDate: null, endDate: null });
+                    //setStartDate(null);
+                    //setEndDate(null);
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           {selectedIds?.length > 0 && (
             <div className=" w-full mt-8">
               <Button
