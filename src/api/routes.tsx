@@ -109,6 +109,7 @@ export const UPDATE_ICON = '/updateIcon';
 export const GET_UNREVIEW_REIMBURSEMENT = 'reviewer/reimbursement';
 export const ACCEPT_REVIEW_REIMBURSEMENT = (id: number) =>
   `reviewer/accept/${id}`;
+export const ACCEPT_REVIEW_REIMBURSEMENT_MULTI = `reviewer/accept-multi`;
 
 // Maker
 export const GET_MAKER_REIMBURSEMENT = 'maker/reimbursement';
