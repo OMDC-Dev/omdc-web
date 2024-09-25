@@ -16,6 +16,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
 import {
   ACCEPT_REVIEW_REIMBURSEMENT_MULTI,
+  FINANCE_ACCEPTANCE_MULTI,
   FINANCE_PENGAJUAN,
   GET_MAKER_REIMBURSEMENT,
   GET_UNREVIEW_REIMBURSEMENT,
@@ -116,7 +117,8 @@ function RiwayatDiajukan() {
 
   const SHOW_CHECKBOX =
     (user.type == 'ADMIN' && hasMultipleAccept && statusType == 'waiting') ||
-    (user.type == 'REVIEWER' && hasMultipleAccept && statusType == 'waiting');
+    (user.type == 'REVIEWER' && hasMultipleAccept && statusType == 'waiting') ||
+    (user.type == 'FINANCE' && hasMultipleAccept && statusType == 'waiting');
 
   const ADMIN_TYPE = user?.type;
 
@@ -388,6 +390,9 @@ function RiwayatDiajukan() {
         break;
       case 'REVIEWER':
         API_URL = ACCEPT_REVIEW_REIMBURSEMENT_MULTI;
+        break;
+      case 'FINANCE':
+        API_URL = FINANCE_ACCEPTANCE_MULTI;
         break;
       default:
         break;

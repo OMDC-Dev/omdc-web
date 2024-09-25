@@ -67,6 +67,8 @@ export const FINANCE_PENGAJUAN = 'finance/pengajuan';
 export const FINANCE_ACCEPTANCE = (id: number, status: string) => {
   return `finance/acceptance/${id}?status=${status}`;
 };
+export const FINANCE_ACCEPTANCE_MULTI = `finance/acceptance-multi`;
+
 export const FINANCE_UPDATE_COA = (id: any) => {
   return `finance/update-coa/${id}`;
 };
