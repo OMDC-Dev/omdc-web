@@ -121,7 +121,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.5 rev 7
+            OMDC v0.9.5 rev 8.1
           </span>
         </NavLink>
 
