@@ -84,7 +84,10 @@ const ListBarangModal = ({
                         Permintaan: {item?.requestData?.request}
                       </span>
                       <span className=" text-xs text-blue-gray-300">
-                        Keterangan: {item?.requestData?.keterangan || '-'}
+                        Keterangan:{' '}
+                        {item?.requestData?.keterangan ||
+                          item?.keterangan ||
+                          '-'}
                       </span>
                     </div>
                     <ListItemSuffix className="flex gap-x-4 cursor-pointer">
