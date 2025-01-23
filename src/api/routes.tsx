@@ -4,7 +4,7 @@ const LOCAL = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = DEV;
+export const BASE_URL = PROD;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -67,6 +67,8 @@ export const FINANCE_PENGAJUAN = 'finance/pengajuan';
 export const FINANCE_ACCEPTANCE = (id: number, status: string) => {
   return `finance/acceptance/${id}?status=${status}`;
 };
+export const FINANCE_ACCEPTANCE_MULTI = `finance/acceptance-multi`;
+
 export const FINANCE_UPDATE_COA = (id: any) => {
   return `finance/update-coa/${id}`;
 };
@@ -109,6 +111,7 @@ export const UPDATE_ICON = '/updateIcon';
 export const GET_UNREVIEW_REIMBURSEMENT = 'reviewer/reimbursement';
 export const ACCEPT_REVIEW_REIMBURSEMENT = (id: number) =>
   `reviewer/accept/${id}`;
+export const ACCEPT_REVIEW_REIMBURSEMENT_MULTI = `reviewer/accept-multi`;
 
 // Maker
 export const GET_MAKER_REIMBURSEMENT = 'maker/reimbursement';

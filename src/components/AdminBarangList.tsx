@@ -51,7 +51,7 @@ export default function AdminBarangList({
           Permintaan: {item?.jml_kemasan} {item?.nm_kemasan}
         </span>
         <span className=" text-xs text-blue-gray-300">
-          Keterangan: {item?.requestData?.keterangan || '-'}
+          Keterangan: {item?.requestData?.keterangan || item?.keterangan || '-'}
         </span>
         <span className=" mt-4 text-xs text-blue-gray-300">
           Status Approve:{' '}

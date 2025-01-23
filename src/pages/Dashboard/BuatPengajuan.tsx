@@ -191,6 +191,8 @@ const BuatPengajuan: React.FC = () => {
   // handle nominal
   React.useEffect(() => {
     const nominal = hitungTotalNominal(item);
+    console.log(item);
+    console.log('NOMINAL', nominal);
 
     setNominal(formatRupiah(nominal, true));
   }, [item]);

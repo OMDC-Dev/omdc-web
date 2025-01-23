@@ -121,6 +121,9 @@ function ReportReimbursement() {
         attachment,
         maker_approve,
         reviewer_approve,
+        pengajuan_ca,
+        parentDoc,
+        childDoc,
         ...rest
       }: any = itemCol;
 
@@ -146,7 +149,22 @@ function ReportReimbursement() {
 
       const formatedNominal = formatCurrencyToNumber(nominal);
 
+      const formatCANominal = formatCurrencyToNumber(pengajuan_ca);
+
       const parsedAttachment = isValidURL(attachment) ? attachment : '';
+
+      let saldo = 0;
+
+      if (rest.jenis_reimbursement == 'Cash Advance Report') {
+        const intNominal = parseInt(
+          pengajuan_ca.replace('Rp. ', '').replace(/\./g, ''),
+        );
+        const intRealisasi = parseInt(
+          nominal.replace('Rp. ', '').replace(/\./g, ''),
+        );
+
+        saldo = intNominal - intRealisasi;
+      }
 
       return {
         ...rest,
@@ -158,6 +176,10 @@ function ReportReimbursement() {
         lampiran: parsedAttachment,
         makerApprove: maker_approve,
         reviewerApprove: reviewer_approve,
+        pengajuan_ca: formatCANominal,
+        saldo: saldo,
+        parentDoc: parentDoc,
+        childDoc: childDoc,
       };
     });
 
@@ -187,13 +209,126 @@ function ReportReimbursement() {
       'Lampiran',
       'Tanggal Disetujui Maker',
       'Tanggal Disetujui Reviewer',
+      'Nominal Pengajuan Cash Advance',
+      'Sisa Saldo',
+      'No. Dokumen Cash Advance',
+      'No. Dokumen Cash Advance Report',
     ];
 
     const title = `Report${startDate}-${endDate}`;
 
     const sortedData = normalizeData.sort((a, b) => a.id - b.id);
 
-    exportToExcell(sortedData, customHeaders, title);
+    // Data dan header untuk sheet tambahan
+    const mappingItemList = data
+      .map((colData: any) => {
+        const itemList = colData.item;
+        const remapItem = itemList.map((itemData: any) => {
+          delete itemData.id;
+          const IS_CASH = colData.payment_type.toUpperCase() == 'CASH';
+          const parsedAcceptedBy = colData.accepted_by
+            .map((item: any) => `${item.nm_user} (${item.status})`)
+            .join(', ');
+          const parsedFinanceBy = colData.finance_by.nm_user;
+          const formatedNominal = formatCurrencyToNumber(colData.nominal);
+          const formatCANominal = formatCurrencyToNumber(colData.pengajuan_ca);
+          const parsedAttachment = isValidURL(colData.attachment)
+            ? colData.attachment
+            : '';
+
+          let saldo = 0;
+
+          if (colData.jenis_reimbursement == 'Cash Advance Report') {
+            const intNominal = parseInt(
+              colData.pengajuan_ca.replace('Rp. ', '').replace(/\./g, ''),
+            );
+            const intRealisasi = parseInt(
+              colData.nominal.replace('Rp. ', '').replace(/\./g, ''),
+            );
+
+            saldo = intNominal - intRealisasi;
+          }
+
+          return {
+            nodoc: colData.no_doc,
+            ...itemData,
+            pm: colData.payment_type,
+            bn: IS_CASH ? '' : colData.bank_detail?.bankname,
+            acn: IS_CASH ? '' : colData.bank_detail?.accountname,
+            an: IS_CASH ? '' : colData.bank_detail?.accountnumber,
+            jr: colData.jenis_reimbursement,
+            tp: colData.tanggal_reimbursement,
+            cb: colData.kode_cabang,
+            id: colData.requester_id,
+            rn: colData.requester_name,
+            sn: colData.name,
+            coa: colData.coa,
+            dc: colData.description,
+            sp: colData.status,
+            spf: colData.status_finance,
+            ts: colData.accepted_date,
+            rl: formatCurrencyToNumber(colData.realisasi),
+            kp: colData.tipePembayaran,
+            bf: colData.finance_bank,
+            td: colData.createdAt,
+            dp: parsedAcceptedBy,
+            nf: parsedFinanceBy,
+            np: formatedNominal,
+            lp: parsedAttachment,
+            tdm: colData.maker_approve,
+            tdr: colData.reviwer_approve,
+            nca: formatCANominal,
+            ss: saldo,
+            ndca: colData.parentDoc,
+            ndcar: colData.childDoc,
+          };
+        });
+
+        return remapItem;
+      })
+      .flat();
+
+    const detailItemSheetData = {
+      sheetName: 'List Item & Bank Detail',
+      data: mappingItemList,
+      headers: [
+        'Nomor Dokumen',
+        'Nama Item',
+        'No. Invoice',
+        'Amount',
+        'Metode Pembayaran',
+        'Nama Bank',
+        'Nama Pemilik Rekening',
+        'Nomor Rekening',
+        'Jenis R.O.P',
+        'Tanggal Pengajuan',
+        'Cabang',
+        'ID User',
+        'Nama User',
+        'Nama Suplier',
+        'COA',
+        'Deskripsi',
+        'Status Pengajuan',
+        'Status Persetujuan Finance',
+        'Tanggal Disetujui',
+        'Realisasi',
+        'Kategori Permintaan',
+        'Bank Finance',
+        'Tanggal Dibuat',
+        'Daftar Penyetuju',
+        'Nama Finance',
+        'Nominal Pengajuan',
+        'Lampiran',
+        'Tanggal Disetujui Maker',
+        'Tanggal Disetujui Reviewer',
+        'Nominal Pengajuan Cash Advance',
+        'Sisa Saldo',
+        'No. Dokumen Cash Advance',
+        'No. Dokumen Cash Advance Report',
+      ],
+    };
+
+    exportToExcell(sortedData, customHeaders, title, detailItemSheetData);
     toggle();
   }
 

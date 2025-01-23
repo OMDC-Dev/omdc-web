@@ -7,10 +7,16 @@ import formatRupiah from './formatRupiah';
 export function hitungTotalNominal(data: any) {
   let total = 0;
   data.forEach((item: any) => {
-    // Hilangkan "Rp" dan koma, lalu ubah ke tipe number
-    const nominal = Number(
-      item.nominal.replace(/\./g, '').replace('Rp', '').trim(),
-    );
+    // Ambil nominal dan konversi ke number
+    const nominalString = item.nominal.trim();
+
+    // Pisahkan bagian desimal dan ambil maksimal 2 angka di belakang koma
+    const parts = nominalString.split('.');
+    const integerPart = parts[0];
+    const decimalPart = parts.length > 1 ? parts[1].slice(0, 2) : '00'; // Ambil maksimal 2 angka desimal
+
+    // Gabungkan kembali dan konversi ke number
+    const nominal = Number(integerPart + '.' + decimalPart);
     // Tambahkan nominal ke total
     total += nominal;
   });
@@ -18,7 +24,8 @@ export function hitungTotalNominal(data: any) {
 }
 
 export function unformatRupiah(rupiah: any) {
-  return rupiah.replace(/\./g, '').replace('Rp', '').trim();
+  // Mengganti koma dengan titik, menghapus titik ribuan, dan menghapus 'Rp'
+  return rupiah.replace(/,/g, '.').replace(/\./g, '').replace('Rp', '').trim();
 }
 
 export const downloadPDF = (base64Data: string, fileName: string) => {

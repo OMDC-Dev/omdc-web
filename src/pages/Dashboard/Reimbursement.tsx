@@ -20,7 +20,7 @@ import {
   USER_STATUS,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
@@ -33,6 +33,8 @@ import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
+import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
+import useRiwayatSayafilter from '../../hooks/useRiwayatSayaFilter';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -59,17 +61,19 @@ function Reimbursement() {
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
-  const [tipeFilter, setTipeFilter] = React.useState<string>('');
-  const [caFilter, setCaFilter] = React.useState<string>('');
-  const [ropFilter, setROPFilter] = React.useState<string>('');
+  // const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  // const [caFilter, setCaFilter] = React.useState<string>('');
+  // const [ropFilter, setROPFilter] = React.useState<string>('');
+  // const [cabangFilter, setCabangFilter] = React.useState<string>('');
 
   const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
 
-  const [startDate, setStartDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  // const [startDate, setStartDate] = React.useState<Date | null>(null);
+  // const [endDate, setEndDate] = React.useState<Date | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
+  const navigationType = useNavigationType();
 
   // reimbursement akses
   const hasReimbursementAkses = cekAkses('#1');
@@ -77,7 +81,17 @@ function Reimbursement() {
   const { user, setUser, setToken } = useAuth();
   const { toggle, visible, type, changeType, hide, show } = useModal();
 
-  console.log('USER DATA X', user);
+  // filter store
+  const {
+    tipeFilter,
+    caFilter,
+    ropFilter,
+    cabangFilter,
+    startDate,
+    endDate,
+    setFilters,
+    resetFilters,
+  } = useRiwayatSayafilter();
 
   React.useEffect(() => {
     getReimbursementList(
@@ -87,8 +101,9 @@ function Reimbursement() {
       ropFilter,
       startDate,
       endDate,
+      cabangFilter,
     );
-  }, [page, startDate, endDate]);
+  }, [tipeFilter, caFilter, ropFilter, startDate, endDate, cabangFilter, page]);
 
   React.useEffect(() => {
     cekUserStatus();
@@ -141,6 +156,8 @@ function Reimbursement() {
     console.log('UPDTED USER', user);
   }
 
+  console.log('CABANG', cabangFilter);
+
   async function getReimbursementList(
     clear?: boolean,
     type?: string,
@@ -148,6 +165,7 @@ function Reimbursement() {
     rop?: string,
     startDate?: any,
     endDate?: any,
+    cabang?: any,
   ) {
     changeType('LOADING');
     show();
@@ -170,9 +188,15 @@ function Reimbursement() {
           .endOf('day')
           .format('YYYY-MM-DDTHH:mm:ss[Z]')}`
       : '';
+    const cabangParam = cabang ? `&cabang=${cabang}` : '';
 
     const filterParam =
-      typeParam + caParam + ropParam + startDateParam + endDateParam;
+      typeParam +
+      caParam +
+      ropParam +
+      startDateParam +
+      endDateParam +
+      cabangParam;
 
     const { state, data, error } = await useFetch({
       url:
@@ -240,6 +264,17 @@ function Reimbursement() {
       return item.childId ? 'Belum dikembalikan' : 'Perlu laporan realisasi';
     }
   }
+  // Update filters di Zustand
+  // React.useEffect(() => {
+  //   setFilters({
+  //     tipeFilter,
+  //     caFilter,
+  //     ropFilter,
+  //     cabangFilter,
+  //     startDate,
+  //     endDate,
+  //   });
+  // }, [tipeFilter, caFilter, ropFilter, cabangFilter, startDate, endDate]);
 
   return (
     <DefaultLayout>
@@ -269,7 +304,7 @@ function Reimbursement() {
               ) : null}
             </div>
           </div>
-          <div className="relative w-full">
+          <div className="w-full flex flex-row items-center gap-x-2">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -298,21 +333,42 @@ function Reimbursement() {
                 </button>
               )}
             </form>
+            <CabangFilterGroup
+              className=" w-full mt-4"
+              value={cabangFilter}
+              setValue={(val: string) => {
+                setPage(1);
+                setFilters({ cabangFilter: val });
+                //setCabangFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   caFilter,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   val,
+                // );
+              }}
+            />
           </div>
+
           <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
             <TipeFilterGroup
               className="w-full lg:w-1/3 mt-2"
               setValue={(val: string) => {
                 setPage(1);
-                setTipeFilter(val);
-                getReimbursementList(
-                  false,
-                  val,
-                  caFilter,
-                  ropFilter,
-                  startDate,
-                  endDate,
-                );
+                setFilters({ tipeFilter: val });
+                //setTipeFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   val,
+                //   caFilter,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   cabangFilter,
+                // );
               }}
               value={tipeFilter}
             />
@@ -320,15 +376,17 @@ function Reimbursement() {
               className="w-full lg:w-1/3"
               setValue={(val: string) => {
                 setPage(1);
-                setCaFilter(val);
-                getReimbursementList(
-                  false,
-                  tipeFilter,
-                  val,
-                  ropFilter,
-                  startDate,
-                  endDate,
-                );
+                setFilters({ caFilter: val });
+                //setCaFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   val,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   cabangFilter,
+                // );
               }}
               value={caFilter}
             />
@@ -337,15 +395,17 @@ function Reimbursement() {
               isUser={true}
               setValue={(val: string) => {
                 setPage(1);
-                setROPFilter(val);
-                getReimbursementList(
-                  false,
-                  tipeFilter,
-                  caFilter,
-                  val,
-                  startDate,
-                  endDate,
-                );
+                setFilters({ ropFilter: val });
+                //setROPFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   caFilter,
+                //   val,
+                //   startDate,
+                //   endDate,
+                //   cabangFilter,
+                // );
               }}
               value={ropFilter}
             />
@@ -356,8 +416,9 @@ function Reimbursement() {
               periodeStart={startDate}
               periodeEnd={endDate}
               onResetButtonPress={() => {
-                setStartDate(null);
-                setEndDate(null);
+                setFilters({ startDate: null, endDate: null });
+                //setStartDate(null);
+                //setEndDate(null);
               }}
             />
           </div>
@@ -569,8 +630,12 @@ function Reimbursement() {
         endDate={endDate}
         toggle={() => setShowPeriode(!showPeriode)}
         value={(cb: any) => {
-          setStartDate(cb.startDate);
-          setEndDate(cb.endDate);
+          setFilters({
+            startDate: cb.startDate,
+            endDate: cb.endDate,
+          });
+          // setStartDate(cb.startDate);
+          // setEndDate(cb.endDate);
         }}
       />
     </DefaultLayout>

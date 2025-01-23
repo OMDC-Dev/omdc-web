@@ -15,6 +15,8 @@ import {
 import DefaultLayout from '../../layout/DefaultLayout';
 import useFetch from '../../hooks/useFetch';
 import {
+  ACCEPT_REVIEW_REIMBURSEMENT_MULTI,
+  FINANCE_ACCEPTANCE_MULTI,
   FINANCE_PENGAJUAN,
   GET_MAKER_REIMBURSEMENT,
   GET_UNREVIEW_REIMBURSEMENT,
@@ -22,7 +24,12 @@ import {
   REIMBURSEMENT_ACCEPTANCE_MULTI,
 } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+  useNavigationType,
+  useParams,
+} from 'react-router-dom';
 import moment from 'moment';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
@@ -34,6 +41,8 @@ import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
 import { cekAkses, getFormattedDateTable } from '../../common/utils';
 import KategoriFilterGroup from '../../components/SelectGroup/KategoriFilterGroup';
+import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
+import useAdminFilter from '../../hooks/useAdminFilter';
 
 const TABLE_HEAD = [
   '',
@@ -81,13 +90,13 @@ function RiwayatDiajukan() {
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [search, setSearch] = React.useState<string>('');
-  const [tipeFilter, setTipeFilter] = React.useState<string>('');
-  const [caFilter, setCaFilter] = React.useState<string>('');
-  const [ropFilter, setROPFilter] = React.useState<string>('');
+  // const [tipeFilter, setTipeFilter] = React.useState<string>('');
+  // const [caFilter, setCaFilter] = React.useState<string>('');
+  // const [ropFilter, setROPFilter] = React.useState<string>('');
   const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
 
-  const [startDate, setStartDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  // const [startDate, setStartDate] = React.useState<Date | null>(null);
+  // const [endDate, setEndDate] = React.useState<Date | null>(null);
   const [selectedIds, setSelectedIds] = React.useState<any>([]);
 
   const [kategoriFilter, setKategoriFilter] = React.useState<string>('');
@@ -107,7 +116,9 @@ function RiwayatDiajukan() {
   const hasMultipleAccept = cekAkses('#10');
 
   const SHOW_CHECKBOX =
-    user.type == 'ADMIN' && hasMultipleAccept && statusType == 'waiting';
+    (user.type == 'ADMIN' && hasMultipleAccept && statusType == 'waiting') ||
+    (user.type == 'REVIEWER' && hasMultipleAccept && statusType == 'waiting') ||
+    (user.type == 'FINANCE' && hasMultipleAccept && statusType == 'waiting');
 
   const ADMIN_TYPE = user?.type;
 
@@ -117,6 +128,19 @@ function RiwayatDiajukan() {
       : TABLE_HEAD_FINANCE;
 
   const navigate = useNavigate();
+  const navigationType = useNavigationType();
+
+  // filter store
+  const {
+    tipeFilter,
+    caFilter,
+    ropFilter,
+    cabangFilter,
+    startDate,
+    endDate,
+    setFilters,
+    resetFilters,
+  } = useAdminFilter();
 
   React.useEffect(() => {
     getReimbursementList(
@@ -127,20 +151,19 @@ function RiwayatDiajukan() {
       startDate,
       endDate,
       kategoriFilter,
+      cabangFilter,
     );
-  }, [page, startDate, endDate]);
+  }, [tipeFilter, caFilter, ropFilter, startDate, endDate, cabangFilter, page]);
 
   React.useEffect(() => {
-    onClearList();
+    if (navigationType !== 'POP') {
+      onClearList();
+    }
   }, [location.key]);
 
   function onClearList() {
-    setTipeFilter('');
-    setCaFilter('');
-    setROPFilter('');
-    setKategoriFilter('');
-    setStartDate(null);
-    setEndDate(null);
+    resetFilters();
+    setSelectedIds([]);
 
     getReimbursementList(
       true,
@@ -163,6 +186,7 @@ function RiwayatDiajukan() {
     startDate?: any,
     endDate?: any,
     kategori?: any,
+    cabang?: any,
   ) {
     changeType('LOADING');
     show();
@@ -187,6 +211,7 @@ function RiwayatDiajukan() {
       : '';
 
     const statusTypeParam = `&statusType=${statusType}`;
+    const cabangParam = cabang ? `&cabang=${cabang}` : '';
 
     const kategoriParam =
       kategori && kategori !== 'all'
@@ -205,6 +230,7 @@ function RiwayatDiajukan() {
       param += endDateParam;
       param += statusTypeParam;
       param += kategoriParam;
+      param += cabangParam;
     } else if (ADMIN_TYPE == 'FINANCE') {
       URL = FINANCE_PENGAJUAN;
       param = typeParam('type');
@@ -215,6 +241,7 @@ function RiwayatDiajukan() {
       param += endDateParam;
       param += statusTypeParam;
       param += kategoriParam;
+      param += cabangParam;
     } else if (ADMIN_TYPE == 'REVIEWER') {
       URL = GET_UNREVIEW_REIMBURSEMENT;
       param = typeParam('typePembayaran');
@@ -225,6 +252,7 @@ function RiwayatDiajukan() {
       param += endDateParam;
       param += statusTypeParam;
       param += kategoriParam;
+      param += cabangParam;
     } else {
       URL = GET_MAKER_REIMBURSEMENT;
       param = typeParam('typePembayaran');
@@ -235,6 +263,7 @@ function RiwayatDiajukan() {
       param += endDateParam;
       param += statusTypeParam;
       param += kategoriParam;
+      param += cabangParam;
     }
 
     console.log('URL', URL);
@@ -353,11 +382,28 @@ function RiwayatDiajukan() {
   async function onAcceptMulti() {
     changeType('LOADING');
 
+    let API_URL = '';
+
+    switch (ADMIN_TYPE) {
+      case 'ADMIN':
+        API_URL = REIMBURSEMENT_ACCEPTANCE_MULTI;
+        break;
+      case 'REVIEWER':
+        API_URL = ACCEPT_REVIEW_REIMBURSEMENT_MULTI;
+        break;
+      case 'FINANCE':
+        API_URL = FINANCE_ACCEPTANCE_MULTI;
+        break;
+      default:
+        break;
+    }
+
     const { state, data, error } = await useFetch({
-      url: REIMBURSEMENT_ACCEPTANCE_MULTI,
+      url: API_URL,
       method: 'POST',
       data: {
         ids: selectedIds,
+        status: 'APPROVED',
       },
     });
 
@@ -382,7 +428,7 @@ function RiwayatDiajukan() {
               </Typography>
             </div>
           </div>
-          <div className="relative w-full">
+          <div className="w-full flex flex-row items-center gap-x-2">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -411,121 +457,100 @@ function RiwayatDiajukan() {
                 </button>
               )}
             </form>
-          </div>
-          <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
-            <TipeFilterGroup
-              className="w-full lg:w-1/3 mt-2"
+            <CabangFilterGroup
+              className=" w-full mt-4"
+              value={cabangFilter}
               setValue={(val: string) => {
                 setPage(1);
-                val == 'all' ? setTipeFilter('') : setTipeFilter(val);
-                getReimbursementList(
-                  false,
-                  val,
-                  caFilter,
-                  ropFilter,
-                  startDate,
-                  endDate,
-                  kategoriFilter,
-                );
-              }}
-              value={tipeFilter}
-            />
-            {statusType != 'waiting' ? (
-              <CashAdvanceFilterGroup
-                className="w-full lg:w-1/3"
-                setValue={(val: string) => {
-                  setPage(1);
-                  val == 'ALL' ? setCaFilter('') : setCaFilter(val);
-                  getReimbursementList(
-                    false,
-                    tipeFilter,
-                    val,
-                    ropFilter,
-                    startDate,
-                    endDate,
-                    kategoriFilter,
-                  );
-                }}
-                value={caFilter}
-              />
-            ) : (
-              <KategoriFilterGroup
-                className="w-full lg:w-1/3"
-                setValue={(val: string) => {
-                  if (val == 'all') {
-                    setKategoriFilter('');
-                  } else {
-                    setKategoriFilter(val);
-                  }
-                  setPage(1);
-                  getReimbursementList(
-                    false,
-                    tipeFilter,
-                    caFilter,
-                    ropFilter,
-                    startDate,
-                    endDate,
-                    val,
-                  );
-                }}
-                value={kategoriFilter}
-              />
-            )}
-            {statusType != 'waiting' && (
-              <StatusROPFilterGroup
-                className="w-full lg:w-1/3"
-                isUser={false}
-                setValue={(val: string) => {
-                  setPage(1);
-                  val == 'ALL' ? setROPFilter('') : setROPFilter(val);
-                  getReimbursementList(
-                    false,
-                    tipeFilter,
-                    caFilter,
-                    val,
-                    startDate,
-                    endDate,
-                    kategoriFilter,
-                  );
-                }}
-                value={ropFilter}
-              />
-            )}
-            {statusType != 'waiting' && (
-              <KategoriFilterGroup
-                className="w-full lg:w-1/3"
-                setValue={(val: string) => {
-                  if (val == 'all') {
-                    setKategoriFilter('');
-                  } else {
-                    setKategoriFilter(val);
-                  }
-                  setPage(1);
-                  getReimbursementList(
-                    false,
-                    tipeFilter,
-                    caFilter,
-                    ropFilter,
-                    startDate,
-                    endDate,
-                    val,
-                  );
-                }}
-                value={kategoriFilter}
-              />
-            )}
-          </div>
-          <div className=" mt-2">
-            <DateRange
-              onShowButtonPress={() => setShowPeriode(!showPeriode)}
-              periodeStart={startDate}
-              periodeEnd={endDate}
-              onResetButtonPress={() => {
-                setStartDate(null);
-                setEndDate(null);
+                setFilters({ cabangFilter: val });
+                //setCabangFilter(val);
+                // getReimbursementList(
+                //   false,
+                //   tipeFilter,
+                //   caFilter,
+                //   ropFilter,
+                //   startDate,
+                //   endDate,
+                //   val,
+                // );
               }}
             />
           </div>
+
+          {statusType !== 'waiting' && (
+            <div>
+              <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
+                <TipeFilterGroup
+                  className="w-full lg:w-1/3 mt-2"
+                  setValue={(val: string) => {
+                    setPage(1);
+                    setFilters({ tipeFilter: val });
+                    //setTipeFilter(val);
+                    // getReimbursementList(
+                    //   false,
+                    //   val,
+                    //   caFilter,
+                    //   ropFilter,
+                    //   startDate,
+                    //   endDate,
+                    //   cabangFilter,
+                    // );
+                  }}
+                  value={tipeFilter}
+                />
+                <CashAdvanceFilterGroup
+                  className="w-full lg:w-1/3"
+                  setValue={(val: string) => {
+                    setPage(1);
+                    setFilters({ caFilter: val });
+                    //setCaFilter(val);
+                    // getReimbursementList(
+                    //   false,
+                    //   tipeFilter,
+                    //   val,
+                    //   ropFilter,
+                    //   startDate,
+                    //   endDate,
+                    //   cabangFilter,
+                    // );
+                  }}
+                  value={caFilter}
+                />
+                <StatusROPFilterGroup
+                  className="w-full lg:w-1/3"
+                  isUser={true}
+                  setValue={(val: string) => {
+                    setPage(1);
+                    setFilters({ ropFilter: val });
+                    //setROPFilter(val);
+                    // getReimbursementList(
+                    //   false,
+                    //   tipeFilter,
+                    //   caFilter,
+                    //   val,
+                    //   startDate,
+                    //   endDate,
+                    //   cabangFilter,
+                    // );
+                  }}
+                  value={ropFilter}
+                />
+              </div>
+              <div className=" mt-2">
+                <DateRange
+                  onShowButtonPress={() => setShowPeriode(!showPeriode)}
+                  periodeStart={startDate}
+                  periodeEnd={endDate}
+                  onResetButtonPress={() => {
+                    setFilters({ startDate: null, endDate: null });
+                    //setStartDate(null);
+                    //setEndDate(null);
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           {selectedIds?.length > 0 && (
             <div className=" w-full mt-8">
               <Button
@@ -784,8 +809,12 @@ function RiwayatDiajukan() {
         endDate={endDate}
         toggle={() => setShowPeriode(!showPeriode)}
         value={(cb: any) => {
-          setStartDate(cb.startDate);
-          setEndDate(cb.endDate);
+          setFilters({
+            startDate: cb.startDate,
+            endDate: cb.endDate,
+          });
+          // setStartDate(cb.startDate);
+          // setEndDate(cb.endDate);
         }}
       />
     </DefaultLayout>
