@@ -124,6 +124,8 @@ function ReportReimbursement() {
         pengajuan_ca,
         parentDoc,
         childDoc,
+        finance_note,
+        maker_note,
         ...rest
       }: any = itemCol;
 
@@ -180,6 +182,8 @@ function ReportReimbursement() {
         saldo: saldo,
         parentDoc: parentDoc,
         childDoc: childDoc,
+        finance_note: finance_note,
+        maker_note: maker_note,
       };
     });
 
@@ -213,6 +217,8 @@ function ReportReimbursement() {
       'Sisa Saldo',
       'No. Dokumen Cash Advance',
       'No. Dokumen Cash Advance Report',
+      'Catatan Finance',
+      'Catatan Maker',
     ];
 
     const title = `Report${startDate}-${endDate}`;
