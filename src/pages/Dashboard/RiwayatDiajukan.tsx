@@ -122,10 +122,18 @@ function RiwayatDiajukan() {
 
   const ADMIN_TYPE = user?.type;
 
+  function addSpaceForMulti(data: any[] = []): any[] {
+    if (hasMultipleAccept) {
+      return ['', ...data];
+    }
+
+    return data;
+  }
+
   const TABLE =
     ADMIN_TYPE == 'ADMIN' || ADMIN_TYPE == 'REVIEWER' || ADMIN_TYPE == 'MAKER'
-      ? TABLE_HEAD
-      : TABLE_HEAD_FINANCE;
+      ? addSpaceForMulti(TABLE_HEAD)
+      : addSpaceForMulti(TABLE_HEAD_FINANCE);
 
   const navigate = useNavigate();
   const navigationType = useNavigationType();
@@ -424,7 +432,7 @@ function RiwayatDiajukan() {
                 Diajukan ke Saya
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua riwayat pengajuan oleh user.
+                Menampilkan semua riwayat pengajuan oleh user
               </Typography>
             </div>
           </div>
