@@ -15,6 +15,7 @@ export const USER_COMPLETE = 'user/complete';
 export const UPDATE_PASSWORD = 'user/update-password';
 export const GET_NOTIFICATION = 'pengumuman';
 export const GET_NOTIFICATION_COUNT = 'pengumuman/count';
+export const USER_SESSION = (id: number) => `user/session/${id}`;
 export const READ_NOTIFICATION = (id: number) => {
   return `pengumuman/read/${id}`;
 };

@@ -140,6 +140,8 @@ function Reimbursement() {
       if (data.status !== 'Aktif') {
         onLogout();
       }
+
+      setUser({ ...user, isAdmin: data.isAdmin });
     }
   }
 
