@@ -78,6 +78,9 @@ const AdminDetailPengajuan: React.FC = () => {
   const [parentData, setParentData] = React.useState<any>();
 
   const [status, setStatus] = React.useState<any>();
+  const [previewType, setPreviewType] = React.useState<'BASIC' | 'BUKTI'>(
+    'BASIC',
+  );
 
   // COA
   const [coa, setCoa] = React.useState<string>();
@@ -891,6 +894,30 @@ const AdminDetailPengajuan: React.FC = () => {
                     {formatRupiah(saldo, true)}
                   </div>
                 </div>
+
+                {status?.bukti_attachment && (
+                  <div className="w-full mb-9">
+                    <label className="mb-3 block text-black dark:text-white">
+                      Bukti Pengembalian
+                    </label>
+                    <div className=" flex flex-col gap-4">
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {status?.bukti_file_info?.name}
+                      </div>
+                      <Button
+                        onClick={(e: any) => {
+                          e.preventDefault();
+                          setPreviewType('BUKTI');
+                          status?.bukti_file_info?.type !== 'application/pdf'
+                            ? setShowFile(!showFile)
+                            : openInNewTab(status?.bukti_attachment);
+                        }}
+                      >
+                        Lihat Lampiran
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1109,6 +1136,7 @@ const AdminDetailPengajuan: React.FC = () => {
                       <Button
                         onClick={(e: any) => {
                           e.preventDefault();
+                          setPreviewType('BASIC');
                           data?.file_info?.type !== 'application/pdf'
                             ? setShowFile(!showFile)
                             : openInNewTab(data?.attachment);
@@ -1329,8 +1357,14 @@ const AdminDetailPengajuan: React.FC = () => {
       {/* MODAL CONTAINER */}
       <Modal visible={visible} toggle={toggle} />
       <FileModal
-        type={data?.file_info?.type}
-        data={data?.attachment}
+        type={
+          previewType == 'BASIC'
+            ? data?.file_info?.type
+            : data?.bukti_file_info?.type
+        }
+        data={
+          previewType == 'BASIC' ? data?.attachment : data?.bukti_attachment
+        }
         visible={showFile}
         toggle={() => setShowFile(!showFile)}
       />

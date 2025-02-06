@@ -555,19 +555,17 @@ function Reimbursement() {
                             {moment(item?.createdAt).format('lll') || '-'}
                           </Typography>
                         </td>
-                        <td className={classes}>
-                          {/* <Typography variant="small" className="font-normal">
-                            {item?.status}
-                          </Typography> */}
+                        <td className={`${classes}`}>
                           {keteranganStatus(item)}
                         </td>
-                        <td className={classes}>
-                          {/* <Typography variant="small" className="font-normal">
-                            {item?.status}
-                          </Typography> */}
+                        <td
+                          className={`${classes} sticky right-[4rem] bg-white z-10`}
+                        >
                           {statusChip(item?.status, item?.status_finance)}
                         </td>
-                        <td className={classes}>
+                        <td
+                          className={`${classes} sticky right-0 bg-white z-10`}
+                        >
                           <Tooltip content="Detail">
                             <IconButton
                               variant="text"

@@ -81,6 +81,10 @@ const DetailPengajuan: React.FC = () => {
   const [showFile, setShowFile] = React.useState(false);
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
 
+  const [previewType, setPreviewType] = React.useState<'BASIC' | 'BUKTI'>(
+    'BASIC',
+  );
+
   const { toPDF, targetRef } = usePDF({ filename: 'report.pdf' });
 
   const RID = data?.id;
@@ -637,6 +641,7 @@ const DetailPengajuan: React.FC = () => {
                       <Button
                         onClick={(e: any) => {
                           e.preventDefault();
+                          setPreviewType('BASIC');
                           status?.file_info?.type !== 'application/pdf'
                             ? setShowFile(!showFile)
                             : openInNewTab(status?.attachment);
@@ -802,6 +807,30 @@ const DetailPengajuan: React.FC = () => {
                         className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
                     </div>
+                    {status?.bukti_attachment && (
+                      <div className="w-full mt-4.5">
+                        <label className="mb-3 block text-black dark:text-white">
+                          Bukti Pengembalian
+                        </label>
+                        <div className=" flex flex-col gap-4">
+                          <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                            {status?.bukti_file_info?.name}
+                          </div>
+                          <Button
+                            onClick={(e: any) => {
+                              e.preventDefault();
+                              setPreviewType('BUKTI');
+                              status?.bukti_file_info?.type !==
+                              'application/pdf'
+                                ? setShowFile(!showFile)
+                                : openInNewTab(status?.bukti_attachment);
+                            }}
+                          >
+                            Lihat Lampiran
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </>
                 ) : null}
               </div>
@@ -882,8 +911,14 @@ const DetailPengajuan: React.FC = () => {
       {/* MODAL CONTAINER */}
       {/* <Modal visible={visible} toggle={toggle} /> */}
       <FileModal
-        type={status?.file_info?.type}
-        data={status?.attachment}
+        type={
+          previewType == 'BASIC'
+            ? data?.file_info?.type
+            : data?.bukti_file_info?.type
+        }
+        data={
+          previewType == 'BASIC' ? data?.attachment : data?.bukti_attachment
+        }
         visible={showFile}
         toggle={() => setShowFile(!showFile)}
       />
