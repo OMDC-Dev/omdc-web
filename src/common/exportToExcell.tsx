@@ -83,6 +83,8 @@ export const createReportData = (data = []): any => {
       childDoc,
       finance_note,
       maker_note,
+      bukti_attachment,
+      remarked,
     }: any = itemCol;
 
     // get reference dok
@@ -206,7 +208,16 @@ export const createReportData = (data = []): any => {
       nPaidStatus,
       acceptDate,
       nPeriod,
+      maker_note,
+      finance_note,
       attachment,
+      bukti_attachment,
+      remarked:
+        jenis_reimbursement == 'Cash Advance Report'
+          ? remarked
+            ? 'SUDAH DICEK'
+            : 'BELUM DICEK'
+          : 'BUKAN REPORT',
     };
   });
 

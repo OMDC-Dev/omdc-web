@@ -353,7 +353,11 @@ function ReportReimbursement() {
         'PAID STATUS',
         'PAYMENT DATE',
         'PERIOD',
+        'CATATAN MAKER',
+        'CATATAN FINANCE',
         'LINK GDRIVE',
+        'BUKTI PENGEMBALIAN',
+        'REMARK',
       ],
     };
 

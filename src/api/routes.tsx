@@ -26,6 +26,9 @@ export const DELETE_PENGUMUMAN = (pid: number) => {
 // REIMBURSEMENT
 export const GET_CABANG = 'cabang';
 export const REIMBURSEMENT = 'reimbursement';
+export const REIMBURSEMENT_REMARK = 'reviewer/remarked';
+export const REIMBURSEMENT_REMARK_CHECK = (id: number, check: boolean) =>
+  `reviewer/remarked/check/${id}?check=${check}`;
 export const REIMBURSEMENT_DETAIL = (id: number) => {
   return `reimbursement/${id}`;
 };

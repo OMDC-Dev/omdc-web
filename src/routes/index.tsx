@@ -41,6 +41,7 @@ import ListMasterBarang from '../pages/MasterBarang/ListBarang';
 import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
 import BuatPengajuanUlang from '../pages/Dashboard/BuatPengajuanUlang';
 import ManualUploadFile from '../pages/SuperAdmin/ManualUploadFIle';
+import RemarkCA from '../pages/Dashboard/RemarkCA';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -182,6 +183,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Pengajuan'} />
               <RiwayatDiajukan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/remark-ca',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Pengajuan'} />
+              <RemarkCA />
             </>
           ),
         },
