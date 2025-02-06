@@ -17,7 +17,7 @@ import {
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { exportToExcell } from '../../common/exportToExcell';
+import { createReportData, exportToExcell } from '../../common/exportToExcell';
 import formatRupiah from '../../common/formatRupiah';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
@@ -328,7 +328,42 @@ function ReportReimbursement() {
       ],
     };
 
-    exportToExcell(sortedData, customHeaders, title, detailItemSheetData);
+    // Sheet 3
+    const newReportROP = {
+      sheetName: 'Report ROP',
+      data: createReportData(data),
+      headers: [
+        'NO',
+        'NO DOKUMEN',
+        'BRANCH',
+        'USER',
+        'INVOICE DATE',
+        'TYPE PAYMENT',
+        'INVOICE NO.',
+        'DESCRIPTION',
+        'AMOUNT',
+        'REF DOKUMEN',
+        'NOMINAL CASH ADVANCE',
+        'SALDO',
+        'TOTAL PAYMENT',
+        'BENEFICIARY NAME',
+        'ACCOUNT NO.',
+        'BANK',
+        'PAID BY',
+        'PAID STATUS',
+        'PAYMENT DATE',
+        'PERIOD',
+        'LINK GDRIVE',
+      ],
+    };
+
+    exportToExcell(
+      sortedData,
+      customHeaders,
+      title,
+      detailItemSheetData,
+      newReportROP,
+    );
     toggle();
   }
 
