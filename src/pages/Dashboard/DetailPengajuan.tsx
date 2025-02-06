@@ -259,7 +259,7 @@ const DetailPengajuan: React.FC = () => {
   function handleAttachment(event: any) {
     const file = event.target.files[0];
     const reader = new FileReader();
-    const maxSize = 5242880;
+    const maxSize = 10485760;
 
     // handle file type
     const fileInfo = {
@@ -276,7 +276,7 @@ const DetailPengajuan: React.FC = () => {
       } else {
         // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
         alert(
-          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 10 MB.',
         );
         event.target.value = null; // Mengosongkan input file
         return;
@@ -650,12 +650,12 @@ const DetailPengajuan: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Lampirkan File ( Maks. 5MB )
+                        Lampirkan File ( hanya PDF, maks. 10MB)
                       </label>
                       <input
                         type="file"
                         className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        accept=".pdf,image/*"
+                        accept={/*".pdf,image/*"*/ '.pdf'}
                         onChange={handleAttachment}
                       />
                     </div>

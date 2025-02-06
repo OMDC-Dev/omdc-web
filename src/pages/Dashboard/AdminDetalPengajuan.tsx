@@ -40,6 +40,7 @@ import { useAuth } from '../../hooks/useAuth';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import COAModal from '../../components/Modal/COAModal';
 import BankModal from '../../components/Modal/BankModal';
+import CabangModal from '../../components/Modal/CabangModal';
 
 const AdminDetailPengajuan: React.FC = () => {
   const {
@@ -88,6 +89,10 @@ const AdminDetailPengajuan: React.FC = () => {
   const [saldo, setSaldo] = React.useState<any>();
   const [isNeedBank, setIsNeedBank] = React.useState<boolean>(true);
 
+  // Cabang
+  const [cabang, setCabang] = React.useState<string | any>();
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+
   // CONST
   const RID = data?.id;
   const EX_STATUS = data?.status;
@@ -99,6 +104,17 @@ const AdminDetailPengajuan: React.FC = () => {
     'iduser',
     'status',
   );
+
+  const IS_EXTRA_ADMIN = data.extraAcceptance.iduser == user.iduser;
+
+  const IS_CAN_EDIT_CABANG =
+    ACCEPTANCE_STATUS_BY_ID == 'WAITING' ||
+    (ADMIN_TYPE == 'REVIEWER' && status?.reviewStatus == 'IDLE') ||
+    (ADMIN_TYPE == 'MAKER' && status?.makerStatus == 'IDLE') ||
+    (ADMIN_TYPE == 'FINANCE' && status?.status_finance == 'WAITING') ||
+    (ADMIN_TYPE == 'ADMIN' &&
+      IS_EXTRA_ADMIN &&
+      status?.extraAcceptanceStatus == 'WAITING');
 
   const [note, setNote] = React.useState<string>('');
 
@@ -154,6 +170,7 @@ const AdminDetailPengajuan: React.FC = () => {
 
     if (state == API_STATES.OK) {
       setStatus(data);
+      setData((prev: any) => ({ ...prev, kode_cabang: data.kode_cabang }));
       //setSelectedBank({ namaBank: data.finance_bank });
     } else {
       setStatus(EX_STATUS);
@@ -181,6 +198,7 @@ const AdminDetailPengajuan: React.FC = () => {
       coa: coa,
       bank: selectedBank?.namaBank,
       extra: admin.iduser,
+      cabang: cabang ? cabang.value : null,
     };
 
     const { state, data, error } = await useFetch({
@@ -211,6 +229,7 @@ const AdminDetailPengajuan: React.FC = () => {
       nominal: fnominal,
       note: note,
       coa: coa,
+      cabang: cabang ? cabang.value : null,
     };
 
     const { state, data, error } = await useFetch({
@@ -238,6 +257,7 @@ const AdminDetailPengajuan: React.FC = () => {
     const body = {
       status: status,
       note: note,
+      cabang: cabang ? cabang.value : null,
     };
 
     const { state, data, error } = await useFetch({
@@ -264,6 +284,7 @@ const AdminDetailPengajuan: React.FC = () => {
       note: note,
       coa: coa,
       status: tStatus,
+      cabang: cabang ? cabang.value : null,
     };
 
     const { state, data, error } = await useFetch({
@@ -291,6 +312,7 @@ const AdminDetailPengajuan: React.FC = () => {
       coa: coa,
       status: tStatus,
       bank: selectedBank?.namaBank,
+      cabang: cabang ? cabang.value : null,
     };
 
     const { state, data, error } = await useFetch({
@@ -541,6 +563,9 @@ const AdminDetailPengajuan: React.FC = () => {
           return;
         }
       } else {
+        if (!IS_EXTRA_ADMIN) {
+          return;
+        }
         if (status?.extraAcceptanceStatus !== 'WAITING') {
           return;
         }
@@ -595,6 +620,9 @@ const AdminDetailPengajuan: React.FC = () => {
           return;
         }
       } else {
+        if (!IS_EXTRA_ADMIN) {
+          return;
+        }
         if (status?.extraAcceptanceStatus !== 'WAITING') {
           return;
         }
@@ -1016,11 +1044,29 @@ const AdminDetailPengajuan: React.FC = () => {
 
                   <div className="w-full">
                     <label className="mb-3 block text-black dark:text-white">
-                      Cabang
+                      {IS_CAN_EDIT_CABANG
+                        ? 'Cabang ( dapat diedit )'
+                        : 'Cabang'}
                     </label>
-                    <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
-                      {data?.kode_cabang}
-                    </div>
+                    {!IS_CAN_EDIT_CABANG ? (
+                      <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                        {data?.kode_cabang}
+                      </div>
+                    ) : (
+                      <>
+                        <div
+                          onClick={() => setShowCabang(!showCabang)}
+                          className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        >
+                          {cabang?.label || data?.kode_cabang || 'Pilih Cabang'}
+                        </div>
+                        {cabang?.label && (
+                          <p className="text-sm mt-2 text-gray-400">
+                            * Perubahan akan disimpan saat pengajuan di setujui
+                          </p>
+                        )}
+                      </>
+                    )}
                   </div>
 
                   <div className="w-full">
@@ -1068,9 +1114,7 @@ const AdminDetailPengajuan: React.FC = () => {
                             : openInNewTab(data?.attachment);
                         }}
                       >
-                        {data?.file_info?.type !== 'application/pdf'
-                          ? 'Lihat'
-                          : 'Unduh'}
+                        Lihat Lampiran
                       </Button>
                     </div>
                   </div>
@@ -1333,6 +1377,11 @@ const AdminDetailPengajuan: React.FC = () => {
         visible={showCoa}
         toggle={() => setShowCoa(!showCoa)}
         value={(val: any) => setCoa(val)}
+      />
+      <CabangModal
+        visible={showCabang}
+        toggle={() => setShowCabang(!showCabang)}
+        value={(val: any) => setCabang(val)}
       />
       <BankModal
         visible={showBank}
