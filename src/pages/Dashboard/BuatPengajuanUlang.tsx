@@ -791,7 +791,7 @@ const BuatPengajuanUlang: React.FC = () => {
                 {item?.length ? (
                   <div className="mb-4">
                     <Card>
-                      <List>
+                      <List className="max-h-92 overflow-y-auto py-4.5">
                         {item.map((item: any, index: number) => {
                           return (
                             <ListItem

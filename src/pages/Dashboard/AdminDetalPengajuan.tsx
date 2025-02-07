@@ -1233,7 +1233,7 @@ const AdminDetailPengajuan: React.FC = () => {
               <div className="p-6.5">
                 <div className="mb-4">
                   <Card className=" rounded-md">
-                    <List>
+                    <List className="max-h-92 overflow-y-auto py-4.5">
                       {data?.item?.map((item: any, index: number) => {
                         return (
                           <ListItem
