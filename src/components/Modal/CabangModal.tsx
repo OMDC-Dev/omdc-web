@@ -41,7 +41,7 @@ const CabangModal = ({
         return { label: item.nm_induk, value: item?.kd_induk };
       });
 
-      if (filter.length) {
+      if (filter?.length) {
         const flCabang = doCabang.filter((item: any) => {
           return filter.every((fItem: any) => fItem.value != item.value);
         });

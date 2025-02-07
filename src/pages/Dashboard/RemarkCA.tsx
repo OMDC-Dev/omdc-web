@@ -33,9 +33,14 @@ import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import useRiwayatSayafilter from '../../hooks/useRiwayatSayaFilter';
 import DefaultLayout from '../../layout/DefaultLayout';
-import { formatCurrencyToNumber, openInNewTab } from '../../common/utils';
+import {
+  formatCurrencyToNumber,
+  openInNewTab,
+  removeFromState,
+} from '../../common/utils';
 import formatRupiah from '../../common/formatRupiah';
 import { ArrowDownOnSquareIcon } from '@heroicons/react/24/outline';
+import CabangModal from '../../components/Modal/CabangModal';
 moment.locale('id');
 
 const TABLE_HEAD = [
@@ -66,6 +71,8 @@ function RemarkCA() {
   const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
   const [selectedId, setSelectedId] = React.useState<number>(0);
   const [selectedMark, setSelectedMark] = React.useState<boolean>(false);
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [selectedCabang, setSelectedCabang] = React.useState<any>([]);
 
   const navigate = useNavigate();
 
@@ -198,14 +205,14 @@ function RemarkCA() {
                 </button>
               )}
             </form>
-            <CabangFilterGroup
+            {/* <CabangFilterGroup
               className=" w-full mt-4"
               value={cabangFilter}
               setValue={(val: string) => {
                 setPage(1);
                 setFilters({ cabangFilter: val });
               }}
-            />
+            /> */}
           </div>
 
           <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
@@ -263,6 +270,65 @@ function RemarkCA() {
                   setFilters({ startDate: null, endDate: null });
                 }}
               />
+            </div>
+          </div>
+          <div className="w-full mt-2 max-w-[50%]">
+            <div className="flex flex-row gap-x-4">
+              <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
+                {selectedCabang.length > 0 ? (
+                  <div className="flex-1 flex flex-wrap gap-2 max-h-25 overflow-y-auto">
+                    {selectedCabang.map((item: any, index: number) => {
+                      return (
+                        <Chip
+                          variant={'ghost'}
+                          color={'blue'}
+                          value={item.label}
+                          animate={{
+                            mount: { y: 0 },
+                            unmount: { y: 50 },
+                          }}
+                          onClose={() =>
+                            removeFromState(
+                              selectedCabang,
+                              item,
+                              setSelectedCabang,
+                              'value',
+                            )
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="px-4 text-base">Cabang</p>
+                )}
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Button
+                    color={'blue'}
+                    variant={'outlined'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => setShowCabang(!showCabang)}
+                  >
+                    + Tambahkan
+                  </Button>
+                  <Button
+                    color={'blue'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => {
+                      setPage(1);
+                      setFilters({
+                        cabangFilter: selectedCabang.map(
+                          (item: any) => item.value,
+                        ),
+                      });
+                    }}
+                  >
+                    Terapkan
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </CardHeader>
@@ -468,7 +534,11 @@ function RemarkCA() {
                                 show();
                               }}
                             >
-                              <CheckIcon className="h-4 w-4" />
+                              {item.remarked ? (
+                                <XMarkIcon className="h-4 w-4" />
+                              ) : (
+                                <CheckIcon className="h-4 w-4" />
+                              )}
                             </IconButton>
                           </Tooltip>
                         </td>
@@ -532,6 +602,12 @@ function RemarkCA() {
           // setStartDate(cb.startDate);
           // setEndDate(cb.endDate);
         }}
+      />
+      <CabangModal
+        visible={showCabang}
+        toggle={() => setShowCabang(!showCabang)}
+        value={(val: any) => setSelectedCabang([...selectedCabang, val])}
+        filter={selectedCabang}
       />
     </DefaultLayout>
   );

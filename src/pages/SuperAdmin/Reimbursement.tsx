@@ -28,6 +28,8 @@ import useReportFilter from '../../hooks/useReportFilter';
 import DateRange from '../../components/DateRange';
 import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
+import CabangModal from '../../components/Modal/CabangModal';
+import { removeFromState } from '../../common/utils';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -57,6 +59,8 @@ function SuperReimbursement() {
   const [financeFilter, setFinanceFilter] = React.useState<string>('');
   // const [caFilter, setCaFilter] = React.useState<string>('');
   // const [ropFilter, setROPFilter] = React.useState<string>('');
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [selectedCabang, setSelectedCabang] = React.useState<any>([]);
 
   const [showPeriode, setShowPeriode] = React.useState<boolean>(false);
 
@@ -260,7 +264,7 @@ function SuperReimbursement() {
                 </button>
               )}
             </form>
-            <CabangFilterGroup
+            {/* <CabangFilterGroup
               className=" w-full mt-4"
               value={cabangFilter}
               setValue={(val: string) => {
@@ -277,7 +281,7 @@ function SuperReimbursement() {
                 //   val,
                 // );
               }}
-            />
+            /> */}
           </div>
 
           <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
@@ -348,6 +352,65 @@ function SuperReimbursement() {
                 //setEndDate(null);
               }}
             />
+          </div>
+          <div className="w-full mt-2 max-w-[50%]">
+            <div className="flex flex-row gap-x-4">
+              <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
+                {selectedCabang.length > 0 ? (
+                  <div className="flex-1 flex flex-wrap gap-2 max-h-25 overflow-y-auto">
+                    {selectedCabang.map((item: any, index: number) => {
+                      return (
+                        <Chip
+                          variant={'ghost'}
+                          color={'blue'}
+                          value={item.label}
+                          animate={{
+                            mount: { y: 0 },
+                            unmount: { y: 50 },
+                          }}
+                          onClose={() =>
+                            removeFromState(
+                              selectedCabang,
+                              item,
+                              setSelectedCabang,
+                              'value',
+                            )
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="px-4 text-base">Cabang</p>
+                )}
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Button
+                    color={'blue'}
+                    variant={'outlined'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => setShowCabang(!showCabang)}
+                  >
+                    + Tambahkan
+                  </Button>
+                  <Button
+                    color={'blue'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => {
+                      setPage(1);
+                      setFilters({
+                        cabangFilter: selectedCabang.map(
+                          (item: any) => item.value,
+                        ),
+                      });
+                    }}
+                  >
+                    Terapkan
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </CardHeader>
         {!rList?.length ? (
@@ -556,6 +619,12 @@ function SuperReimbursement() {
           // setStartDate(cb.startDate);
           // setEndDate(cb.endDate);
         }}
+      />
+      <CabangModal
+        visible={showCabang}
+        toggle={() => setShowCabang(!showCabang)}
+        value={(val: any) => setSelectedCabang([...selectedCabang, val])}
+        filter={selectedCabang}
       />
     </DefaultLayout>
   );

@@ -13,6 +13,7 @@ import {
   formatAmount,
   formatCurrencyToNumber,
   hitungSelisihHari,
+  removeFromState,
 } from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
@@ -22,12 +23,15 @@ import formatRupiah from '../../common/formatRupiah';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 import PeriodeTipeFilterGroup from '../../components/SelectGroup/PeriodeTipeFilterGroup';
+import { Chip, Button as MButton } from '@material-tailwind/react';
 
 function ReportReimbursement() {
   const [data, setData] = React.useState();
 
-  const [cabang, setCabang] = React.useState<string | any>();
+  // const [cabang, setCabang] = React.useState<string | any>();
+  // const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [selectedCabang, setSelectedCabang] = React.useState<any>([]);
 
   const [showBank, setShowBank] = React.useState<boolean>(false);
   const [selectedBank, setSelectedBank] = React.useState<any>();
@@ -68,11 +72,15 @@ function ReportReimbursement() {
 
     changeType('LOADING');
 
+    const mapCabang = selectedCabang?.length
+      ? selectedCabang.map((item: any) => item.value)
+      : [];
+
     const { state, data, error } = await useFetch({
       url: SUPERUSER_REPORT_EXPORT(
         startDate,
         endDate,
-        cabang ? cabang.value : '',
+        mapCabang,
         selectedBank ? selectedBank?.namaBank : '',
         typeFilter,
         financeFilter,
@@ -381,7 +389,7 @@ function ReportReimbursement() {
         </div>
         <div className=" p-6.5 flex flex-col gap-y-6">
           <div className="w-full">
-            <div>
+            {/* <div>
               <label className="mb-3 block text-black dark:text-white">
                 Cabang
               </label>
@@ -400,6 +408,60 @@ function ReportReimbursement() {
                   >
                     Reset
                   </Button>
+                </div>
+              </div>
+            </div> */}
+            <div className="w-full">
+              <label className="mb-3 block text-black dark:text-white">
+                Cabang
+              </label>
+              <div className="flex flex-row gap-x-4">
+                <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
+                  {selectedCabang.length > 0 ? (
+                    <div className="flex-1 flex flex-wrap gap-2 max-h-25 overflow-y-auto">
+                      {selectedCabang.map((item: any, index: number) => {
+                        return (
+                          <Chip
+                            variant={'ghost'}
+                            color={'blue'}
+                            value={item.label}
+                            animate={{
+                              mount: { y: 0 },
+                              unmount: { y: 50 },
+                            }}
+                            onClose={() =>
+                              removeFromState(
+                                selectedCabang,
+                                item,
+                                setSelectedCabang,
+                                'value',
+                              )
+                            }
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="px-4 text-base">Cabang</p>
+                  )}
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    <MButton
+                      color={'blue'}
+                      size={'sm'}
+                      className={'normal-case max-h-8'}
+                      onClick={() => setShowCabang(!showCabang)}
+                    >
+                      + Tambahkan
+                    </MButton>
+                    {/* <MButton
+                      color={'blue'}
+                      size={'sm'}
+                      className={'normal-case max-h-8'}
+                      onClick={() => {}}
+                    >
+                      Terapkan
+                    </MButton> */}
+                  </div>
                 </div>
               </div>
             </div>
@@ -545,7 +607,8 @@ function ReportReimbursement() {
       <CabangModal
         visible={showCabang}
         toggle={() => setShowCabang(!showCabang)}
-        value={(val: any) => setCabang(val)}
+        value={(val: any) => setSelectedCabang([...selectedCabang, val])}
+        filter={selectedCabang}
       />
       <BankModal
         visible={showBank}

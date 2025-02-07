@@ -471,10 +471,16 @@ function Reimbursement() {
                   </Button>
                   <Button
                     color={'blue'}
-                    disabled={!selectedCabang.length}
                     size={'sm'}
                     className={'normal-case max-h-8'}
-                    onClick={() => setShowCabang(!showCabang)}
+                    onClick={() => {
+                      setPage(1);
+                      setFilters({
+                        cabangFilter: selectedCabang.map(
+                          (item: any) => item.value,
+                        ),
+                      });
+                    }}
                   >
                     Terapkan
                   </Button>
