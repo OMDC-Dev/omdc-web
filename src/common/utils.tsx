@@ -250,3 +250,16 @@ export const getFormattedDateTable = (date: any) => {
 
   return moment(date).format('LL');
 };
+
+export const removeFromState = (
+  stateData = [],
+  value: any,
+  setState: any,
+  stateKey = '',
+) => {
+  const filterState = stateData.filter(
+    (item) => item[stateKey] !== value[stateKey],
+  );
+
+  setState(filterState);
+};
