@@ -4,7 +4,7 @@ const LOCAL = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = LOCAL;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -62,8 +62,9 @@ export const SUPERUSER_REPORT_EXPORT = (
   tipe?: string,
   finance?: string,
   tipePeriode?: string,
+  rop?: string,
 ) => {
-  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}`;
+  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}&rop=${rop}`;
 };
 
 // FINANCE

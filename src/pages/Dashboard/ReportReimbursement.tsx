@@ -14,6 +14,7 @@ import {
   formatCurrencyToNumber,
   hitungSelisihHari,
   removeFromState,
+  standardizeDate,
 } from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
@@ -24,6 +25,7 @@ import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 import PeriodeTipeFilterGroup from '../../components/SelectGroup/PeriodeTipeFilterGroup';
 import { Chip, Button as MButton } from '@material-tailwind/react';
+import JenisROPFilterGroup from '../../components/SelectGroup/JenisROPFilterGroup';
 
 function ReportReimbursement() {
   const [data, setData] = React.useState();
@@ -42,6 +44,7 @@ function ReportReimbursement() {
 
   const [typeFilter, setTypeFilter] = React.useState<string>('');
   const [financeFilter, setFinanceFilter] = React.useState<string>('');
+  const [ropFilter, setROPFilter] = React.useState<string>('');
   const [typePeriodeFilter, setTypePeriodeFilter] = React.useState<string>('');
 
   // === Modal
@@ -85,6 +88,7 @@ function ReportReimbursement() {
         typeFilter,
         financeFilter,
         typePeriodeFilter,
+        ropFilter,
       ),
       method: 'GET',
     });
@@ -192,9 +196,9 @@ function ReportReimbursement() {
     });
 
     const customHeaders = [
+      'Tanggal Request of Payment',
       'Nomor Dokumen',
       'Jenis Request of Payment',
-      'Tanggal Request of Payment',
       'Cabang',
       'ID User',
       'Nama User',
@@ -265,7 +269,7 @@ function ReportReimbursement() {
             acn: IS_CASH ? '' : colData.bank_detail?.accountname,
             an: IS_CASH ? '' : colData.bank_detail?.accountnumber,
             jr: colData.jenis_reimbursement,
-            tp: colData.tanggal_reimbursement,
+            tp: standardizeDate(colData.tanggal_reimbursement),
             cb: colData.kode_cabang,
             id: colData.requester_id,
             rn: colData.requester_name,
@@ -388,6 +392,31 @@ function ReportReimbursement() {
           </h3>
         </div>
         <div className=" p-6.5 flex flex-col gap-y-6">
+          <div className="w-full">
+            <label className="mb-3 block text-black dark:text-white">
+              Jenis ROP
+            </label>
+            <div className=" flex flex-row gap-x-4">
+              <JenisROPFilterGroup
+                className="mx-0 w-full"
+                typeOnly
+                setValue={(val: string) => setROPFilter(val)}
+                value={ropFilter}
+              />
+              <div className=" w-56">
+                <Button
+                  onClick={() => {
+                    setROPFilter('');
+                  }}
+                  mode="outlined"
+                  className=" h-full"
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+
           <div className="w-full">
             {/* <div>
               <label className="mb-3 block text-black dark:text-white">

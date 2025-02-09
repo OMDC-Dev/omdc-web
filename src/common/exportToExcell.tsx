@@ -181,7 +181,7 @@ export const createReportData = (data = []): any => {
     const nTotalPayment = getTotalPayment();
     const nPaidStatus = getPaidStatus();
     const acceptDate = getFinAcceptDate();
-    const nPeriod = moment(createdAt, 'YYYY-MM-DD HH:mm:ss')
+    const nPeriod = moment(maker_approve, 'DD-MM-YYYY')
       .locale('id')
       .format('MMMM')
       .toUpperCase();

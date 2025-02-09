@@ -263,3 +263,8 @@ export const removeFromState = (
 
   setState(filterState);
 };
+
+export const standardizeDate = (dateString: string) => {
+  const formats = ['YYYY-MM-DD', 'DD-MM-YYYY'];
+  return moment(dateString, formats, true).format('DD-MM-YYYY');
+};

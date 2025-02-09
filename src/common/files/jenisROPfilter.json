@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Semua",
+    "value": "all"
+  },
+  {
+    "label": "Reimbursement",
+    "value": "Reimbursement"
+  },
+  {
+    "label": "Payment Request",
+    "value": "Payment Request"
+  },
+  {
+    "label": "Cash Advance",
+    "value": "Cash Advance"
+  },
+  {
+    "label": "Cash Advance Report",
+    "value": "Cash Advance Report"
+  }
+]
