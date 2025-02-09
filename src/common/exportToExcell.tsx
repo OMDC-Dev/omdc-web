@@ -146,7 +146,7 @@ export const createReportData = (data = []): any => {
 
     const getFinAcceptDate = () => {
       if (status_finance == 'DONE') {
-        return finance_by.acceptDate;
+        return moment(finance_by.acceptDate, 'YYYY-MM-DD').format('DD-MM-YYYY');
       } else {
         return '-';
       }
