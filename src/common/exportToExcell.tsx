@@ -207,6 +207,7 @@ export const createReportData = (data = []): any => {
       finance_bank,
       nPaidStatus,
       acceptDate,
+      maker_approve: maker_approve || '-',
       nPeriod,
       maker_note,
       finance_note,

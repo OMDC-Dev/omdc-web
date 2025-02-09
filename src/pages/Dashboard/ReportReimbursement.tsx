@@ -364,6 +364,7 @@ function ReportReimbursement() {
         'PAID BY',
         'PAID STATUS',
         'PAYMENT DATE',
+        'MAKER DATE',
         'PERIOD',
         'CATATAN MAKER',
         'CATATAN FINANCE',
