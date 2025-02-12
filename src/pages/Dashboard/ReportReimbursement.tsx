@@ -343,7 +343,7 @@ function ReportReimbursement() {
     // Sheet 3
     const newReportROP = {
       sheetName: 'Report ROP',
-      data: createReportData(data),
+      data: createReportData(data, typePeriodeFilter),
       headers: [
         'NO',
         'NO DOKUMEN',

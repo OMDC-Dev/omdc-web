@@ -49,7 +49,7 @@ export function exportToExcell(
   XLSX.writeFile(workbook, title ? `${title}.xlsx` : 'Report.xlsx');
 }
 
-export const createReportData = (data = []): any => {
+export const createReportData = (data = [], periodType = ''): any => {
   const dataMap = data.map((itemCol, index) => {
     const {
       id,
@@ -185,6 +185,11 @@ export const createReportData = (data = []): any => {
       .locale('id')
       .format('MMMM')
       .toUpperCase();
+    const userPeriod = moment(createdAt)
+      .locale('id')
+      .format('MMMM')
+      .toUpperCase();
+    const periodTypeValue = periodType == 'MAKER' ? nPeriod : userPeriod;
     const nDateROP = standardizeDate(tanggal_reimbursement);
 
     return {
@@ -208,7 +213,7 @@ export const createReportData = (data = []): any => {
       nPaidStatus,
       acceptDate,
       maker_approve: maker_approve || '-',
-      nPeriod,
+      period: periodTypeValue,
       maker_note,
       finance_note,
       attachment,

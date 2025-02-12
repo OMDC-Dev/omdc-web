@@ -64,7 +64,7 @@ export const SUPERUSER_REPORT_EXPORT = (
   tipePeriode?: string,
   rop?: string,
 ) => {
-  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}&rop=${rop}`;
+  return `superuser/reimbursement/report?limit=10000&startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}&rop=${rop}`;
 };
 
 // FINANCE
