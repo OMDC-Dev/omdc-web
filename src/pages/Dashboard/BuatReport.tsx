@@ -94,6 +94,7 @@ const BuatReport: React.FC = () => {
   // CAR Bukti
   const [buktiPengembalian, setBuktiPengembalian] = React.useState<any>();
   const [buktiFileInfo, setBuktiFileInfo] = React.useState<any>();
+  const [needBukti, setNeedBukti] = React.useState(false);
 
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
@@ -118,7 +119,7 @@ const BuatReport: React.FC = () => {
   };
 
   const disableByNeedBank = () => {
-    if (jenis == 'CAR' && !needBank) {
+    if (jenis == 'CAR' && needBukti) {
       return !buktiFileInfo;
     }
   };
@@ -251,9 +252,17 @@ const BuatReport: React.FC = () => {
       console.log('Need Bank');
     }
 
+    if (_sal > 0) {
+      setNeedBukti(true);
+    } else {
+      setNeedBukti(false);
+    }
+
     setPayment('');
     setSelectedBank({});
   }, [nominal]);
+
+  console.log('NEED BUKTI', needBukti);
 
   // handle bank rek
   React.useEffect(() => {
@@ -675,7 +684,7 @@ const BuatReport: React.FC = () => {
                     value={stateData?.nominal}
                   />
                 </div>
-                {!needBank && formatCurrencyToNumber(String(nominal)) !== 0 && (
+                {needBukti && (
                   <div className=" mb-16">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
