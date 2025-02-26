@@ -220,9 +220,16 @@ export function formatAmount(amountString: string) {
 
 export function formatCurrencyToNumber(currencyString: string) {
   if (!currencyString) return 0;
-  // Hapus karakter non-digit dari string dan konversi menjadi angka
-  const number = parseInt(currencyString.replace(/\D/g, ''), 10);
-  return number;
+
+  // Hapus 'Rp.' di awal string (jika ada) dan semua titik sebagai pemisah ribuan
+  let cleanedString = currencyString
+    .replace(/^Rp\.?\s?/, '')
+    .replace(/\./g, '');
+
+  // Ganti koma menjadi titik sebagai pemisah desimal
+  cleanedString = cleanedString.replace(',', '.');
+
+  return parseFloat(cleanedString) || 0;
 }
 
 function convertToPreviewLink(downloadLink: string) {
