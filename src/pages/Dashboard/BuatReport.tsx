@@ -326,7 +326,7 @@ const BuatReport: React.FC = () => {
       parentId: stateData?.id || '',
       payment_type: paymentType || stateData.payment_type,
       tipePembayaran: tipePembayaran,
-      need_bukti: needBank ? false : true,
+      need_bukti: needBukti,
       bukti_attachment: buktiPengembalian,
       bukti_file_info: buktiFileInfo,
     };
@@ -684,7 +684,7 @@ const BuatReport: React.FC = () => {
                     value={stateData?.nominal}
                   />
                 </div>
-                {needBukti && (
+                {needBukti && item.length > 0 && (
                   <div className=" mb-16">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
