@@ -4,7 +4,7 @@ const LOCAL = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = LOCAL;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -153,3 +153,11 @@ export const REJECT_REQUEST_BARANG = (id: string) =>
 
 // Invoice
 export const CEK_INVOICE = (inv: string) => `invoice?inv=${inv}`;
+
+// WORK PLAN API
+export const WORKPLAN = 'workplan';
+export const WORKPLAN_UPDATE = (id: number) => `workplan/update/${id}`;
+export const WORKPLAN_STATUS = (id: number) => `workplan/status/${id}`;
+export const WORKPLAN_CC_USER = 'workplan/cc';
+export const WORKPLAN_PROGRESS = (id: number) => `workplan/progress/${id}`;
+export const WORKPLAN_COMMENT = (id: number) => `workplan/comment/${id}`;

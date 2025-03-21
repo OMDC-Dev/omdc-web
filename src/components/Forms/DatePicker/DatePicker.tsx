@@ -45,7 +45,7 @@ const DatePicker = ({
   return (
     <div>
       {showTitle && (
-        <label className="mb-3 block text-md text-black dark:text-white">
+        <label className="mb-3 block text-sm font-medium text-black">
           {title || 'Tanggal Invoice'}
         </label>
       )}

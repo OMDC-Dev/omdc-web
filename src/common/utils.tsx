@@ -91,6 +91,7 @@ export const cekAkses = (akses: string) => {
    * NO NEED APPROVAL -> 1177 -> #8
    * MASTER BARANG -> 1128 -> #9
    * ACCEPT MULTIPLE -> 1190 -> #10
+   * WORKPLAN -> 1199 -> #11
    */
   const { user } = useAuth();
 
@@ -134,6 +135,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#10') {
     return kd.findIndex((item: string) => item == '1190') !== -1;
+  }
+
+  if (akses == '#11') {
+    return kd.findIndex((item: string) => item == '1199') !== -1;
   }
 };
 
@@ -271,7 +276,7 @@ export const removeFromState = (
   setState(filterState);
 };
 
-export const standardizeDate = (dateString: string) => {
+export const standardizeDate = (dateString?: string | Date) => {
   const formats = ['YYYY-MM-DD', 'DD-MM-YYYY'];
   return moment(dateString, formats, true).format('DD-MM-YYYY');
 };

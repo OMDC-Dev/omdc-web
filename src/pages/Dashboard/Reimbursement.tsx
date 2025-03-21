@@ -429,7 +429,7 @@ function Reimbursement() {
               }}
             />
           </div>
-          <div className="w-full mt-2 max-w-[50%]">
+          <div className="w-full mt-2 lg:max-w-[50%]">
             <div className="flex flex-row gap-x-4">
               <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
                 {selectedCabang.length > 0 ? (

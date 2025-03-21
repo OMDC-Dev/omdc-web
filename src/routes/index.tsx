@@ -42,6 +42,8 @@ import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
 import BuatPengajuanUlang from '../pages/Dashboard/BuatPengajuanUlang';
 import ManualUploadFile from '../pages/SuperAdmin/ManualUploadFIle';
 import RemarkCA from '../pages/Dashboard/RemarkCA';
+import WorkplanSaya from '../pages/Workplan/WorkplanSaya';
+import BuatWorkplan from '../pages/Workplan/BuatWorkplan';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -151,6 +153,26 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Reimbursement'} />
               <ManualUploadFile />
+            </>
+          ),
+        },
+
+        // -- WORK PLAN PATH
+        {
+          path: '/workplan/me',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Workplan'} />
+              <WorkplanSaya />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/pengajuan',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Workplan'} />
+              <BuatWorkplan />
             </>
           ),
         },

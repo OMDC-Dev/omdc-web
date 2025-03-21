@@ -1,17 +1,18 @@
-import React from 'react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Dialog, List, ListItem } from '@material-tailwind/react';
-import useFetch from '../../hooks/useFetch';
-import { GET_CABANG, SUPERUSER } from '../../api/routes';
+import React from 'react';
+import { SUPERUSER, WORKPLAN_CC_USER } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
+import useFetch from '../../hooks/useFetch';
 
-const AdminModal = ({
+const WorkplanCCModal = ({
   visible,
   toggle,
   dismissOnBackdrop,
   requesterId,
   value,
   rid,
+  selectedList,
 }: {
   visible: boolean;
   toggle: any;
@@ -19,6 +20,7 @@ const AdminModal = ({
   requesterId?: string;
   value?: any;
   rid?: number;
+  selectedList: any;
 }) => {
   if (!visible) return null;
 
@@ -27,42 +29,43 @@ const AdminModal = ({
   const [search, setSearch] = React.useState<string>('');
 
   React.useEffect(() => {
-    if (!list.length) {
+    if (!list?.length) {
       getList();
     }
   }, [visible]);
 
   async function getList() {
-    console.log(requesterId);
-    let param = '';
-    if (requesterId) {
-      param += `&exceptId=${requesterId}`;
-    }
+    const selectedListMap = selectedList?.map((item: any) => {
+      return item.iduser;
+    });
 
-    if (rid) {
-      param += `&rid=${rid}`;
-    }
+    let param = '';
 
     const { state, data, error } = await useFetch({
-      url: SUPERUSER + `?limit=1000${param}`,
-      method: 'GET',
+      url: WORKPLAN_CC_USER + `?limit=1000${param}`,
+      method: 'POST',
+      data: {
+        selectedList: selectedListMap,
+      },
     });
 
     if (state == API_STATES.OK) {
-      setList(data.rows);
+      setList(data);
     } else {
       setList([]);
     }
   }
 
   React.useEffect(() => {
-    onFilteredBank(search);
+    onFiltered(search);
   }, [search]);
 
-  function onFilteredBank(key: string) {
-    const filtered = list.filter((item: { nm_user: string; value: string }) => {
-      return item.nm_user.toLowerCase().includes(key.toLowerCase());
-    });
+  function onFiltered(key: string) {
+    const filtered = list?.filter(
+      (item: { nm_user: string; value: string }) => {
+        return item.nm_user.toLowerCase().includes(key.toLowerCase());
+      },
+    );
 
     return filtered;
   }
@@ -77,7 +80,7 @@ const AdminModal = ({
     <Dialog className="bg-transparent" open={visible} handler={toggle}>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark-2 p-4 w-full">
         <div className=" flex flex-row items-center border-b border-blue-gray-800 pt-2 pb-4 mb-4.5">
-          <div className=" flex-1">Pilih Approval</div>
+          <div className=" flex-1">Pilih User CC</div>
           <XMarkIcon className=" w-5 h-5 cursor-pointer" onClick={toggle} />
         </div>
         <div className="mb-4.5">
@@ -90,8 +93,8 @@ const AdminModal = ({
           />
         </div>
         <List className=" max-h-56 overflow-y-auto">
-          {onFilteredBank(search) &&
-            onFilteredBank(search).map((item: any, index: number) => {
+          {onFiltered(search) &&
+            onFiltered(search).map((item: any, index: number) => {
               return (
                 <div onClick={() => onSaveButtonPress(item)}>
                   <ListItem className=" text-black">{item?.nm_user}</ListItem>
@@ -104,4 +107,4 @@ const AdminModal = ({
   );
 };
 
-export default AdminModal;
+export default WorkplanCCModal;

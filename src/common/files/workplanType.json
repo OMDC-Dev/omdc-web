@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Approval",
+    "value": "APPROVAL"
+  },
+  {
+    "label": "Non Approval",
+    "value": "NON_APPROVAL"
+  }
+]
