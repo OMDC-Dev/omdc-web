@@ -44,6 +44,7 @@ import ManualUploadFile from '../pages/SuperAdmin/ManualUploadFIle';
 import RemarkCA from '../pages/Dashboard/RemarkCA';
 import WorkplanSaya from '../pages/Workplan/WorkplanSaya';
 import BuatWorkplan from '../pages/Workplan/BuatWorkplan';
+import WorkplanDetail from '../pages/Workplan/WorkplanDetail';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -173,6 +174,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Workplan'} />
               <BuatWorkplan />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/pengajuan/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Workplan'} />
+              <WorkplanDetail />
             </>
           ),
         },

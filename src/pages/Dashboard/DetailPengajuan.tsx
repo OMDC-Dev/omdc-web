@@ -8,6 +8,7 @@ import {
 import { colors } from '@material-tailwind/react/types/generic';
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { usePDF } from 'react-to-pdf';
 import {
   FINANCE_UPDATE_COA,
   REIMBURSEMENT_ACCEPTANCE,
@@ -19,20 +20,17 @@ import formatRupiah from '../../common/formatRupiah';
 import {
   calculateSaldo,
   compressImage,
-  downloadPDF,
-  downloadPDFDirect,
   openInNewTab,
 } from '../../common/utils';
 import Button from '../../components/Button';
+import AdminModal from '../../components/Modal/AdminModal';
+import COAModal from '../../components/Modal/COAModal';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import { API_STATES } from '../../constants/ApiEnum';
 import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
-import COAModal from '../../components/Modal/COAModal';
-import { usePDF } from 'react-to-pdf';
-import AdminModal from '../../components/Modal/AdminModal';
 
 const DetailPengajuan: React.FC = () => {
   const {

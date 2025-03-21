@@ -9,18 +9,28 @@ import {
   Tooltip,
   Typography,
   Button as MButton,
+  Chip,
 } from '@material-tailwind/react';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, TrashIcon } from '@heroicons/react/24/outline';
 import useModal from '../../hooks/useModal';
 import { useNavigate } from 'react-router-dom';
+import useFetch from '../../hooks/useFetch';
+import { WORKPLAN } from '../../api/routes';
+import { API_STATES } from '../../constants/ApiEnum';
+import { getFormattedDateTable } from '../../common/utils';
+import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
+import { colors } from '@material-tailwind/react/types/generic';
 
 const TABLE_HEAD = [
-  'ID User',
-  'Nama User',
-  'Departemen',
-  'Level User',
-  'Tipe User',
+  'ID',
+  'Tanggal Dibuat',
+  'Cabang',
+  'Kategori',
+  'PIC',
+  'Tanggal Mulai',
+  'Est. Tanggal Selesai',
+  'Status',
   '',
 ];
 
@@ -36,6 +46,24 @@ const WorkplanSaya: React.FC = () => {
   const [context, setContext] = React.useState<string>();
 
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    getMyWorkplan();
+  }, []);
+
+  async function getMyWorkplan() {
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setList(data.rows);
+      setPageInfo(data.pageInfo);
+    } else {
+      console.log(error);
+    }
+  }
 
   return (
     <DefaultLayout>
@@ -106,7 +134,7 @@ const WorkplanSaya: React.FC = () => {
                                 variant="small"
                                 className="font-normal"
                               >
-                                {item?.iduser}
+                                {item?.workplan_id}
                               </Typography>
                             </div>
                           </div>
@@ -117,7 +145,7 @@ const WorkplanSaya: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.nm_user}
+                              {getFormattedDateTable(item?.createdAt)}
                             </Typography>
                           </div>
                         </td>
@@ -127,7 +155,7 @@ const WorkplanSaya: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.departemen}
+                              {item?.cabang_detail.nm_induk}
                             </Typography>
                           </div>
                         </td>
@@ -137,7 +165,7 @@ const WorkplanSaya: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.level_user}
+                              {item?.kategori}
                             </Typography>
                           </div>
                         </td>
@@ -147,19 +175,57 @@ const WorkplanSaya: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.type}
+                              {item?.user_detail?.nm_user}
                             </Typography>
                           </div>
                         </td>
                         <td className={classes}>
-                          <Tooltip content="Hapus">
+                          <div className="w-max">
+                            <Typography
+                              variant="small"
+                              className="font-normal "
+                            >
+                              {item?.tanggal_mulai}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="w-max">
+                            <Typography
+                              variant="small"
+                              className="font-normal "
+                            >
+                              {item?.tanggal_selesai}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td
+                          className={`${classes} sticky right-[4rem] bg-white z-10`}
+                        >
+                          <div className="w-max">
+                            <Chip
+                              className="normal-case"
+                              variant={'ghost'}
+                              color={
+                                getWorkplanStatusText(item.status)
+                                  .color as colors
+                              }
+                              value={getWorkplanStatusText(item.status).text}
+                            />
+                          </div>
+                        </td>
+                        <td
+                          className={`${classes} sticky right-0 bg-white z-10`}
+                        >
+                          <Tooltip content="Detail">
                             <IconButton
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
+                                navigate(`/workplan/pengajuan/${item.id}`);
                               }}
                             >
-                              <TrashIcon className="h-4 w-4" />
+                              <DocumentTextIcon className="h-4 w-4" />
                             </IconButton>
                           </Tooltip>
                         </td>
@@ -187,7 +253,7 @@ const WorkplanSaya: React.FC = () => {
                   Previous
                 </MButton>
                 <MButton
-                  disabled={page == pageInfo.pageCount || loading}
+                  disabled={page == pageInfo?.pageCount || loading}
                   variant="outlined"
                   size="sm"
                   color="blue"

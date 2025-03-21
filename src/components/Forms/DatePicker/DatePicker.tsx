@@ -7,12 +7,14 @@ const DatePicker = ({
   id,
   showTitle = true,
   placeholder = 'Pilih Tanggal',
+  defaultValue,
 }: {
   onChange: (arg0: Date) => void;
   title?: string;
   id?: string;
   showTitle?: boolean;
   placeholder?: string;
+  defaultValue?: string;
 }) => {
   const [selectedDate, setSelectedDate] = React.useState<Date>();
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -56,6 +58,7 @@ const DatePicker = ({
           className="form-datepicker w-full rounded-md border-[1.5px] border-stroke bg-transparent px-5 py-2 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
           placeholder={placeholder}
           data-class="flatpickr-right"
+          defaultValue={defaultValue}
         />
       </div>
     </div>

@@ -116,7 +116,7 @@ const BuatWorkplan: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <ActionCard>
+      <ActionCard title="Workplan">
         <Button
           size="sm"
           className="normal-case"

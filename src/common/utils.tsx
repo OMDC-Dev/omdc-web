@@ -255,12 +255,12 @@ export const openInNewTab = (url: string) => {
   window.open(previewUrl, '_blank', 'noreferrer');
 };
 
-export const getFormattedDateTable = (date: any) => {
+export const getFormattedDateTable = (date: any, format?: any) => {
   if (!date) {
     return '-';
   }
 
-  return moment(date).format('LL');
+  return moment(date).format(format ?? 'LL');
 };
 
 export const removeFromState = (
