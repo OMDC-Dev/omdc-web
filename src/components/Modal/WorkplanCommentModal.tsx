@@ -2,26 +2,48 @@ import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Avatar, Button, Dialog } from '@material-tailwind/react';
 import React from 'react';
 import FileModal from './FileModal';
+import useFetch from '../../hooks/useFetch';
+import { WORKPLAN_COMMENT } from '../../api/routes';
+import { compressImage } from '../../common/utils';
+import { API_STATES } from '../../constants/ApiEnum';
+import { useAuth } from '../../hooks/useAuth';
 
-const CommentCard = () => {
+const CommentCard = ({ data, onClick }: { data: any; onClick: any }) => {
+  const { user } = useAuth();
+
+  const IS_SELF = user.iduser == data.iduser;
+
   return (
     <div className="flex flex-row gap-2 items-start bg-white p-2 rounded-lg">
-      <div className="min-w-5 min-h-5 rounded-full bg-red-500 flex justify-center items-center text-xs text-white">
-        P
+      <div
+        className={`min-w-5 min-h-5 rounded-full ${
+          IS_SELF ? 'bg-blue-500' : 'bg-amber-700'
+        } flex justify-center items-center text-xs text-white`}
+      >
+        {data.create_by.split('')[0]}
       </div>
       <div>
-        <p className="text-xs font-semibold text-black">Bos Q</p>
-        <p className="text-sm text-black font-normal text-wrap">
-          lorem ipsum dolor sit amet uhuyy bla bla yuhuggg weww rewrrr, ini
-          misal komentarnya panjang uhuyy hehehe waw wadiaw ini panjang banget
-          si hahahaha test lagi rawrr
+        <p
+          className={`text-xs font-semibold ${
+            IS_SELF ? 'text-blue-500' : 'text-black'
+          }`}
+        >
+          {data.create_by}
         </p>
-        <div className="hover:cursor-pointer flex mt-2.5 w-fit items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50">
-          <PhotoIcon className="h-5 w-5 text-blue-gray-200" />
-          <span className="text-sm text-gray-700 truncate max-w-[180px]">
-            Lampiran
-          </span>
-        </div>
+        <p className="text-sm text-black font-normal text-wrap">
+          {data.message}
+        </p>
+        {data?.attachment && (
+          <div
+            onClick={onClick}
+            className="hover:cursor-pointer flex mt-2.5 w-fit items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50"
+          >
+            <PhotoIcon className="h-5 w-5 text-blue-gray-200" />
+            <span className="text-sm text-gray-700 truncate max-w-[180px]">
+              Lampiran
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -64,22 +86,102 @@ const WorkplanCommentModal = ({
   toggle: any;
   data: any;
 }) => {
-  const [showImage, setShowImage] = React.useState<boolean>(false);
+  const [message, setMessage] = React.useState<string>('');
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = React.useState<any>('');
+  const [fileName, setFileName] = React.useState<string>('');
+  const [commentList, setCommentList] = React.useState<any>(
+    data?.workplant_comment,
+  );
+
+  const [showImage, setShowImage] = React.useState<boolean>(false);
   const [showPreview, setShowPreview] = React.useState<boolean>(false);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
+  const WORKPLAN_ID = data?.id;
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      const maxSize = 10485760;
+
+      if (file.size > maxSize) {
+        if (file.type.includes('image')) {
+          compressImage(file, maxSize, handleFileChange);
+          return; // Menghentikan eksekusi lebih lanjut
+        } else {
+          // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
+          alert(
+            'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 10 MB.',
+          );
+          return;
+        }
+      }
+
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64string: any = reader.result;
+
+        const splitted = base64string?.split(';base64,');
+
+        setSelectedFile(splitted[1]);
+        setFileName(file.name);
+      };
     }
   };
 
   const removeFile = () => {
     setSelectedFile(null);
   };
+
+  async function sendComment() {
+    setIsLoading(true);
+
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_COMMENT(WORKPLAN_ID),
+      method: 'POST',
+      data: {
+        message: message,
+        comment_id: null,
+        attachment: selectedFile,
+      },
+    });
+
+    if (state == API_STATES.OK) {
+      setIsLoading(false);
+      setMessage('');
+      setSelectedFile(null);
+      getComment();
+    } else {
+      setIsLoading(false);
+      setMessage('');
+      setSelectedFile(null);
+    }
+  }
+
+  async function getComment() {
+    setIsLoading(true);
+
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_COMMENT(WORKPLAN_ID),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setIsLoading(false);
+      setCommentList(data.rows);
+    } else {
+      setIsLoading(false);
+    }
+  }
+
+  React.useEffect(() => {
+    if (visible) {
+      getComment();
+    }
+  }, [visible]);
 
   return (
     <Dialog className="bg-transparent" open={visible} handler={toggle}>
@@ -126,10 +228,23 @@ const WorkplanCommentModal = ({
           {/* comment section */}
           {!showImage && (
             <div className="w-full bg-gray-2 rounded-lg p-2.5 flex flex-col gap-y-2.5">
-              {/* <div className="flex flex-row text-sm text-graydark justify-center h-[50px] items-center">
-                Belum ada komentar
-              </div> */}
-              <CommentCard />
+              {commentList && commentList.length ? (
+                commentList?.map((item: any) => {
+                  return (
+                    <CommentCard
+                      data={item}
+                      onClick={() => {
+                        setPreviewUrl(item.attachment);
+                        setShowPreview(true);
+                      }}
+                    />
+                  );
+                })
+              ) : (
+                <div className="flex flex-row text-sm text-graydark justify-center h-[50px] items-center">
+                  Belum ada komentar
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -140,6 +255,8 @@ const WorkplanCommentModal = ({
               rows={6}
               disabled={isLoading}
               placeholder="Tambahkan komentar"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               className="w-full text-sm bg-white rounded border-[1.5px] h-[60px] border-stroke py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary"
             ></textarea>
 
@@ -159,7 +276,7 @@ const WorkplanCommentModal = ({
               ) : (
                 <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50">
                   <span className="text-sm text-gray-700 truncate max-w-[180px]">
-                    {selectedFile.name}
+                    {fileName}
                   </span>
                   <XMarkIcon
                     className="h-5 w-5 cursor-pointer text-red-500"
@@ -168,7 +285,13 @@ const WorkplanCommentModal = ({
                 </div>
               )}
 
-              <Button size="sm" className="normal-case" color="blue">
+              <Button
+                loading={isLoading}
+                size="sm"
+                className="normal-case"
+                color="blue"
+                onClick={() => sendComment()}
+              >
                 Kirim
               </Button>
             </div>

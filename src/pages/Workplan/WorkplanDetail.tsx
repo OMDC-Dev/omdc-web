@@ -143,7 +143,6 @@ const WorkplanDetail: React.FC = () => {
               color={_status.color as color}
               value={_status.text}
             />
-
             {workplanDetail?.approved_date && (
               <div className="text-sm font-medium">disetujui pada</div>
             )}
@@ -161,7 +160,7 @@ const WorkplanDetail: React.FC = () => {
             show();
           }}
         >
-          Simpan Perubahan
+          Simpan
         </Button>
         <Button
           size="sm"
