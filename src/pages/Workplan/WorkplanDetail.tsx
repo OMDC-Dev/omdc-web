@@ -18,6 +18,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
 import { color } from '@material-tailwind/react/types/components/alert';
 import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
+import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
 
 const WorkplanDetail: React.FC = () => {
   const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
@@ -31,6 +32,8 @@ const WorkplanDetail: React.FC = () => {
   const [showWPHistory, setShowWPHistory] = React.useState(false);
 
   const [workplanDetail, setWorkplanDetail] = React.useState<any>();
+  const [selectedGambar, setSelectedGambar] = React.useState<string>('');
+  const [showComment, setShowComment] = React.useState<boolean>(false);
 
   const { id } = useParams();
 
@@ -219,86 +222,123 @@ const WorkplanDetail: React.FC = () => {
           </div>
         </ContainerCard>
 
-        <ContainerCard title="CC dan Attachment">
-          <div className=" p-6.5 flex flex-col gap-y-6.5">
-            <div className="w-full">
-              <label className="mb-2.5 block text-sm font-medium text-black">
-                CC ( Opsional )
-              </label>
-              <div
-                className={`flex flex-row gap-4 border ${
-                  cc.length ? '' : 'items-center'
-                } border-stroke rounded-md border-p p-2`}
-              >
-                {/* Container Chips */}
-                <div className="flex flex-1 flex-wrap gap-2 max-h-[100px] overflow-auto">
-                  {cc.length ? (
-                    cc?.map((item: any, index: number) => {
-                      return (
-                        <Chip
-                          animate={{ mount: { y: 0 }, unmount: { y: 50 } }}
-                          className="normal-case"
-                          color="blue"
-                          variant="ghost"
-                          value={item?.nm_user}
-                          onClose={() => {
-                            let filtered = cc.filter((fItem: any) => {
-                              return fItem.iduser != item.iduser;
-                            });
-
-                            setIsHasChanges(true);
-                            setCC(filtered);
-                          }}
-                        />
-                      );
-                    })
-                  ) : (
-                    <div className=" ml-2.5">Pilih CC</div>
-                  )}
-                </div>
-
-                {/* Tombol Tambah */}
-                <Button
-                  className="normal-case h-8 whitespace-nowrap"
-                  size="sm"
-                  color="blue"
-                  onClick={() => setShowWorkplan(true)}
-                >
-                  Tambah CC
-                </Button>
-              </div>
-            </div>
-
-            <DetailPlaceholder label="Gambar Awal" value={'File Gambar Awal'}>
-              <Button fullWidth color="blue" className="mt-2.5 normal-case">
-                Lihat Gambar
-              </Button>
-            </DetailPlaceholder>
-
-            {!workplanDetail?.attachmentAfter ? (
+        <div className="flex flex-col gap-y-4.5">
+          <ContainerCard title="CC dan Attachment">
+            <div className=" p-6.5 flex flex-col gap-y-6.5">
               <div className="w-full">
-                <label className="mb-3 block text-sm font-medium text-black">
-                  Lampirkan Gambar Akhir ( Opsional maks. 10MB)
+                <label className="mb-2.5 block text-sm font-medium text-black">
+                  CC ( Opsional )
                 </label>
-                <input
-                  type="file"
-                  className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                  accept={'image/*'}
-                  onChange={handleAttachment}
-                />
+                <div
+                  className={`flex flex-row gap-4 border ${
+                    cc.length ? '' : 'items-center'
+                  } border-stroke rounded-md border-p p-2`}
+                >
+                  {/* Container Chips */}
+                  <div className="flex flex-1 flex-wrap gap-2 max-h-[100px] overflow-auto">
+                    {cc.length ? (
+                      cc?.map((item: any, index: number) => {
+                        return (
+                          <Chip
+                            animate={{ mount: { y: 0 }, unmount: { y: 50 } }}
+                            className="normal-case"
+                            color="blue"
+                            variant="ghost"
+                            value={item?.nm_user}
+                            onClose={() => {
+                              let filtered = cc.filter((fItem: any) => {
+                                return fItem.iduser != item.iduser;
+                              });
+
+                              setIsHasChanges(true);
+                              setCC(filtered);
+                            }}
+                          />
+                        );
+                      })
+                    ) : (
+                      <div className=" ml-2.5">Pilih CC</div>
+                    )}
+                  </div>
+
+                  {/* Tombol Tambah */}
+                  <Button
+                    className="normal-case h-8 whitespace-nowrap"
+                    size="sm"
+                    color="blue"
+                    onClick={() => setShowWorkplan(true)}
+                  >
+                    Tambah CC
+                  </Button>
+                </div>
               </div>
-            ) : (
-              <DetailPlaceholder
-                label="Gambar Akhir"
-                value={'File Gambar Akhir'}
-              >
-                <Button fullWidth color="blue" className="mt-2.5 normal-case">
+
+              <DetailPlaceholder label="Gambar Awal" value={'File Gambar Awal'}>
+                <Button
+                  onClick={() => {
+                    setSelectedGambar(workplanDetail?.attachment_before);
+                    setShowFile(true);
+                  }}
+                  fullWidth
+                  color="blue"
+                  className="mt-2.5 normal-case"
+                >
                   Lihat Gambar
                 </Button>
               </DetailPlaceholder>
-            )}
-          </div>
-        </ContainerCard>
+
+              {!workplanDetail?.attachmentAfter ? (
+                <div className="w-full">
+                  <label className="mb-3 block text-sm font-medium text-black">
+                    Lampirkan Gambar Akhir ( Opsional maks. 10MB)
+                  </label>
+                  <input
+                    type="file"
+                    className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                    accept={'image/*'}
+                    onChange={handleAttachment}
+                  />
+                </div>
+              ) : (
+                <DetailPlaceholder
+                  label="Gambar Akhir"
+                  value={'File Gambar Akhir'}
+                >
+                  <Button fullWidth color="blue" className="mt-2.5 normal-case">
+                    Lihat Gambar
+                  </Button>
+                </DetailPlaceholder>
+              )}
+            </div>
+          </ContainerCard>
+
+          <ContainerCard title="Komentar">
+            <div className=" p-6.5 flex flex-col gap-y-6.5">
+              {workplanDetail?.revise_message && (
+                <DetailPlaceholder
+                  value={workplanDetail?.revise_message}
+                  label="Komentar Revisi"
+                  isTextArea
+                />
+              )}
+
+              <div className="w-full">
+                <label className="mb-3 block text-black dark:text-white">
+                  Komentar
+                </label>
+                <Button
+                  fullWidth
+                  variant={'outlined'}
+                  color="blue"
+                  className="normal-case"
+                  onClick={() => setShowComment(true)}
+                >
+                  Lihat Komentar
+                </Button>
+              </div>
+            </div>
+          </ContainerCard>
+        </div>
 
         <WorkplanCCModal
           visible={showWorkplan}
@@ -338,7 +378,7 @@ const WorkplanDetail: React.FC = () => {
 
         <FileModal
           type={'image/png'}
-          data={workplanDetail?.attachment_before}
+          data={selectedGambar}
           visible={showFile}
           toggle={() => setShowFile(!showFile)}
         />
@@ -347,6 +387,12 @@ const WorkplanDetail: React.FC = () => {
           data={workplanDetail?.workplant_date_history}
           visible={showWPHistory}
           toggle={() => setShowWPHistory(!showWPHistory)}
+        />
+
+        <WorkplanCommentModal
+          data={workplanDetail}
+          visible={showComment}
+          toggle={() => setShowComment(!showComment)}
         />
       </div>
     </DefaultLayout>
