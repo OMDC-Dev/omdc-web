@@ -70,7 +70,7 @@ const WorkplanDetail: React.FC = () => {
 
     if (state == API_STATES.OK) {
       setWorkplanDetail(data);
-      setCC(data.user_cc);
+      setCC(data.cc_users);
       setTanggalSelesai(data.tanggal_selesai);
       hide();
     } else {
@@ -82,9 +82,15 @@ const WorkplanDetail: React.FC = () => {
   const saveWorkplan = async () => {
     changeType('LOADING');
 
+    let mappedCC = [];
+
+    if (cc && cc.length > 0) {
+      mappedCC = cc.map((item: any) => item.iduser);
+    }
+
     const body = {
       tanggal_selesai: standardizeDate(tanggalSelesai),
-      user_cc: cc,
+      user_cc: mappedCC,
       attachment_after: attachmentAfter,
     };
 

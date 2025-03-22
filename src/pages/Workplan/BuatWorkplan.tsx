@@ -60,6 +60,12 @@ const BuatWorkplan: React.FC = () => {
   const submitNewWorkplan = async () => {
     changeType('LOADING');
 
+    let mappedCC = [];
+
+    if (cc && cc.length > 0) {
+      mappedCC = cc.map((item: any) => item.iduser);
+    }
+
     const body = {
       jenis_workplan: workplanType,
       tanggal_mulai: standardizeDate(tanggalMulai),
@@ -67,7 +73,7 @@ const BuatWorkplan: React.FC = () => {
       kd_induk: cabang.value,
       perihal: desc,
       kategori: kategori,
-      user_cc: cc,
+      user_cc: mappedCC,
       attachment_before: attachmentBefore,
     };
 
