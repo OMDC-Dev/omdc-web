@@ -47,6 +47,7 @@ import BuatWorkplan from '../pages/Workplan/BuatWorkplan';
 import WorkplanDetail from '../pages/Workplan/WorkplanDetail';
 import WorkplanApproval from '../pages/Workplan/WorkplanApproval';
 import WorkplanApprovalDetail from '../pages/Workplan/WorkplanApprovalDetail';
+import WorkplanCC from '../pages/Workplan/WorkplanCC';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -167,6 +168,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Workplan'} />
               <WorkplanSaya />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/cc',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Workplan'} />
+              <WorkplanCC />
             </>
           ),
         },

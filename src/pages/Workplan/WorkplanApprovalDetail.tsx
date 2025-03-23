@@ -8,7 +8,11 @@ import {
   WORKPLAN_UPDATE,
   WORKPLAN_UPDATE_STATUS,
 } from '../../api/routes';
-import { getFormattedDateTable, standardizeDate } from '../../common/utils';
+import {
+  cekAkses,
+  getFormattedDateTable,
+  standardizeDate,
+} from '../../common/utils';
 import ActionCard from '../../components/ActionCard';
 import { ContainerCard } from '../../components/ContainerCard';
 import { DetailPlaceholder } from '../../components/DetailPlaceholder';
@@ -45,6 +49,7 @@ const WorkplanApprovalDetail: React.FC = () => {
   const { id } = useParams();
 
   const _status = getWorkplanStatusText(workplanDetail?.status);
+  const IS_ADMIN_WP = cekAkses('#12');
 
   const WP_STATUS = workplanDetail?.status;
   const IS_FINISHED =
@@ -146,7 +151,7 @@ const WorkplanApprovalDetail: React.FC = () => {
           </div>
         }
       >
-        {!IS_FINISHED && (
+        {!IS_FINISHED && IS_ADMIN_WP && (
           <>
             <Button
               size="sm"
