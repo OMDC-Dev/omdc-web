@@ -157,7 +157,7 @@ export const CEK_INVOICE = (inv: string) => `invoice?inv=${inv}`;
 // WORK PLAN API
 export const WORKPLAN = 'workplan';
 export const WORKPLAN_UPDATE = (id?: string) => `workplan/update/${id}`;
-export const WORKPLAN_STATUS = (id?: string) => `workplan/status/${id}`;
+export const WORKPLAN_UPDATE_STATUS = (id?: string) => `workplan/status/${id}`;
 export const WORKPLAN_CC_USER = 'workplan/cc';
 export const WORKPLAN_PROGRESS = (id?: string) => `workplan/progress/${id}`;
 export const WORKPLAN_COMMENT = (id?: string) => `workplan/comment/${id}`;

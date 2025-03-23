@@ -81,10 +81,12 @@ const WorkplanCommentModal = ({
   visible,
   toggle,
   data,
+  isDone,
 }: {
   visible: boolean;
   toggle: any;
   data: any;
+  isDone?: boolean;
 }) => {
   const [message, setMessage] = React.useState<string>('');
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
@@ -249,54 +251,56 @@ const WorkplanCommentModal = ({
           )}
         </div>
         {/* Input Komentar dan Upload File */}
-        <div className="bg-gray-2 mt-6.5 p-2.5 rounded-lg">
-          <div className="w-full">
-            <textarea
-              rows={6}
-              disabled={isLoading}
-              placeholder="Tambahkan komentar"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="w-full text-sm bg-white rounded border-[1.5px] h-[60px] border-stroke py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary"
-            ></textarea>
+        {!isDone && (
+          <div className="bg-gray-2 mt-6.5 p-2.5 rounded-lg">
+            <div className="w-full">
+              <textarea
+                rows={6}
+                disabled={isLoading}
+                placeholder="Tambahkan komentar"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="w-full text-sm bg-white rounded border-[1.5px] h-[60px] border-stroke py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary"
+              ></textarea>
 
-            <div className="flex flex-row justify-end gap-4 items-center mt-2">
-              {/* Upload Button */}
-              {!selectedFile ? (
-                <label className="cursor-pointer flex items-center gap-1 text-blue-500 hover:text-blue-700">
-                  <PhotoIcon className="h-6 w-6" />
-                  <span className="text-xs">Pilih Gambar</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                </label>
-              ) : (
-                <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50">
-                  <span className="text-sm text-gray-700 truncate max-w-[180px]">
-                    {fileName}
-                  </span>
-                  <XMarkIcon
-                    className="h-5 w-5 cursor-pointer text-red-500"
-                    onClick={removeFile}
-                  />
-                </div>
-              )}
+              <div className="flex flex-row justify-end gap-4 items-center mt-2">
+                {/* Upload Button */}
+                {!selectedFile ? (
+                  <label className="cursor-pointer flex items-center gap-1 text-blue-500 hover:text-blue-700">
+                    <PhotoIcon className="h-6 w-6" />
+                    <span className="text-xs">Pilih Gambar</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                ) : (
+                  <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50">
+                    <span className="text-sm text-gray-700 truncate max-w-[180px]">
+                      {fileName}
+                    </span>
+                    <XMarkIcon
+                      className="h-5 w-5 cursor-pointer text-red-500"
+                      onClick={removeFile}
+                    />
+                  </div>
+                )}
 
-              <Button
-                loading={isLoading}
-                size="sm"
-                className="normal-case"
-                color="blue"
-                onClick={() => sendComment()}
-              >
-                Kirim
-              </Button>
+                <Button
+                  loading={isLoading}
+                  size="sm"
+                  className="normal-case"
+                  color="blue"
+                  onClick={() => sendComment()}
+                >
+                  Kirim
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <FileModal
         type={'image/png'}

@@ -10,6 +10,8 @@ import {
   Typography,
   Button as MButton,
   Chip,
+  Input,
+  Button,
 } from '@material-tailwind/react';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import { DocumentTextIcon, TrashIcon } from '@heroicons/react/24/outline';
@@ -18,9 +20,10 @@ import { useNavigate } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import { WORKPLAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { getFormattedDateTable } from '../../common/utils';
+import { delay, getFormattedDateTable } from '../../common/utils';
 import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 const TABLE_HEAD = [
   'ID',
@@ -28,6 +31,7 @@ const TABLE_HEAD = [
   'Cabang',
   'Kategori',
   'PIC',
+  'Perihal',
   'Tanggal Mulai',
   'Est. Tanggal Selesai',
   'Status',
@@ -36,32 +40,40 @@ const TABLE_HEAD = [
 
 const WorkplanSaya: React.FC = () => {
   const [list, setList] = React.useState<any>([]);
-  const [limit, setLimit] = React.useState<number>(5);
+  const [limit, setLimit] = React.useState<number>(20);
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
-  const [context, setContext] = React.useState<string>();
-
   const navigate = useNavigate();
 
   React.useEffect(() => {
     getMyWorkplan();
   }, []);
 
-  async function getMyWorkplan() {
+  async function getMyWorkplan(clearOn?: string) {
+    changeType('LOADING');
+    show();
+    let param = '';
+
+    if (search) {
+      param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
+    }
+
     const { state, data, error } = await useFetch({
-      url: WORKPLAN,
+      url: WORKPLAN + `?limit=${limit}&page=${page}${param}`,
       method: 'GET',
     });
 
     if (state == API_STATES.OK) {
       setList(data.rows);
       setPageInfo(data.pageInfo);
+      hide();
     } else {
       console.log(error);
+      hide();
     }
   }
 
@@ -88,6 +100,36 @@ const WorkplanSaya: React.FC = () => {
             >
               Buat Workplan
             </MButton>
+          </div>
+          <div className="w-full mt-4.5">
+            <form
+              className="w-full relative"
+              onSubmit={(e) => {
+                e.preventDefault();
+                getMyWorkplan();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Cari No. Workplan, cabang, perihal ..."
+                className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              {search && ( // Tampilkan tombol X jika nilai input tidak kosong
+                <button
+                  type="button"
+                  className="absolute inset-y-0 top-4 right-0 px-3 flex items-center"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    setSearch('');
+                    getMyWorkplan('SEARCH');
+                  }}
+                >
+                  <XMarkIcon className="w-5 h-5" />
+                </button>
+              )}
+            </form>
           </div>
         </CardHeader>
         {!list?.length ? (
@@ -185,6 +227,16 @@ const WorkplanSaya: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
+                              {item?.perihal}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="w-max">
+                            <Typography
+                              variant="small"
+                              className="font-normal "
+                            >
                               {item?.tanggal_mulai}
                             </Typography>
                           </div>
@@ -222,7 +274,11 @@ const WorkplanSaya: React.FC = () => {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(`/workplan/pengajuan/${item.id}`);
+                                navigate(`/workplan/pengajuan/${item.id}`, {
+                                  state: {
+                                    jenis_workplan: item.jenis_workplan,
+                                  },
+                                });
                               }}
                             >
                               <DocumentTextIcon className="h-4 w-4" />
@@ -241,7 +297,7 @@ const WorkplanSaya: React.FC = () => {
               </Typography>
               <div className="flex gap-2">
                 <MButton
-                  disabled={page < 2 || loading}
+                  disabled={page < 2 || type == 'LOADING'}
                   variant="outlined"
                   size="sm"
                   color="blue"
@@ -253,7 +309,7 @@ const WorkplanSaya: React.FC = () => {
                   Previous
                 </MButton>
                 <MButton
-                  disabled={page == pageInfo?.pageCount || loading}
+                  disabled={page == pageInfo?.pageCount || type == 'LOADING'}
                   variant="outlined"
                   size="sm"
                   color="blue"

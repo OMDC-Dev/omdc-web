@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserIcon, VariableIcon } from '@heroicons/react/24/outline';
 
@@ -75,13 +75,16 @@ const DropdownUser = () => {
     }
   }
 
+  const toggleDropdown = useCallback(() => {
+    setDropdownOpen((prev) => !prev);
+  }, []);
+
   return (
     <div className="relative">
-      <Link
+      <div
         ref={trigger}
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-4"
-        to="#"
+        onClick={toggleDropdown}
+        className="flex items-center gap-4 hover:cursor-pointer"
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
@@ -114,7 +117,7 @@ const DropdownUser = () => {
             fill=""
           />
         </svg>
-      </Link>
+      </div>
 
       {/* <!-- Dropdown Start --> */}
       <div

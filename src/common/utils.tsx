@@ -280,3 +280,7 @@ export const standardizeDate = (dateString?: string | Date) => {
   const formats = ['YYYY-MM-DD', 'DD-MM-YYYY'];
   return moment(dateString, formats, true).format('DD-MM-YYYY');
 };
+
+export const delay = async () => {
+  return await new Promise((resolve) => setTimeout(resolve, 0)); // Tunggu re-render
+};

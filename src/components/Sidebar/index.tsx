@@ -500,6 +500,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 Workplan CC ke Saya
                               </NavLink>
                             </li>
+                            <li>
+                              <NavLink
+                                to="/"
+                                className={({ isActive }) =>
+                                  'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                  (isActive && '!text-white')
+                                }
+                              >
+                                Workplan Perlu Persetujuan
+                              </NavLink>
+                            </li>
                           </ul>
                         </div>
                       </React.Fragment>
