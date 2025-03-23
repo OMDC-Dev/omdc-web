@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Chip,
-  IconButton,
-  List,
-  ListItem,
-  ListItemSuffix,
-} from '@material-tailwind/react';
+import { Button, Card, Chip, List, ListItem } from '@material-tailwind/react';
 import 'flatpickr/dist/flatpickr.min.css';
 import * as React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -16,15 +8,10 @@ import {
   WORKPLAN_UPDATE,
   WORKPLAN_UPDATE_STATUS,
 } from '../../api/routes';
-import {
-  compressImage,
-  getFormattedDateTable,
-  standardizeDate,
-} from '../../common/utils';
+import { getFormattedDateTable, standardizeDate } from '../../common/utils';
 import ActionCard from '../../components/ActionCard';
 import { ContainerCard } from '../../components/ContainerCard';
 import { DetailPlaceholder } from '../../components/DetailPlaceholder';
-import DatePicker from '../../components/Forms/DatePicker/DatePicker';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import WorkplanCCModal from '../../components/Modal/WorkplanCCModal';
@@ -39,20 +26,13 @@ import {
 import { color } from '@material-tailwind/react/types/components/alert';
 import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
 import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import WorkplanProgressModal from '../../components/Modal/WorkplanProgressModal';
 
-const WorkplanDetail: React.FC = () => {
-  const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
-
+const WorkplanApprovalDetail: React.FC = () => {
   const [showWorkplan, setShowWorkplan] = React.useState<boolean>(false);
   const [cc, setCC] = React.useState<any>([]);
-  const [attachmentAfter, setAttachmentAfter] = React.useState();
-  const [attachmentBefore, setAttachmentBefore] = React.useState();
-  const [isHasChanges, setIsHasChanges] = React.useState(false);
   const [progressList, setProgressList] = React.useState([]);
   const [selectedProgress, setSelectedProgress] = React.useState<any>();
-  const [isChangeFile, setIsChangeFile] = React.useState(false);
 
   const [showFile, setShowFile] = React.useState(false);
   const [showWPHistory, setShowWPHistory] = React.useState(false);
@@ -63,16 +43,14 @@ const WorkplanDetail: React.FC = () => {
   const [showProgress, setShowProgress] = React.useState<boolean>(false);
 
   const { id } = useParams();
-  const { state } = useLocation();
 
   const _status = getWorkplanStatusText(workplanDetail?.status);
-  const IS_NON_APPROVAL =
-    state?.jenis_workplan !== 'APPROVAL' ??
-    workplanDetail?.jenis_workplan !== 'APPROVAL';
+
   const WP_STATUS = workplanDetail?.status;
   const IS_FINISHED =
     WP_STATUS == WORKPLAN_STATUS.FINISH ||
-    WP_STATUS == WORKPLAN_STATUS.REJECTED;
+    WP_STATUS == WORKPLAN_STATUS.REJECTED ||
+    WP_STATUS == WORKPLAN_STATUS.REVISON;
 
   const {
     show,
@@ -86,8 +64,6 @@ const WorkplanDetail: React.FC = () => {
   } = useModal();
 
   const navigate = useNavigate();
-
-  const submitButtonDisabled = !isHasChanges && tanggalSelesai != null;
 
   React.useEffect(() => {
     getWorkplanDetail();
@@ -107,7 +83,6 @@ const WorkplanDetail: React.FC = () => {
     if (state == API_STATES.OK) {
       setWorkplanDetail(data);
       setCC(data.cc_users);
-      setTanggalSelesai(data.tanggal_selesai);
       getWorkplanProgress(id);
       hide();
     } else {
@@ -133,38 +108,6 @@ const WorkplanDetail: React.FC = () => {
     }
   }
 
-  const saveWorkplan = async () => {
-    changeType('LOADING');
-
-    let mappedCC = [];
-
-    if (cc && cc?.length > 0) {
-      mappedCC = cc.map((item: any) => item.iduser);
-    }
-
-    const body = {
-      tanggal_selesai: standardizeDate(tanggalSelesai),
-      user_cc: mappedCC,
-      attachment_after: attachmentAfter,
-      attachment_before: attachmentBefore,
-      isUpdateAfter: isChangeFile,
-    };
-
-    const { state, data, error } = await useFetch({
-      url: WORKPLAN_UPDATE(id),
-      method: 'POST',
-      data: body,
-    });
-
-    if (state == API_STATES.OK) {
-      changeType('SUCCESS');
-      setIsHasChanges(false);
-      setIsChangeFile(false);
-    } else {
-      changeType('FAILED');
-    }
-  };
-
   const updateStatusWorkplan = async (status: any) => {
     changeType('LOADING');
     const body = {
@@ -179,61 +122,10 @@ const WorkplanDetail: React.FC = () => {
 
     if (state == API_STATES.OK) {
       changeType('SUCCESS');
-      setIsHasChanges(false);
     } else {
       changeType('FAILED');
     }
   };
-
-  const deleteWorkplan = async () => {
-    changeType('LOADING');
-
-    const { state, data, error } = await useFetch({
-      url: WORKPLAN + `/${id}`,
-      method: 'DELETE',
-    });
-
-    if (state == API_STATES.OK) {
-      changeType('SUCCESS');
-    } else {
-      changeType('FAILED');
-    }
-  };
-
-  // handle attachment
-  function handleAttachment(event: any, type: string) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    const maxSize = 10485760;
-
-    if (file.size > maxSize) {
-      if (file.type.includes('image')) {
-        compressImage(file, maxSize, handleAttachment);
-        return; // Menghentikan eksekusi lebih lanjut
-      } else {
-        // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
-        alert(
-          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 10 MB.',
-        );
-        event.target.value = null; // Mengosongkan input file
-        return;
-      }
-    }
-
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const base64string: any = reader.result;
-
-      const splitted = base64string?.split(';base64,');
-
-      setIsHasChanges(true);
-      if (type == 'AFTER') {
-        setAttachmentAfter(splitted[1]);
-      } else {
-        setAttachmentBefore(splitted[1]);
-      }
-    };
-  }
 
   return (
     <DefaultLayout>
@@ -254,34 +146,11 @@ const WorkplanDetail: React.FC = () => {
           </div>
         }
       >
-        {IS_NON_APPROVAL && !IS_FINISHED && (
+        {!IS_FINISHED && (
           <>
             <Button
               size="sm"
               className="normal-case"
-              color={'amber'}
-              onClick={() => {
-                changeContext(
-                  WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
-                    WP_STATUS == WORKPLAN_STATUS.REVISON
-                    ? 'PENDING'
-                    : 'ON_PROGRESS',
-                );
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              {WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
-              WP_STATUS == WORKPLAN_STATUS.REVISON
-                ? 'Set ke Pending'
-                : 'Set ke On Progress'}
-            </Button>
-            <Button
-              size="sm"
-              className="normal-case"
-              disabled={
-                !progressList?.length || WP_STATUS == WORKPLAN_STATUS.PENDING
-              }
               color={'green'}
               onClick={() => {
                 changeContext('DONE');
@@ -289,41 +158,35 @@ const WorkplanDetail: React.FC = () => {
                 show();
               }}
             >
-              Set ke Selesai
+              Setujui
             </Button>
-          </>
-        )}
-
-        {!IS_FINISHED && (
-          <>
             <Button
               size="sm"
               className="normal-case"
-              disabled={submitButtonDisabled}
-              color={'blue'}
+              color={'amber'}
               onClick={() => {
-                changeContext('SAVE');
+                changeContext('REVISI');
                 changeType('CONFIRM');
                 show();
               }}
             >
-              Simpan
+              Revisi
             </Button>
-
             <Button
               size="sm"
               className="normal-case"
               color={'red'}
               onClick={() => {
-                changeContext('DELETE');
+                changeContext('REJECT');
                 changeType('CONFIRM');
                 show();
               }}
             >
-              Hapus
+              Tolak
             </Button>
           </>
         )}
+
         <Button
           size="sm"
           variant={'outlined'}
@@ -352,18 +215,9 @@ const WorkplanDetail: React.FC = () => {
             />
 
             <div className="w-full">
-              <DatePicker
-                title={
-                  IS_FINISHED
-                    ? 'Tanggal Selesai'
-                    : 'Tanggal Selesai ( bisa diupdate )'
-                }
-                onChange={(date) => {
-                  setTanggalSelesai(date);
-                  setIsHasChanges(true);
-                }}
-                disabled={IS_FINISHED}
-                defaultValue={workplanDetail?.tanggal_selesai}
+              <DetailPlaceholder
+                value={workplanDetail?.tanggal_selesai}
+                label="Tanggal Selesai"
               />
 
               <div
@@ -415,18 +269,6 @@ const WorkplanDetail: React.FC = () => {
                             color="blue"
                             variant="ghost"
                             value={item?.nm_user}
-                            onClose={
-                              IS_FINISHED
-                                ? undefined
-                                : () => {
-                                    let filtered = cc.filter((fItem: any) => {
-                                      return fItem.iduser != item.iduser;
-                                    });
-
-                                    setIsHasChanges(true);
-                                    setCC(filtered);
-                                  }
-                            }
                           />
                         );
                       })
@@ -434,18 +276,6 @@ const WorkplanDetail: React.FC = () => {
                       <div className=" ml-2.5">Pilih CC</div>
                     )}
                   </div>
-
-                  {/* Tombol Tambah */}
-                  {!IS_FINISHED && (
-                    <Button
-                      className="normal-case h-8 whitespace-nowrap"
-                      size="sm"
-                      color="blue"
-                      onClick={() => setShowWorkplan(true)}
-                    >
-                      Tambah CC
-                    </Button>
-                  )}
                 </div>
               </div>
 
@@ -465,23 +295,9 @@ const WorkplanDetail: React.FC = () => {
 
               {!workplanDetail?.attachment_before ? (
                 <div className="w-full">
-                  {!IS_FINISHED ? (
-                    <>
-                      <label className="mb-3 block text-sm font-medium text-black">
-                        Lampirkan Gambar Awal ( Opsional maks. 10MB)
-                      </label>
-                      <input
-                        type="file"
-                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        accept={'image/*'}
-                        onChange={(e) => handleAttachment(e, 'BEFORE')}
-                      />
-                    </>
-                  ) : (
-                    <Card className="h-16 flex items-center justify-center text-sm">
-                      <p>Tidak ada gambar diunggah</p>
-                    </Card>
-                  )}
+                  <Card className="h-16 flex items-center justify-center text-sm">
+                    <p>Tidak ada gambar diunggah</p>
+                  </Card>
                 </div>
               ) : (
                 <DetailPlaceholder
@@ -507,45 +323,9 @@ const WorkplanDetail: React.FC = () => {
 
               {!workplanDetail?.attachment_after ? (
                 <div className="w-full">
-                  {!IS_FINISHED ? (
-                    <>
-                      <label className="mb-3 block text-sm font-medium text-black">
-                        Lampirkan Gambar Akhir ( Opsional maks. 10MB)
-                      </label>
-                      <input
-                        type="file"
-                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        accept={'image/*'}
-                        onChange={(e) => handleAttachment(e, 'AFTER')}
-                      />
-                    </>
-                  ) : (
-                    <Card className="h-16 flex items-center justify-center text-sm">
-                      <p>Tidak ada gambar diunggah</p>
-                    </Card>
-                  )}
-                </div>
-              ) : isChangeFile ? (
-                <div className="w-full">
-                  <label className="mb-3 block text-sm font-medium text-black">
-                    Lampirkan Gambar Akhir ( Opsional maks. 10MB)
-                  </label>
-                  <input
-                    type="file"
-                    className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                    accept={'image/*'}
-                    onChange={(e) => handleAttachment(e, 'AFTER')}
-                  />
-                  <Button
-                    variant={'outlined'}
-                    fullWidth
-                    color="blue"
-                    size="sm"
-                    className="normal-case mt-4"
-                    onClick={() => setIsChangeFile(false)}
-                  >
-                    Batalkan
-                  </Button>
+                  <Card className="h-16 flex items-center justify-center text-sm">
+                    <p>Tidak ada gambar diunggah</p>
+                  </Card>
                 </div>
               ) : (
                 <DetailPlaceholder
@@ -565,42 +345,16 @@ const WorkplanDetail: React.FC = () => {
                     >
                       Lihat
                     </Button>
-
-                    <Button
-                      variant={'outlined'}
-                      size="sm"
-                      onClick={() => setIsChangeFile(true)}
-                      fullWidth
-                      color="blue"
-                      className="mt-2.5 normal-case"
-                    >
-                      Ganti
-                    </Button>
                   </div>
                 </DetailPlaceholder>
               )}
             </div>
           </ContainerCard>
 
-          <ContainerCard
-            title="Progress"
-            suffix={
-              IS_FINISHED ? null : (
-                <Button
-                  className="normal-case h-8"
-                  size={'sm'}
-                  color={'blue'}
-                  variant={'outlined'}
-                  onClick={() => setShowProgress(true)}
-                >
-                  + Progress
-                </Button>
-              )
-            }
-          >
+          <ContainerCard title="Progress">
             <div className=" p-6.5 flex flex-col gap-y-6.5">
               <div className="w-full">
-                {progressList?.length > 0 ? (
+                {progressList.length > 0 ? (
                   <Card>
                     <List className="max-h-50 overflow-y-auto">
                       {progressList.map((item: any) => {
@@ -615,21 +369,6 @@ const WorkplanDetail: React.FC = () => {
                               </span>
                               {item.progress}
                             </div>
-
-                            {!IS_FINISHED && (
-                              <ListItemSuffix>
-                                <IconButton
-                                  onClick={() => {
-                                    setSelectedProgress(item);
-                                    setShowProgress(true);
-                                  }}
-                                  variant="text"
-                                  color={'blue'}
-                                >
-                                  <PencilIcon className="text-blue-500 w-4 h-4" />
-                                </IconButton>
-                              </ListItemSuffix>
-                            )}
                           </ListItem>
                         );
                       })}
@@ -687,7 +426,6 @@ const WorkplanDetail: React.FC = () => {
                 fcmToken: val.fcmToken,
               },
             ]);
-            setIsHasChanges(true);
           }}
         />
 
@@ -696,26 +434,18 @@ const WorkplanDetail: React.FC = () => {
           visible={visible}
           toggle={toggle}
           onConfirm={() => {
-            if (context == 'SAVE') {
-              saveWorkplan();
-            } else if (context == 'PENDING') {
-              updateStatusWorkplan(WORKPLAN_STATUS.PENDING);
-            } else if (context == 'ON_PROGRESS') {
-              updateStatusWorkplan(WORKPLAN_STATUS.ON_PROGRESS);
-            } else if (context == 'DONE') {
+            if (context == 'DONE') {
               updateStatusWorkplan(WORKPLAN_STATUS.FINISH);
+            } else if (context == 'REVISI') {
+              updateStatusWorkplan(WORKPLAN_STATUS.REVISON);
             } else {
-              deleteWorkplan();
+              updateStatusWorkplan(WORKPLAN_STATUS.REJECTED);
             }
           }}
           onDone={() => {
             hide();
             if (type == 'SUCCESS') {
-              if (context !== 'DELETE') {
-                getWorkplanDetail();
-              } else {
-                navigate(-1);
-              }
+              getWorkplanDetail();
             }
           }}
         />
@@ -745,15 +475,11 @@ const WorkplanDetail: React.FC = () => {
           visible={showProgress}
           selected={selectedProgress}
           toggle={() => setShowProgress(!showProgress)}
-          onSuccess={() => {
-            setSelectedProgress(null);
-            getWorkplanProgress(id);
-            getWorkplanDetail();
-          }}
+          onSuccess={() => getWorkplanProgress(id)}
         />
       </div>
     </DefaultLayout>
   );
 };
 
-export default WorkplanDetail;
+export default WorkplanApprovalDetail;

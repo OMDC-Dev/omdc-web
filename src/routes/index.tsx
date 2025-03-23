@@ -45,6 +45,8 @@ import RemarkCA from '../pages/Dashboard/RemarkCA';
 import WorkplanSaya from '../pages/Workplan/WorkplanSaya';
 import BuatWorkplan from '../pages/Workplan/BuatWorkplan';
 import WorkplanDetail from '../pages/Workplan/WorkplanDetail';
+import WorkplanApproval from '../pages/Workplan/WorkplanApproval';
+import WorkplanApprovalDetail from '../pages/Workplan/WorkplanApprovalDetail';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -183,6 +185,24 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Workplan'} />
               <WorkplanDetail />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/approval/:status',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Workplan'} />
+              <WorkplanApproval />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/pengajuan/admin/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Workplan'} />
+              <WorkplanApprovalDetail />
             </>
           ),
         },

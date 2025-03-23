@@ -16,12 +16,15 @@ import {
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import { DocumentTextIcon, TrashIcon } from '@heroicons/react/24/outline';
 import useModal from '../../hooks/useModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import { WORKPLAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { cekAkses, delay, getFormattedDateTable } from '../../common/utils';
-import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
+import { delay, getFormattedDateTable } from '../../common/utils';
+import {
+  WORKPLAN_STATUS,
+  getWorkplanStatusText,
+} from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 
@@ -38,7 +41,7 @@ const TABLE_HEAD = [
   '',
 ];
 
-const WorkplanSaya: React.FC = () => {
+const WorkplanApproval: React.FC = () => {
   const [list, setList] = React.useState<any>([]);
   const [limit, setLimit] = React.useState<number>(20);
   const [page, setPage] = React.useState<number>(1);
@@ -49,11 +52,11 @@ const WorkplanSaya: React.FC = () => {
   const { show, hide, toggle, changeType, visible, type } = useModal();
   const navigate = useNavigate();
 
-  const isWorkplanMaker = cekAkses('#11');
+  const { status } = useParams();
 
   React.useEffect(() => {
     getMyWorkplan();
-  }, []);
+  }, [status]);
 
   async function getMyWorkplan(clearOn?: string) {
     changeType('LOADING');
@@ -64,8 +67,15 @@ const WorkplanSaya: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
+    const _GET_STATUS =
+      status == 'waiting'
+        ? WORKPLAN_STATUS.ON_PROGRESS
+        : WORKPLAN_STATUS.FINISH;
+
     const { state, data, error } = await useFetch({
-      url: WORKPLAN + `?limit=${limit}&page=${page}${param}`,
+      url:
+        WORKPLAN +
+        `?limit=${limit}&page=${page}${param}&admin=true&status=${_GET_STATUS}`,
       method: 'GET',
     });
 
@@ -86,24 +96,12 @@ const WorkplanSaya: React.FC = () => {
           <div className="flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Workplan Saya
+                Workplan
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
                 Menampilkan semua workplan
               </Typography>
             </div>
-            {isWorkplanMaker && (
-              <MButton
-                variant="filled"
-                size="sm"
-                color="blue"
-                onClick={() =>
-                  navigate('/workplan/pengajuan', { replace: false })
-                }
-              >
-                Buat Workplan
-              </MButton>
-            )}
           </div>
           <div className="w-full mt-4.5">
             <form
@@ -278,11 +276,14 @@ const WorkplanSaya: React.FC = () => {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(`/workplan/pengajuan/${item.id}`, {
-                                  state: {
-                                    jenis_workplan: item.jenis_workplan,
+                                navigate(
+                                  `/workplan/pengajuan/admin/${item.id}`,
+                                  {
+                                    state: {
+                                      jenis_workplan: item.jenis_workplan,
+                                    },
                                   },
-                                });
+                                );
                               }}
                             >
                               <DocumentTextIcon className="h-4 w-4" />
@@ -340,4 +341,4 @@ const WorkplanSaya: React.FC = () => {
   );
 };
 
-export default WorkplanSaya;
+export default WorkplanApproval;

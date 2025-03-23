@@ -4,7 +4,7 @@ import React from 'react';
 import FileModal from './FileModal';
 import useFetch from '../../hooks/useFetch';
 import { WORKPLAN_COMMENT } from '../../api/routes';
-import { compressImage } from '../../common/utils';
+import { compressImage, getFormattedDateTable } from '../../common/utils';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -22,14 +22,20 @@ const CommentCard = ({ data, onClick }: { data: any; onClick: any }) => {
       >
         {data.create_by.split('')[0]}
       </div>
-      <div>
-        <p
-          className={`text-xs font-semibold ${
-            IS_SELF ? 'text-blue-500' : 'text-black'
-          }`}
-        >
-          {data.create_by}
-        </p>
+      <div className="w-full">
+        <div className="flex flex-row justify-between items-center">
+          <p
+            className={`text-xs font-semibold ${
+              IS_SELF ? 'text-blue-500' : 'text-black'
+            }`}
+          >
+            {data.create_by}
+          </p>
+          <p className="text-xs">
+            {getFormattedDateTable(data?.createdAt, 'lll')}
+          </p>
+        </div>
+
         <p className="text-sm text-black font-normal text-wrap">
           {data.message}
         </p>

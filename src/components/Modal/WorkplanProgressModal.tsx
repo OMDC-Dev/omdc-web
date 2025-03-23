@@ -53,6 +53,9 @@ const WorkplanProgressModal = ({
     const { state, data, error } = await useFetch({
       url: WORKPLAN_PROGRESS(selected?.id),
       method: 'DELETE',
+      data: {
+        wp_id: WP_ID,
+      },
     });
 
     if (state == API_STATES.OK) {
@@ -73,6 +76,7 @@ const WorkplanProgressModal = ({
       url: WORKPLAN_PROGRESS(selected?.id),
       data: {
         progress: progress,
+        wp_id: WP_ID,
       },
       method: 'PUT',
     });
@@ -107,6 +111,9 @@ const WorkplanProgressModal = ({
         </div>
         {/* Make the following div take remaining space and allow overflow */}
         <div className="flex-1 overflow-auto">
+          <p className="text-xs mb-2.5">
+            Perubahan progress akan otomatis disimpan
+          </p>
           <div className="w-full">
             <textarea
               rows={6}
@@ -132,17 +139,19 @@ const WorkplanProgressModal = ({
               Simpan
             </Button>
 
-            <Button
-              loading={isLoading}
-              fullWidth
-              variant={'outlined'}
-              color={'red'}
-              size={'sm'}
-              className="normal-case"
-              onClick={() => deleteProgress()}
-            >
-              Hapus
-            </Button>
+            {selected && (
+              <Button
+                loading={isLoading}
+                fullWidth
+                variant={'outlined'}
+                color={'red'}
+                size={'sm'}
+                className="normal-case"
+                onClick={() => deleteProgress()}
+              >
+                Hapus
+              </Button>
+            )}
           </div>
         </div>
       </div>

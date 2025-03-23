@@ -92,6 +92,7 @@ export const cekAkses = (akses: string) => {
    * MASTER BARANG -> 1128 -> #9
    * ACCEPT MULTIPLE -> 1190 -> #10
    * WORKPLAN -> 1199 -> #11
+   * WORKPLAN ADMIN -> 1200 -> #12
    */
   const { user } = useAuth();
 
@@ -139,6 +140,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#11') {
     return kd.findIndex((item: string) => item == '1199') !== -1;
+  }
+
+  if (akses == '#12') {
+    return kd.findIndex((item: string) => item == '1200') !== -1;
   }
 };
 

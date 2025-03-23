@@ -51,6 +51,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const hasPengumumanAkses = cekAkses('#3');
   const hasExportExcell = cekAkses('#4');
   const isAdminPB = cekAkses('#7');
+  const isAdminWorkplan = cekAkses('#12');
 
   // close on click outside
   useEffect(() => {
@@ -489,28 +490,44 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 Workplan Saya
                               </NavLink>
                             </li>
-                            <li>
-                              <NavLink
-                                to="/"
-                                className={({ isActive }) =>
-                                  'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                  (isActive && '!text-white')
-                                }
-                              >
-                                Workplan CC ke Saya
-                              </NavLink>
-                            </li>
-                            <li>
-                              <NavLink
-                                to="/"
-                                className={({ isActive }) =>
-                                  'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                  (isActive && '!text-white')
-                                }
-                              >
-                                Workplan Perlu Persetujuan
-                              </NavLink>
-                            </li>
+                            {!isAdminWorkplan ? (
+                              <li>
+                                <NavLink
+                                  to="/"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Workplan CC ke Saya
+                                </NavLink>
+                              </li>
+                            ) : (
+                              <>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/waiting"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Workplan Perlu Persetujuan
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/done"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Workplan Selesai
+                                  </NavLink>
+                                </li>
+                              </>
+                            )}
                           </ul>
                         </div>
                       </React.Fragment>
