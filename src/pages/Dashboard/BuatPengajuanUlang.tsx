@@ -327,7 +327,7 @@ const BuatPengajuanUlang: React.FC = () => {
       payment_type: paymentType,
       tipePembayaran: tipePembayaran,
       uploadedFile: useExtFile ? FILE : null,
-      kdsp: suplier?.kdsp || '',
+      kdsp: suplier?.kdsp ?? null,
     };
 
     const { state, data, error } = await useFetch({
