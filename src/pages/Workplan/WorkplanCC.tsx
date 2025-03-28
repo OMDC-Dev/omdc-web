@@ -14,7 +14,11 @@ import {
   Button,
 } from '@material-tailwind/react';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import { DocumentTextIcon, TrashIcon } from '@heroicons/react/24/outline';
+import {
+  AdjustmentsHorizontalIcon,
+  DocumentTextIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 import useModal from '../../hooks/useModal';
 import { useNavigate, useParams } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
@@ -27,9 +31,11 @@ import {
 } from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
 import { XMarkIcon } from '@heroicons/react/24/solid';
+import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
 
 const TABLE_HEAD = [
   'ID',
+  'Jenis Workplan',
   'Tanggal Dibuat',
   'Cabang',
   'Kategori',
@@ -50,6 +56,8 @@ const WorkplanCC: React.FC = () => {
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
+  const [showWPFilter, setShowWPFilter] = React.useState(false);
+  const [filter, setFilter] = React.useState('');
   const navigate = useNavigate();
 
   const { status } = useParams();
@@ -57,6 +65,12 @@ const WorkplanCC: React.FC = () => {
   React.useEffect(() => {
     getMyWorkplan();
   }, [status]);
+
+  React.useEffect(() => {
+    if (filter) {
+      getMyWorkplan();
+    }
+  }, [filter]);
 
   async function getMyWorkplan(clearOn?: string) {
     changeType('LOADING');
@@ -73,7 +87,7 @@ const WorkplanCC: React.FC = () => {
         : WORKPLAN_STATUS.FINISH;
 
     const { state, data, error } = await useFetch({
-      url: WORKPLAN + `?limit=${limit}&page=${page}${param}&cc=true`,
+      url: WORKPLAN + `?limit=${limit}&page=${page}${param}&cc=true&${filter}`,
       method: 'GET',
     });
 
@@ -101,7 +115,7 @@ const WorkplanCC: React.FC = () => {
               </Typography>
             </div>
           </div>
-          <div className="w-full mt-4.5">
+          <div className="w-full flex flex-row gap-4 mt-4.5">
             <form
               className="w-full relative"
               onSubmit={(e) => {
@@ -130,6 +144,9 @@ const WorkplanCC: React.FC = () => {
                 </button>
               )}
             </form>
+            <IconButton className="m-4" onClick={() => setShowWPFilter(true)}>
+              <AdjustmentsHorizontalIcon className=" text-blue-gray-500 w-6 h-6" />
+            </IconButton>
           </div>
         </CardHeader>
         {!list?.length ? (
@@ -182,6 +199,26 @@ const WorkplanCC: React.FC = () => {
                           </div>
                         </td>
                         <td className={classes}>
+                          <div className="flex items-center gap-3 ">
+                            <div className="flex flex-col">
+                              <Chip
+                                className="normal-case"
+                                variant={'ghost'}
+                                color={
+                                  item?.jenis_workplan == 'APPROVAL'
+                                    ? 'light-blue'
+                                    : 'teal'
+                                }
+                                value={
+                                  item?.jenis_workplan == 'APPROVAL'
+                                    ? 'Approval'
+                                    : 'Non Approval'
+                                }
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className={classes}>
                           <div className="w-max">
                             <Typography
                               variant="small"
@@ -222,7 +259,7 @@ const WorkplanCC: React.FC = () => {
                           </div>
                         </td>
                         <td className={classes}>
-                          <div className="w-max">
+                          <div className="w-max max-w-[350px]">
                             <Typography
                               variant="small"
                               className="font-normal "
@@ -334,6 +371,12 @@ const WorkplanCC: React.FC = () => {
         type={type}
         onConfirm={() => {}}
         onDone={() => {}}
+      />
+
+      <WorkplanFilterModal
+        visible={showWPFilter}
+        toggle={() => setShowWPFilter(!showWPFilter)}
+        onApply={(flr: string) => setFilter(flr)}
       />
     </DefaultLayout>
   );

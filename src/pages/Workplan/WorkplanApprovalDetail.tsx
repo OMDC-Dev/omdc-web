@@ -57,6 +57,8 @@ const WorkplanApprovalDetail: React.FC = () => {
     WP_STATUS == WORKPLAN_STATUS.REJECTED ||
     WP_STATUS == WORKPLAN_STATUS.REVISON;
 
+  const IS_APPROVAL = workplanDetail?.jenis_workplan == 'APPROVAL';
+
   const {
     show,
     hide,
@@ -151,7 +153,7 @@ const WorkplanApprovalDetail: React.FC = () => {
           </div>
         }
       >
-        {!IS_FINISHED && IS_ADMIN_WP && (
+        {!IS_FINISHED && IS_ADMIN_WP && IS_APPROVAL && (
           <>
             <Button
               size="sm"
