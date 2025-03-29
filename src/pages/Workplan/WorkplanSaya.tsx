@@ -90,6 +90,7 @@ const WorkplanSaya: React.FC = () => {
   React.useEffect(() => {
     if (filter) {
       getMyWorkplan();
+      console.log('FILTER', filter);
     }
   }, [filter]);
 

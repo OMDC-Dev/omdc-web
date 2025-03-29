@@ -119,6 +119,7 @@ const WorkplanApprovalDetail: React.FC = () => {
     changeType('LOADING');
     const body = {
       status: status,
+      fromAdmin: true,
     };
 
     const { state, data, error } = await useFetch({

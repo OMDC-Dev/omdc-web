@@ -48,6 +48,7 @@ import WorkplanDetail from '../pages/Workplan/WorkplanDetail';
 import WorkplanApproval from '../pages/Workplan/WorkplanApproval';
 import WorkplanApprovalDetail from '../pages/Workplan/WorkplanApprovalDetail';
 import WorkplanCC from '../pages/Workplan/WorkplanCC';
+import SuperBanner from '../pages/SuperAdmin/Banner';
 
 const Routes = () => {
   const { token, user } = useAuth();
@@ -580,6 +581,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Icon'} />
               <SuperIcon />
+            </>
+          ),
+        },
+        {
+          path: '/banner',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Banner'} />
+              <SuperBanner />
             </>
           ),
         },
