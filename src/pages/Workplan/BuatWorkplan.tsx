@@ -143,7 +143,7 @@ const BuatWorkplan: React.FC = () => {
           color={'blue'}
           onClick={() => navigate(-1)}
         >
-          Batalkan
+          Kembali
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">

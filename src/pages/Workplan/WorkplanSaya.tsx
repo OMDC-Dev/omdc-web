@@ -81,18 +81,21 @@ const WorkplanSaya: React.FC = () => {
       setList(data.rows);
       setPageInfo(data.pageInfo);
       hide();
+      changeType('NONE');
     } else {
       console.log(error);
       hide();
+      changeType('NONE');
     }
   }
 
   React.useEffect(() => {
-    if (filter) {
-      getMyWorkplan();
-      console.log('FILTER', filter);
-    }
-  }, [filter]);
+    // if (filter) {
+    //   getMyWorkplan();
+    //   console.log('FILTER', filter);
+    // }
+    getMyWorkplan();
+  }, [filter, page]);
 
   return (
     <DefaultLayout>

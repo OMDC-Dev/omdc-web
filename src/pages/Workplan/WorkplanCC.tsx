@@ -67,10 +67,11 @@ const WorkplanCC: React.FC = () => {
   }, [status]);
 
   React.useEffect(() => {
-    if (filter) {
-      getMyWorkplan();
-    }
-  }, [filter]);
+    // if (filter) {
+    //   getMyWorkplan();
+    // }
+    getMyWorkplan();
+  }, [filter, page]);
 
   async function getMyWorkplan(clearOn?: string) {
     changeType('LOADING');
@@ -95,9 +96,11 @@ const WorkplanCC: React.FC = () => {
       setList(data.rows);
       setPageInfo(data.pageInfo);
       hide();
+      changeType('NONE');
     } else {
       console.log(error);
       hide();
+      changeType('NONE');
     }
   }
 

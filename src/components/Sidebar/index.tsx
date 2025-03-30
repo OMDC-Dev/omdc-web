@@ -524,7 +524,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Workplan Perlu Persetujuan
+                                    List Workplan
                                   </NavLink>
                                 </li>
                                 <li>

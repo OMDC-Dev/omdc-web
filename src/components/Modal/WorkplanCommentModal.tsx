@@ -102,7 +102,7 @@ const WorkplanCommentModal = ({
     data?.workplant_comment,
   );
 
-  const [showImage, setShowImage] = React.useState<boolean>(false);
+  const [showImage, setShowImage] = React.useState<boolean>(true);
   const [showPreview, setShowPreview] = React.useState<boolean>(false);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -203,7 +203,7 @@ const WorkplanCommentModal = ({
         {/* Make the following div take remaining space and allow overflow */}
         <div className="flex-1 flex flex-col gap-4 overflow-auto">
           {/* Media Section */}
-          <div className="flex flex-row justify-end">
+          {/* <div className="flex flex-row justify-end">
             <Button
               onClick={() => setShowImage(!showImage)}
               className="normal-case"
@@ -212,8 +212,8 @@ const WorkplanCommentModal = ({
             >
               {showImage ? 'Sembunyikan Lampiran' : 'Tampilkan Lampiran'}
             </Button>
-          </div>
-          {showImage && (
+          </div> */}
+          {true && (
             <div className="flex flex-row gap-4">
               <ImagePlaceholder
                 onClick={() => {
@@ -234,7 +234,7 @@ const WorkplanCommentModal = ({
           )}
 
           {/* comment section */}
-          {!showImage && (
+          {true && (
             <div className="w-full bg-gray-2 rounded-lg p-2.5 flex flex-col gap-y-2.5">
               {commentList && commentList.length ? (
                 commentList?.map((item: any) => {

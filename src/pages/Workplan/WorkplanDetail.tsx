@@ -331,7 +331,7 @@ const WorkplanDetail: React.FC = () => {
           color={'blue'}
           onClick={() => navigate(-1)}
         >
-          Batalkan
+          Kembali
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
@@ -484,25 +484,35 @@ const WorkplanDetail: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <DetailPlaceholder
-                  label="Gambar Awal"
-                  value={'File Gambar Awal'}
-                >
-                  <div className="flex flex-row items-center gap-2.5">
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setSelectedGambar(workplanDetail?.attachment_before);
-                        setShowFile(true);
-                      }}
-                      fullWidth
-                      color="blue"
-                      className="mt-2.5 normal-case"
-                    >
-                      Lihat
-                    </Button>
-                  </div>
-                </DetailPlaceholder>
+                // <DetailPlaceholder label="Before" value={'File Gambar Awal'}>
+                //   <div className="flex flex-row items-center gap-2.5">
+                //     <Button
+                //       size="sm"
+                //       onClick={() => {
+                //         setSelectedGambar(workplanDetail?.attachment_before);
+                //         setShowFile(true);
+                //       }}
+                //       fullWidth
+                //       color="blue"
+                //       className="mt-2.5 normal-case"
+                //     >
+                //       Lihat
+                //     </Button>
+                //   </div>
+                // </DetailPlaceholder>
+                <div>
+                  <label className="mb-3 block text-black dark:text-white">
+                    Before
+                  </label>
+                  <img
+                    src={workplanDetail?.attachment_before}
+                    className="w-full aspect-video object-cover bg-gray-200 rounded-lg hover:cursor-pointer"
+                    onClick={() => {
+                      setSelectedGambar(workplanDetail?.attachment_before);
+                      setShowFile(true);
+                    }}
+                  />
+                </div>
               )}
 
               {!workplanDetail?.attachment_after ? (
@@ -548,36 +558,49 @@ const WorkplanDetail: React.FC = () => {
                   </Button>
                 </div>
               ) : (
-                <DetailPlaceholder
-                  label="Gambar Akhir"
-                  value={'File Gambar Akhir'}
-                >
-                  <div className="flex flex-row items-center gap-2.5">
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setSelectedGambar(workplanDetail?.attachment_after);
-                        setShowFile(true);
-                      }}
-                      fullWidth
-                      color="blue"
-                      className="mt-2.5 normal-case"
-                    >
-                      Lihat
-                    </Button>
+                // <DetailPlaceholder
+                //   label="Gambar Akhir"
+                //   value={'File Gambar Akhir'}
+                // >
+                //   <div className="flex flex-row items-center gap-2.5">
+                //     <Button
+                //       size="sm"
+                //       onClick={() => {
+                //         setSelectedGambar(workplanDetail?.attachment_after);
+                //         setShowFile(true);
+                //       }}
+                //       fullWidth
+                //       color="blue"
+                //       className="mt-2.5 normal-case"
+                //     >
+                //       Lihat
+                //     </Button>
 
-                    <Button
-                      variant={'outlined'}
-                      size="sm"
-                      onClick={() => setIsChangeFile(true)}
-                      fullWidth
-                      color="blue"
-                      className="mt-2.5 normal-case"
-                    >
-                      Ganti
-                    </Button>
-                  </div>
-                </DetailPlaceholder>
+                //     <Button
+                //       variant={'outlined'}
+                //       size="sm"
+                //       onClick={() => setIsChangeFile(true)}
+                //       fullWidth
+                //       color="blue"
+                //       className="mt-2.5 normal-case"
+                //     >
+                //       Ganti
+                //     </Button>
+                //   </div>
+                // </DetailPlaceholder>
+                <div>
+                  <label className="mb-3 block text-black dark:text-white">
+                    After
+                  </label>
+                  <img
+                    src={workplanDetail?.attachment_after}
+                    className="w-full aspect-video object-cover bg-gray-200 rounded-lg hover:cursor-pointer"
+                    onClick={() => {
+                      setSelectedGambar(workplanDetail?.attachment_after);
+                      setShowFile(true);
+                    }}
+                  />
+                </div>
               )}
             </div>
           </ContainerCard>
