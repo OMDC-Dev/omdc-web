@@ -1,5 +1,5 @@
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { Avatar, Button, Dialog } from '@material-tailwind/react';
+import { Avatar, Button, Dialog, IconButton } from '@material-tailwind/react';
 import React from 'react';
 import FileModal from './FileModal';
 import useFetch from '../../hooks/useFetch';
@@ -8,48 +8,152 @@ import { compressImage, getFormattedDateTable } from '../../common/utils';
 import { API_STATES } from '../../constants/ApiEnum';
 import { useAuth } from '../../hooks/useAuth';
 
-const CommentCard = ({ data, onClick }: { data: any; onClick: any }) => {
+const CommentCard = ({
+  data,
+  onClick,
+  onReply,
+  isContext,
+  onRemovePin,
+}: {
+  data: any;
+  onClick: any;
+  onReply: any;
+  isContext?: boolean;
+  onRemovePin?: any;
+}) => {
   const { user } = useAuth();
 
-  const IS_SELF = user.iduser == data.iduser;
+  const IS_SELF = user.iduser == data?.iduser;
+
+  const REPLIES = data?.replies;
+
+  console.log('DATA', data);
 
   return (
-    <div className="flex flex-row gap-2 items-start bg-white p-2 rounded-lg">
+    <div className={`flex flex-col gap-2.5 ${isContext ? 'max-w-[50%]' : ''}`}>
+      {isContext && <p className="text-sm font-semibold">Balas ke : </p>}
       <div
-        className={`min-w-5 min-h-5 rounded-full ${
-          IS_SELF ? 'bg-blue-500' : 'bg-amber-700'
-        } flex justify-center items-center text-xs text-white`}
+        className={`flex flex-row gap-2 ${
+          isContext ? 'items-center' : 'items-start'
+        } bg-white p-2 rounded-lg ${isContext ? 'mb-4' : ''}`}
       >
-        {data.create_by.split('')[0]}
-      </div>
-      <div className="w-full">
-        <div className="flex flex-row justify-between items-center">
-          <p
-            className={`text-xs font-semibold ${
-              IS_SELF ? 'text-blue-500' : 'text-black'
-            }`}
-          >
-            {data.create_by}
-          </p>
-          <p className="text-xs">
-            {getFormattedDateTable(data?.createdAt, 'lll')}
-          </p>
-        </div>
-
-        <p className="text-sm text-black font-normal text-wrap">
-          {data.message}
-        </p>
-        {data?.attachment && (
+        {!isContext && (
           <div
-            onClick={onClick}
-            className="hover:cursor-pointer flex mt-2.5 w-fit items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50"
+            className={`min-w-5 min-h-5 rounded-full ${
+              IS_SELF ? 'bg-blue-500' : 'bg-amber-700'
+            } flex justify-center items-center text-xs text-white`}
           >
-            <PhotoIcon className="h-5 w-5 text-blue-gray-200" />
-            <span className="text-sm text-gray-700 truncate max-w-[180px]">
-              Lampiran
-            </span>
+            {data?.create_by?.split('')[0]}
           </div>
         )}
+        <div className="w-full">
+          <div className="flex flex-row justify-between items-center">
+            <p
+              className={`text-xs font-semibold ${
+                IS_SELF ? 'text-blue-500' : 'text-black'
+              }`}
+            >
+              {data?.create_by}
+            </p>
+            {!isContext && (
+              <p className="text-xs">
+                {getFormattedDateTable(data?.createdAt, 'lll')}
+              </p>
+            )}
+          </div>
+
+          <p
+            className={`text-sm text-black font-normal text-wrap ${
+              isContext ? 'line-clamp-1' : ''
+            }`}
+          >
+            {data?.message}
+          </p>
+          {data?.attachment && (
+            <div
+              onClick={onClick}
+              className="hover:cursor-pointer flex mt-2.5 w-fit items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50"
+            >
+              <PhotoIcon className="h-5 w-5 text-blue-gray-200" />
+              <span className="text-sm text-gray-700 truncate max-w-[180px]">
+                Lampiran
+              </span>
+            </div>
+          )}
+          {!isContext && (
+            <p
+              onClick={onReply}
+              className="mt-2.5 text-sm hover:cursor-pointer text-blue-gray-600 w-fit"
+            >
+              Balas
+            </p>
+          )}
+        </div>
+        {isContext && (
+          <div onClick={onRemovePin} className="hover:cursor-pointer">
+            <XMarkIcon className="w-5 h-5" />
+          </div>
+        )}
+      </div>
+
+      <div
+        className={`flex flex-row gap-2 items-start bg-white p-2 rounded-lg ${
+          isContext ? 'mb-4' : ''
+        }`}
+      >
+        <div
+          className={`min-w-5 min-h-5 rounded-full ${
+            IS_SELF ? 'bg-blue-500' : 'bg-amber-700'
+          } flex justify-center items-center text-xs text-white`}
+        >
+          {data?.create_by?.split('')[0]}
+        </div>
+        <div className="w-full">
+          <div className="flex flex-row justify-between items-center">
+            <p
+              className={`text-xs font-semibold ${
+                IS_SELF ? 'text-blue-500' : 'text-black'
+              }`}
+            >
+              {data?.create_by}
+            </p>
+            {!isContext && (
+              <p className="text-xs">
+                {getFormattedDateTable(data?.createdAt, 'lll')}
+              </p>
+            )}
+          </div>
+
+          <p
+            className={`text-sm text-black font-normal text-wrap ${
+              isContext ? 'line-clamp-1' : ''
+            }`}
+          >
+            {data?.message}
+          </p>
+          {data?.attachment && (
+            <div
+              onClick={onClick}
+              className="hover:cursor-pointer flex mt-2.5 w-fit items-center gap-2 bg-white px-2 py-1 rounded-md border border-blue-gray-50"
+            >
+              <PhotoIcon className="h-5 w-5 text-blue-gray-200" />
+              <span className="text-sm text-gray-700 truncate max-w-[180px]">
+                Lampiran
+              </span>
+            </div>
+          )}
+          {!isContext && (
+            <p
+              onClick={onReply}
+              className="mt-2.5 text-sm hover:cursor-pointer text-blue-gray-600 w-fit"
+            >
+              Balas
+            </p>
+          )}
+        </div>
+        <div onClick={onRemovePin} className="hover:cursor-pointer">
+          <XMarkIcon className="w-5 h-5" />
+        </div>
       </div>
     </div>
   );
@@ -106,6 +210,7 @@ const WorkplanCommentModal = ({
   const [showPreview, setShowPreview] = React.useState<boolean>(false);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [selectedComment, setSelectedComment] = React.useState<any>();
 
   const WORKPLAN_ID = data?.id;
 
@@ -152,7 +257,7 @@ const WorkplanCommentModal = ({
       method: 'POST',
       data: {
         message: message,
-        comment_id: null,
+        comment_id: selectedComment ? selectedComment.id : null,
         attachment: selectedFile,
       },
     });
@@ -161,6 +266,7 @@ const WorkplanCommentModal = ({
       setIsLoading(false);
       setMessage('');
       setSelectedFile(null);
+      setSelectedComment(null);
       getComment();
     } else {
       setIsLoading(false);
@@ -245,6 +351,9 @@ const WorkplanCommentModal = ({
                         setPreviewUrl(item.attachment);
                         setShowPreview(true);
                       }}
+                      onReply={() => {
+                        setSelectedComment(item);
+                      }}
                     />
                   );
                 })
@@ -259,6 +368,15 @@ const WorkplanCommentModal = ({
         {/* Input Komentar dan Upload File */}
         {!isDone && (
           <div className="bg-gray-2 mt-6.5 p-2.5 rounded-lg">
+            {selectedComment && (
+              <CommentCard
+                isContext
+                data={selectedComment}
+                onClick={() => {}}
+                onReply={() => {}}
+                onRemovePin={() => setSelectedComment(null)}
+              />
+            )}
             <div className="w-full">
               <textarea
                 rows={6}
