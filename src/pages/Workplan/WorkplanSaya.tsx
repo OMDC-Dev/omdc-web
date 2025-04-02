@@ -78,6 +78,7 @@ const WorkplanSaya: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
+      setList([]);
       setList(data.rows);
       setPageInfo(data.pageInfo);
       hide();
@@ -85,6 +86,7 @@ const WorkplanSaya: React.FC = () => {
     } else {
       console.log(error);
       hide();
+      setList([]);
       changeType('NONE');
     }
   }

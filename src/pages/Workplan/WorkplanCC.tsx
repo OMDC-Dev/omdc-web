@@ -93,6 +93,7 @@ const WorkplanCC: React.FC = () => {
     });
 
     if (state == API_STATES.OK) {
+      setList([]);
       setList(data.rows);
       setPageInfo(data.pageInfo);
       hide();

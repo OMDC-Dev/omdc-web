@@ -222,6 +222,14 @@ const WorkplanCommentModal = ({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [selectedComment, setSelectedComment] = React.useState<any>();
 
+  const commentContainerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (commentContainerRef.current) {
+      commentContainerRef.current?.lastElementChild?.scrollIntoView();
+    }
+  }, [commentList]);
+
   const WORKPLAN_ID = data?.id;
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,7 +361,10 @@ const WorkplanCommentModal = ({
 
           {/* comment section */}
           {true && (
-            <div className="w-full bg-gray-2 rounded-lg p-2.5 flex flex-col gap-y-2.5">
+            <div
+              ref={commentContainerRef}
+              className="w-full bg-gray-2 rounded-lg p-2.5 flex flex-col gap-y-2.5"
+            >
               {commentList && commentList.length ? (
                 commentList?.map((item: any) => {
                   return (
