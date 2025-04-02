@@ -331,7 +331,7 @@ const WorkplanCommentModal = ({
               {showImage ? 'Sembunyikan Lampiran' : 'Tampilkan Lampiran'}
             </Button>
           </div> */}
-          {true && (
+          {/* {true && (
             <div className="flex flex-row gap-4">
               <ImagePlaceholder
                 onClick={() => {
@@ -349,7 +349,7 @@ const WorkplanCommentModal = ({
                 imageUrl={data?.attachment_after}
               />
             </div>
-          )}
+          )} */}
 
           {/* comment section */}
           {true && (

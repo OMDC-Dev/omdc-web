@@ -36,7 +36,7 @@ const WorkplanTypeStatus = ({
   return (
     <div>
       <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
-        Status Workplan
+        Status Work Plan
       </label>
 
       <div className="relative z-20">

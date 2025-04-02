@@ -167,7 +167,7 @@ const Routes = () => {
           path: '/workplan/me',
           element: (
             <>
-              <PageTitle title={TITLE + 'Workplan'} />
+              <PageTitle title={TITLE + 'Work Plan'} />
               <WorkplanSaya />
             </>
           ),
@@ -176,7 +176,7 @@ const Routes = () => {
           path: '/workplan/cc',
           element: (
             <>
-              <PageTitle title={TITLE + 'Workplan'} />
+              <PageTitle title={TITLE + 'Work Plan'} />
               <WorkplanCC />
             </>
           ),
@@ -185,7 +185,7 @@ const Routes = () => {
           path: '/workplan/pengajuan',
           element: (
             <>
-              <PageTitle title={TITLE + 'Workplan'} />
+              <PageTitle title={TITLE + 'Work Plan'} />
               <BuatWorkplan />
             </>
           ),
@@ -194,7 +194,7 @@ const Routes = () => {
           path: '/workplan/pengajuan/:id',
           element: (
             <>
-              <PageTitle title={TITLE + 'Workplan'} />
+              <PageTitle title={TITLE + 'Work Plan'} />
               <WorkplanDetail />
             </>
           ),
@@ -203,7 +203,7 @@ const Routes = () => {
           path: '/workplan/approval/:status',
           element: (
             <>
-              <PageTitle title={TITLE + 'Workplan'} />
+              <PageTitle title={TITLE + 'Work Plan'} />
               <WorkplanApproval />
             </>
           ),
@@ -212,7 +212,7 @@ const Routes = () => {
           path: '/workplan/pengajuan/admin/:id',
           element: (
             <>
-              <PageTitle title={TITLE + 'Workplan'} />
+              <PageTitle title={TITLE + 'Work Plan'} />
               <WorkplanApprovalDetail />
             </>
           ),

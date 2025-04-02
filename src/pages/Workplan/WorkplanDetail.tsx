@@ -335,7 +335,7 @@ const WorkplanDetail: React.FC = () => {
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
-        <ContainerCard title="Detail Workplan">
+        <ContainerCard title="Detail Work Plan">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
             <DetailPlaceholder
               value={
@@ -343,7 +343,7 @@ const WorkplanDetail: React.FC = () => {
                   ? 'Approval'
                   : 'Non Approval'
               }
-              label="Jenis Workplan"
+              label="Jenis Work Plan"
             />
 
             <DetailPlaceholder
@@ -352,19 +352,26 @@ const WorkplanDetail: React.FC = () => {
             />
 
             <div className="w-full">
-              <DatePicker
-                title={
-                  IS_FINISHED
-                    ? 'Tanggal Selesai'
-                    : 'Tanggal Selesai ( bisa diupdate )'
-                }
-                onChange={(date) => {
-                  setTanggalSelesai(date);
-                  setIsHasChanges(true);
-                }}
-                disabled={IS_FINISHED}
-                defaultValue={workplanDetail?.tanggal_selesai}
-              />
+              {IS_FINISHED ? (
+                <DetailPlaceholder
+                  value={workplanDetail?.tanggal_selesai}
+                  label="Tanggal Selesai"
+                />
+              ) : (
+                <DatePicker
+                  title={
+                    IS_FINISHED
+                      ? 'Tanggal Selesai'
+                      : 'Tanggal Selesai ( bisa diupdate )'
+                  }
+                  onChange={(date) => {
+                    setTanggalSelesai(date);
+                    setIsHasChanges(true);
+                  }}
+                  disabled={IS_FINISHED}
+                  defaultValue={workplanDetail?.tanggal_selesai}
+                />
+              )}
 
               <div
                 onClick={() => setShowWPHistory(true)}

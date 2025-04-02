@@ -206,15 +206,60 @@ const WorkplanApprovalDetail: React.FC = () => {
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
-        <ContainerCard title="Detail Workplan">
+        <ContainerCard title="Detail Work Plan">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
             <DetailPlaceholder
+              value={workplanDetail?.perihal}
+              label="Perihal"
+              isTextArea
+            />
+
+            {/* <DetailPlaceholder
               value={
                 workplanDetail?.jenis_workplan == 'APPROVAL'
                   ? 'Approval'
                   : 'Non Approval'
               }
               label="Jenis Workplan"
+            /> */}
+            <DetailPlaceholder
+              value={workplanDetail?.user_detail?.nm_user}
+              label="PIC"
+            />
+
+            <div className="w-full">
+              <label className="mb-2.5 block text-sm font-medium text-black">
+                CC
+              </label>
+              <div
+                className={`flex flex-row gap-4 border ${
+                  cc?.length ? '' : 'items-center'
+                } border-stroke rounded-md border-p p-2`}
+              >
+                {/* Container Chips */}
+                <div className="flex flex-1 flex-wrap gap-2 max-h-[100px] overflow-auto">
+                  {cc?.length ? (
+                    cc?.map((item: any, index: number) => {
+                      return (
+                        <Chip
+                          animate={{ mount: { y: 0 }, unmount: { y: 50 } }}
+                          className="normal-case"
+                          color="blue"
+                          variant="ghost"
+                          value={item?.nm_user}
+                        />
+                      );
+                    })
+                  ) : (
+                    <div className=" ml-2.5">Tidak ada CC</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <DetailPlaceholder
+              value={workplanDetail?.cabang_detail?.nm_induk}
+              label="Cabang"
             />
 
             <DetailPlaceholder
@@ -237,17 +282,6 @@ const WorkplanApprovalDetail: React.FC = () => {
             </div>
 
             <DetailPlaceholder
-              value={workplanDetail?.cabang_detail?.nm_induk}
-              label="Cabang"
-            />
-
-            <DetailPlaceholder
-              value={workplanDetail?.perihal}
-              label="Perihal"
-              isTextArea
-            />
-
-            <DetailPlaceholder
               value={workplanDetail?.kategori}
               label="Kategori"
             />
@@ -255,9 +289,9 @@ const WorkplanApprovalDetail: React.FC = () => {
         </ContainerCard>
 
         <div className="flex flex-col gap-y-4.5">
-          <ContainerCard title="CC dan Attachment">
+          <ContainerCard title="Attachment">
             <div className=" p-6.5 flex flex-col gap-y-6.5">
-              <div className="w-full">
+              {/* <div className="w-full">
                 <label className="mb-2.5 block text-sm font-medium text-black">
                   CC ( Opsional )
                 </label>
@@ -266,7 +300,6 @@ const WorkplanApprovalDetail: React.FC = () => {
                     cc?.length ? '' : 'items-center'
                   } border-stroke rounded-md border-p p-2`}
                 >
-                  {/* Container Chips */}
                   <div className="flex flex-1 flex-wrap gap-2 max-h-[100px] overflow-auto">
                     {cc?.length ? (
                       cc?.map((item: any, index: number) => {
@@ -285,7 +318,7 @@ const WorkplanApprovalDetail: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* <DetailPlaceholder label="Gambar Awal" value={'File Gambar Awal'}>
                 <Button

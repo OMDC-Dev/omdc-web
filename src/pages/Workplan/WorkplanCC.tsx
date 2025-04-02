@@ -35,7 +35,7 @@ import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
 
 const TABLE_HEAD = [
   'ID',
-  'Jenis Workplan',
+  'Jenis Work Plan',
   'Tanggal Dibuat',
   'Cabang',
   'Kategori',
@@ -111,7 +111,7 @@ const WorkplanCC: React.FC = () => {
           <div className="flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Workplan
+                Work Plan
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
                 Menampilkan semua workplan
@@ -128,7 +128,7 @@ const WorkplanCC: React.FC = () => {
             >
               <input
                 type="text"
-                placeholder="Cari No. Workplan, cabang, perihal ..."
+                placeholder="Cari No. Wor Plan, cabang, perihal ..."
                 className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

@@ -454,7 +454,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
             <div>
               <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
-                Workplan
+                Work Plan
               </h3>
 
               <ul className="mb-6 flex flex-col gap-1.5">
@@ -482,7 +482,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }}
                         >
                           <BanknotesIcon className=" h-5 w-5" />
-                          Workplan
+                          Work Plan
                           <IconArrow open={open} />
                         </NavLink>
                         <div
@@ -491,29 +491,31 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                         >
                           <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                            <li>
-                              <NavLink
-                                to="/workplan/me"
-                                className={({ isActive }) =>
-                                  'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                  (isActive && '!text-white')
-                                }
-                              >
-                                Workplan Saya
-                              </NavLink>
-                            </li>
                             {!isAdminWorkplan ? (
-                              <li>
-                                <NavLink
-                                  to="/workplan/cc"
-                                  className={({ isActive }) =>
-                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                    (isActive && '!text-white')
-                                  }
-                                >
-                                  Workplan CC ke Saya
-                                </NavLink>
-                              </li>
+                              <>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Work Plan Saya
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Work Plan CC ke Saya
+                                  </NavLink>
+                                </li>
+                              </>
                             ) : (
                               <>
                                 <li>
@@ -524,7 +526,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Workplan
+                                    List Work Plan
                                   </NavLink>
                                 </li>
                                 <li>
@@ -535,7 +537,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Workplan Selesai
+                                    Work Plan Selesai
                                   </NavLink>
                                 </li>
                               </>
