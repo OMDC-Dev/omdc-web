@@ -61,6 +61,7 @@ function SuperBanner() {
     if (state == API_STATES.OK) {
       changeType('SUCCESS');
       setSelectedBanner(null);
+      getBanner();
     } else {
       changeType('FAILED');
     }

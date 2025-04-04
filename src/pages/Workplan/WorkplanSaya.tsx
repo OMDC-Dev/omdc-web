@@ -34,7 +34,7 @@ const TABLE_HEAD = [
   'ID',
   'Jenis Work Plan',
   'Tanggal Dibuat',
-  'Cabang',
+  'Cabang / Lokasi',
   'Kategori',
   'PIC',
   'Perihal',
@@ -244,7 +244,9 @@ const WorkplanSaya: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.cabang_detail.nm_induk}
+                              {item?.cabang_detail
+                                ? item?.cabang_detail.nm_induk
+                                : item?.custom_location}
                             </Typography>
                           </div>
                         </td>

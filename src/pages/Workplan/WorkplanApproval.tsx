@@ -37,7 +37,7 @@ const TABLE_HEAD = [
   'ID',
   'Jenis Work Plan',
   'Tanggal Dibuat',
-  'Cabang',
+  'Cabang / Lokasi',
   'Kategori',
   'PIC',
   'Perihal',
@@ -84,7 +84,11 @@ const WorkplanApproval: React.FC = () => {
 
     const _GET_STATUS =
       status == 'waiting'
-        ? [WORKPLAN_STATUS.ON_PROGRESS, WORKPLAN_STATUS.REVISON]
+        ? [
+            WORKPLAN_STATUS.ON_PROGRESS,
+            WORKPLAN_STATUS.REVISON,
+            WORKPLAN_STATUS.PENDING,
+          ]
         : WORKPLAN_STATUS.FINISH;
 
     const { state, data, error } = await useFetch({
@@ -241,7 +245,9 @@ const WorkplanApproval: React.FC = () => {
                               variant="small"
                               className="font-normal "
                             >
-                              {item?.cabang_detail.nm_induk}
+                              {item?.cabang_detail
+                                ? item?.cabang_detail.nm_induk
+                                : item?.custom_location}
                             </Typography>
                           </div>
                         </td>

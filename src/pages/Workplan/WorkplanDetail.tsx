@@ -12,6 +12,7 @@ import * as React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   WORKPLAN,
+  WORKPLAN_COMMENT,
   WORKPLAN_PROGRESS,
   WORKPLAN_UPDATE,
   WORKPLAN_UPDATE_STATUS,
@@ -53,6 +54,7 @@ const WorkplanDetail: React.FC = () => {
   const [progressList, setProgressList] = React.useState([]);
   const [selectedProgress, setSelectedProgress] = React.useState<any>();
   const [isChangeFile, setIsChangeFile] = React.useState(false);
+  const [commentCount, setCommentCount] = React.useState(0);
 
   const [showFile, setShowFile] = React.useState(false);
   const [showWPHistory, setShowWPHistory] = React.useState(false);
@@ -92,7 +94,25 @@ const WorkplanDetail: React.FC = () => {
   React.useEffect(() => {
     getWorkplanDetail();
     getWorkplanProgress(id);
+    getCommentCount();
   }, []);
+
+  async function getCommentCount() {
+    changeType('LOADING');
+    show();
+
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_COMMENT(id) + '/count',
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setCommentCount(data.count);
+    } else {
+      hide();
+    }
+  }
 
   async function getWorkplanDetail() {
     console.log('GETTING DETAIL....');
@@ -382,8 +402,12 @@ const WorkplanDetail: React.FC = () => {
             </div>
 
             <DetailPlaceholder
-              value={workplanDetail?.cabang_detail?.nm_induk}
-              label="Cabang"
+              value={
+                workplanDetail?.cabang_detail
+                  ? workplanDetail?.cabang_detail?.nm_induk
+                  : workplanDetail?.custom_location
+              }
+              label="Cabang / Lokasi"
             />
 
             <DetailPlaceholder
@@ -697,7 +721,7 @@ const WorkplanDetail: React.FC = () => {
                   className="normal-case"
                   onClick={() => setShowComment(true)}
                 >
-                  Lihat Komentar
+                  Lihat Komentar ( {commentCount} )
                 </Button>
               </div>
             </div>
@@ -768,6 +792,7 @@ const WorkplanDetail: React.FC = () => {
           visible={showComment}
           isDone={IS_FINISHED}
           toggle={() => setShowComment(!showComment)}
+          onSuccess={() => getCommentCount()}
         />
 
         <WorkplanProgressModal

@@ -54,8 +54,7 @@ const WorkplanApprovalDetail: React.FC = () => {
   const WP_STATUS = workplanDetail?.status;
   const IS_FINISHED =
     WP_STATUS == WORKPLAN_STATUS.FINISH ||
-    WP_STATUS == WORKPLAN_STATUS.REJECTED ||
-    WP_STATUS == WORKPLAN_STATUS.REVISON;
+    WP_STATUS == WORKPLAN_STATUS.REJECTED;
 
   const IS_APPROVAL = workplanDetail?.jenis_workplan == 'APPROVAL';
 
@@ -258,10 +257,13 @@ const WorkplanApprovalDetail: React.FC = () => {
             </div>
 
             <DetailPlaceholder
-              value={workplanDetail?.cabang_detail?.nm_induk}
-              label="Cabang"
+              value={
+                workplanDetail?.cabang_detail
+                  ? workplanDetail?.cabang_detail?.nm_induk
+                  : workplanDetail?.custom_location
+              }
+              label="Cabang / Lokasi"
             />
-
             <DetailPlaceholder
               value={workplanDetail?.tanggal_mulai}
               label="Tanggal Mulai"

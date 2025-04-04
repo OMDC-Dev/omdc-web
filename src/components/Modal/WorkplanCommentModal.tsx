@@ -202,11 +202,13 @@ const WorkplanCommentModal = ({
   toggle,
   data,
   isDone,
+  onSuccess,
 }: {
   visible: boolean;
   toggle: any;
   data: any;
   isDone?: boolean;
+  onSuccess?: any;
 }) => {
   const [message, setMessage] = React.useState<string>('');
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
@@ -288,6 +290,7 @@ const WorkplanCommentModal = ({
       setSelectedFile(null);
       setSelectedComment(null);
       getComment();
+      onSuccess ? onSuccess() : null;
     } else {
       setIsLoading(false);
       setMessage('');

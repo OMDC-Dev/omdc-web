@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardHeader,
+  Checkbox,
   Chip,
   Typography,
 } from '@material-tailwind/react';
@@ -34,6 +35,8 @@ const BuatWorkplan: React.FC = () => {
   const [cabang, setCabang] = React.useState<string | any>();
   const [cc, setCC] = React.useState<any>([]);
   const [attachmentBefore, setAttachmentBefore] = React.useState();
+  const [useCabang, setUseCabang] = React.useState(true);
+  const [customLocation, setCustomLocation] = React.useState<string | any>('');
 
   const {
     show,
@@ -48,13 +51,21 @@ const BuatWorkplan: React.FC = () => {
 
   const navigate = useNavigate();
 
+  function disabledByLocation() {
+    if (useCabang) {
+      return !cabang;
+    } else {
+      return !customLocation;
+    }
+  }
+
   const submitButtonDisabled =
     !workplanType ||
     !tanggalMulai ||
     !tanggalSelesai ||
     !kategori ||
     !desc ||
-    !cabang;
+    disabledByLocation();
 
   // Hit Api
   const submitNewWorkplan = async () => {
@@ -70,11 +81,12 @@ const BuatWorkplan: React.FC = () => {
       jenis_workplan: workplanType,
       tanggal_mulai: standardizeDate(tanggalMulai),
       tanggal_selesai: standardizeDate(tanggalSelesai),
-      kd_induk: cabang.value,
+      kd_induk: useCabang ? cabang.value : null,
       perihal: desc,
       kategori: kategori,
       user_cc: mappedCC,
       attachment_before: attachmentBefore,
+      custom_location: useCabang ? null : customLocation,
     };
 
     const { state, data, error } = await useFetch({
@@ -119,6 +131,14 @@ const BuatWorkplan: React.FC = () => {
       setAttachmentBefore(splitted[1]);
     };
   }
+
+  React.useEffect(() => {
+    if (useCabang) {
+      setCustomLocation(null);
+    } else {
+      setCabang(null);
+    }
+  }, [useCabang]);
 
   return (
     <DefaultLayout>
@@ -169,18 +189,43 @@ const BuatWorkplan: React.FC = () => {
             </div>
 
             <div className="w-full">
-              <div>
-                <label className="mb-3 block text-sm font-medium text-black">
-                  Cabang
-                </label>
-                <div
-                  onClick={() => setShowCabang(!showCabang)}
-                  className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                >
-                  {cabang?.label || 'Pilih Cabang'}
+              <Checkbox
+                color={'blue'}
+                checked={useCabang}
+                label="Gunakan lokasi dari list cabang"
+                onClick={() => setUseCabang(!useCabang)}
+              />
+            </div>
+
+            {useCabang ? (
+              <div className="w-full">
+                <div>
+                  <label className="mb-3 block text-sm font-medium text-black">
+                    Cabang
+                  </label>
+                  <div
+                    onClick={() => setShowCabang(!showCabang)}
+                    className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                  >
+                    {cabang?.label || 'Pilih Cabang'}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="w-full">
+                <div>
+                  <label className="mb-3 block text-sm font-medium text-black">
+                    Lokasi
+                  </label>
+                  <input
+                    placeholder="Masukan lokasi"
+                    className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                    onChange={(e) => setCustomLocation(e.target.value)}
+                    value={customLocation}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="w-full">
               <label className="mb-2.5 block text-sm font-medium text-black">
