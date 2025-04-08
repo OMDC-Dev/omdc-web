@@ -30,6 +30,11 @@ import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
+import {
+  createWorkplanReportData,
+  exportToExcell,
+} from '../../common/exportToExcell';
+import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'ID',
@@ -60,6 +65,7 @@ const WorkplanSaya: React.FC = () => {
   const navigate = useNavigate();
 
   const isWorkplanMaker = cekAkses('#11');
+  const { user } = useAuth();
 
   React.useEffect(() => {
     getMyWorkplan();
@@ -93,6 +99,51 @@ const WorkplanSaya: React.FC = () => {
     }
   }
 
+  async function downloadWorkplan() {
+    changeType('LOADING');
+    show();
+
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN + `?limit=5000&page=1`,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      onExportToExcell(data.rows);
+    } else {
+      hide();
+      changeType('ERROR');
+    }
+  }
+
+  function onExportToExcell(data = []) {
+    // Sheet 3
+    const reportWP = {
+      sheetName: `Report Workplan - ${user.nm_user}`,
+      data: createWorkplanReportData(data),
+      headers: [
+        'NO',
+        'ID WORKPLAN',
+        'JENIS WORKPLAN',
+        'PIC',
+        'TANGGAL MULAI',
+        'EST. TANGGAL SELESAI',
+        'PERIHAL',
+        'KATEGORI',
+        'BEFORE',
+        'AFTER',
+        'STATUS',
+        'TANGGAL DISETUJUI / SELESAI',
+        'DISETUJUI OLEH',
+        'LOKASI / CABANG',
+        'TANGGAL DIBUAT',
+      ],
+    };
+
+    exportToExcell(reportWP.data, reportWP.headers, reportWP.sheetName);
+    hide();
+  }
+
   React.useEffect(() => {
     // if (filter) {
     //   getMyWorkplan();
@@ -115,16 +166,26 @@ const WorkplanSaya: React.FC = () => {
               </Typography>
             </div>
             {isWorkplanMaker && (
-              <MButton
-                variant="filled"
-                size="sm"
-                color="blue"
-                onClick={() =>
-                  navigate('/workplan/pengajuan', { replace: false })
-                }
-              >
-                Buat Work Plan
-              </MButton>
+              <div className="flex flex-col gap-4 lg:flex-row">
+                <MButton
+                  variant={'outlined'}
+                  size="sm"
+                  color="blue"
+                  onClick={() => downloadWorkplan()}
+                >
+                  Download Report
+                </MButton>
+                <MButton
+                  variant="filled"
+                  size="sm"
+                  color="blue"
+                  onClick={() =>
+                    navigate('/workplan/pengajuan', { replace: false })
+                  }
+                >
+                  Buat Work Plan
+                </MButton>
+              </div>
             )}
           </div>
           <div className="w-full flex flex-row mt-4.5">

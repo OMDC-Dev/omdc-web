@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { formatCurrencyToNumber } from './utils';
 import moment from 'moment';
+import { getWorkplanStatusText } from '../constants/WorkplanStatus';
 
 // export function exportToExcell(
 //   data: any[],
@@ -228,4 +229,46 @@ export const createReportData = (data = [], periodType = ''): any => {
   });
 
   return dataMap;
+};
+
+export const createWorkplanReportData = (data = []) => {
+  const mapData = data.map((itemCol: any, index) => {
+    const {
+      workplan_id,
+      jenis_workplan,
+      tanggal_mulai,
+      tanggal_selesai,
+      perihal,
+      kategori,
+      attachment_before,
+      attachment_after,
+      status,
+      approved_date,
+      approved_by,
+      custom_location,
+      createdAt,
+      cabang_detail,
+      user_detail,
+    } = itemCol;
+
+    return {
+      no: index + 1,
+      wp: workplan_id,
+      js: jenis_workplan == 'APPROVAL' ? 'APPROVAL' : 'NON APPROVAL',
+      pc: user_detail.nm_user,
+      tm: tanggal_mulai,
+      ts: tanggal_selesai,
+      ph: perihal,
+      kt: kategori,
+      bf: attachment_before,
+      af: attachment_after,
+      st: getWorkplanStatusText(status).text,
+      apd: approved_date ? moment(approved_date).format('DD-MM-YYYY') : '',
+      apb: approved_by,
+      cb: custom_location ? custom_location : cabang_detail.nm_induk,
+      cd: moment(createdAt).format('DD-MM-YYYY'),
+    };
+  });
+
+  return mapData;
 };
