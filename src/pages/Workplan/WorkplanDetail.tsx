@@ -76,6 +76,8 @@ const WorkplanDetail: React.FC = () => {
     WP_STATUS == WORKPLAN_STATUS.FINISH ||
     WP_STATUS == WORKPLAN_STATUS.REJECTED;
 
+  const IS_EDIT_MODE = state?.isEditMode;
+
   const {
     show,
     hide,
@@ -274,7 +276,7 @@ const WorkplanDetail: React.FC = () => {
           </div>
         }
       >
-        {IS_NON_APPROVAL && !IS_FINISHED && (
+        {IS_NON_APPROVAL && !IS_FINISHED && IS_EDIT_MODE && (
           <>
             <Button
               size="sm"
@@ -314,7 +316,7 @@ const WorkplanDetail: React.FC = () => {
           </>
         )}
 
-        {!IS_FINISHED && (
+        {!IS_FINISHED && IS_EDIT_MODE && (
           <>
             <Button
               size="sm"
@@ -372,7 +374,7 @@ const WorkplanDetail: React.FC = () => {
             />
 
             <div className="w-full">
-              {IS_FINISHED ? (
+              {IS_FINISHED || !IS_EDIT_MODE ? (
                 <DetailPlaceholder
                   value={workplanDetail?.tanggal_selesai}
                   label="Tanggal Selesai"
@@ -447,7 +449,7 @@ const WorkplanDetail: React.FC = () => {
                             variant="ghost"
                             value={item?.nm_user}
                             onClose={
-                              IS_FINISHED
+                              IS_FINISHED || !IS_EDIT_MODE
                                 ? undefined
                                 : () => {
                                     let filtered = cc.filter((fItem: any) => {
@@ -467,7 +469,7 @@ const WorkplanDetail: React.FC = () => {
                   </div>
 
                   {/* Tombol Tambah */}
-                  {!IS_FINISHED && (
+                  {!IS_FINISHED && IS_EDIT_MODE && (
                     <Button
                       className="normal-case h-8 whitespace-nowrap"
                       size="sm"
@@ -496,7 +498,7 @@ const WorkplanDetail: React.FC = () => {
 
               {!workplanDetail?.attachment_before ? (
                 <div className="w-full">
-                  {!IS_FINISHED ? (
+                  {!IS_FINISHED && IS_EDIT_MODE ? (
                     <>
                       <label className="mb-3 block text-sm font-medium text-black">
                         Lampirkan Gambar Awal ( Opsional maks. 10MB)
@@ -548,7 +550,7 @@ const WorkplanDetail: React.FC = () => {
 
               {!workplanDetail?.attachment_after ? (
                 <div className="w-full">
-                  {!IS_FINISHED ? (
+                  {!IS_FINISHED && IS_EDIT_MODE ? (
                     <>
                       <label className="mb-3 block text-sm font-medium text-black">
                         Lampirkan Gambar Akhir ( Opsional maks. 10MB)
@@ -639,7 +641,7 @@ const WorkplanDetail: React.FC = () => {
           <ContainerCard
             title="Progress"
             suffix={
-              IS_FINISHED ? null : (
+              IS_FINISHED || !IS_EDIT_MODE ? null : (
                 <Button
                   className="normal-case h-8"
                   size={'sm'}
