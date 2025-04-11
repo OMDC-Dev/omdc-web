@@ -17,6 +17,7 @@ import ModalSelector from '../../components/Modal/ModalSelctor';
 import {
   AdjustmentsHorizontalIcon,
   DocumentTextIcon,
+  PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import useModal from '../../hooks/useModal';
@@ -44,6 +45,7 @@ const TABLE_HEAD = [
   'Tanggal Mulai',
   'Est. Tanggal Selesai',
   'Status',
+  '',
   '',
 ];
 
@@ -295,7 +297,7 @@ const WorkplanCC: React.FC = () => {
                           </div>
                         </td>
                         <td
-                          className={`${classes} sticky right-[4rem] bg-white z-10`}
+                          className={`${classes} sticky right-[8rem] bg-white z-10`}
                         >
                           <div className="w-max">
                             <Chip
@@ -310,6 +312,26 @@ const WorkplanCC: React.FC = () => {
                           </div>
                         </td>
                         <td
+                          className={`${classes} sticky right-[4rem] bg-white z-10`}
+                        >
+                          <Tooltip content="Edit">
+                            <IconButton
+                              variant="text"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navigate(`/workplan/pengajuan/${item.id}`, {
+                                  state: {
+                                    jenis_workplan: item.jenis_workplan,
+                                    isEditMode: true,
+                                  },
+                                });
+                              }}
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </IconButton>
+                          </Tooltip>
+                        </td>
+                        <td
                           className={`${classes} sticky right-0 bg-white z-10`}
                         >
                           <Tooltip content="Detail">
@@ -317,14 +339,11 @@ const WorkplanCC: React.FC = () => {
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();
-                                navigate(
-                                  `/workplan/pengajuan/admin/${item.id}`,
-                                  {
-                                    state: {
-                                      jenis_workplan: item.jenis_workplan,
-                                    },
+                                navigate(`/workplan/pengajuan/${item.id}`, {
+                                  state: {
+                                    jenis_workplan: item.jenis_workplan,
                                   },
-                                );
+                                });
                               }}
                             >
                               <DocumentTextIcon className="h-4 w-4" />

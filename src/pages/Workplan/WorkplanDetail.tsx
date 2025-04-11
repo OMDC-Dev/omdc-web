@@ -42,6 +42,8 @@ import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
 import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import WorkplanProgressModal from '../../components/Modal/WorkplanProgressModal';
+import { useAuth } from '../../hooks/useAuth';
+import moment from 'moment';
 
 const WorkplanDetail: React.FC = () => {
   const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
@@ -66,6 +68,9 @@ const WorkplanDetail: React.FC = () => {
 
   const { id } = useParams();
   const { state } = useLocation();
+  const { user } = useAuth();
+
+  console.log(cc);
 
   const _status = getWorkplanStatusText(workplanDetail?.status);
   const IS_NON_APPROVAL =
@@ -422,6 +427,16 @@ const WorkplanDetail: React.FC = () => {
               value={workplanDetail?.kategori}
               label="Kategori"
             />
+
+            <DetailPlaceholder
+              value={getFormattedDateTable(workplanDetail?.last_update, 'LLL')}
+              label="Terakhir Diupdate"
+            />
+
+            <DetailPlaceholder
+              value={workplanDetail?.last_update_by}
+              label="Terakhir Diupdate Oleh"
+            />
           </div>
         </ContainerCard>
 
@@ -449,7 +464,9 @@ const WorkplanDetail: React.FC = () => {
                             variant="ghost"
                             value={item?.nm_user}
                             onClose={
-                              IS_FINISHED || !IS_EDIT_MODE
+                              IS_FINISHED ||
+                              !IS_EDIT_MODE ||
+                              item.iduser == user.iduser
                                 ? undefined
                                 : () => {
                                     let filtered = cc.filter((fItem: any) => {
@@ -669,6 +686,9 @@ const WorkplanDetail: React.FC = () => {
                               <span className="text-xs font-semibold text-black">
                                 {getFormattedDateTable(item.createdAt, 'LLL')}
                               </span>
+                              <p className="text-xs text-blue-gray-400 mb-2">
+                                oleh {item.created_by}
+                              </p>
                               {item.progress}
                             </div>
 
@@ -734,6 +754,7 @@ const WorkplanDetail: React.FC = () => {
           visible={showWorkplan}
           toggle={() => setShowWorkplan(!showWorkplan)}
           selectedList={cc}
+          requesterId={workplanDetail?.iduser}
           value={(val: any) => {
             setCC((prev: any) => [
               ...prev,

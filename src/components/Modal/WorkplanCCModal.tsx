@@ -39,7 +39,7 @@ const WorkplanCCModal = ({
       return item.iduser;
     });
 
-    let param = '';
+    let param = `&ownerId=${requesterId}`;
 
     const { state, data, error } = await useFetch({
       url: WORKPLAN_CC_USER + `?limit=1000${param}`,

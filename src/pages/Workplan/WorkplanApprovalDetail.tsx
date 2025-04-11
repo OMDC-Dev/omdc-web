@@ -287,6 +287,16 @@ const WorkplanApprovalDetail: React.FC = () => {
               value={workplanDetail?.kategori}
               label="Kategori"
             />
+
+            <DetailPlaceholder
+              value={getFormattedDateTable(workplanDetail?.last_update, 'LLL')}
+              label="Terakhir Diupdate"
+            />
+
+            <DetailPlaceholder
+              value={workplanDetail?.last_update_by}
+              label="Terakhir Diupdate Oleh"
+            />
           </div>
         </ContainerCard>
 
@@ -430,6 +440,9 @@ const WorkplanApprovalDetail: React.FC = () => {
                               <span className="text-xs font-semibold text-black">
                                 {getFormattedDateTable(item.createdAt, 'LLL')}
                               </span>
+                              <p className="text-xs text-blue-gray-400 mb-2">
+                                oleh {item.created_by}
+                              </p>
                               {item.progress}
                             </div>
                           </ListItem>
