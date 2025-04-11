@@ -36,7 +36,7 @@ import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
 
 const TABLE_HEAD = [
   'ID',
-  'Jenis Work Plan',
+  'Jenis Work in Progress',
   'Tanggal Dibuat',
   'Cabang / Lokasi',
   'Kategori',
@@ -114,10 +114,10 @@ const WorkplanCC: React.FC = () => {
           <div className="flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Work Plan
+                Work in Progress
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua workplan
+                Menampilkan semua work in progress
               </Typography>
             </div>
           </div>

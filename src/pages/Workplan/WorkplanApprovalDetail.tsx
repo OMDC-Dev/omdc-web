@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   WORKPLAN,
+  WORKPLAN_COMMENT,
   WORKPLAN_PROGRESS,
   WORKPLAN_UPDATE,
   WORKPLAN_UPDATE_STATUS,
@@ -37,6 +38,7 @@ const WorkplanApprovalDetail: React.FC = () => {
   const [cc, setCC] = React.useState<any>([]);
   const [progressList, setProgressList] = React.useState([]);
   const [selectedProgress, setSelectedProgress] = React.useState<any>();
+  const [commentCount, setCommentCount] = React.useState(0);
 
   const [showFile, setShowFile] = React.useState(false);
   const [showWPHistory, setShowWPHistory] = React.useState(false);
@@ -74,7 +76,25 @@ const WorkplanApprovalDetail: React.FC = () => {
   React.useEffect(() => {
     getWorkplanDetail();
     getWorkplanProgress(id);
+    getCommentCount();
   }, []);
+
+  async function getCommentCount() {
+    changeType('LOADING');
+    show();
+
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_COMMENT(id) + '/count',
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+      setCommentCount(data.count);
+    } else {
+      hide();
+    }
+  }
 
   async function getWorkplanDetail() {
     console.log('GETTING DETAIL....');
@@ -205,7 +225,7 @@ const WorkplanApprovalDetail: React.FC = () => {
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
-        <ContainerCard title="Detail Work Plan">
+        <ContainerCard title="Detail Work in Progress">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
             <DetailPlaceholder
               value={workplanDetail?.perihal}
@@ -482,7 +502,7 @@ const WorkplanApprovalDetail: React.FC = () => {
                   className="normal-case"
                   onClick={() => setShowComment(true)}
                 >
-                  Lihat Komentar
+                  Lihat Komentar ({commentCount})
                 </Button>
               </div>
             </div>

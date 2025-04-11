@@ -362,7 +362,7 @@ const WorkplanDetail: React.FC = () => {
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
-        <ContainerCard title="Detail Work Plan">
+        <ContainerCard title="Detail Work in Progress">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
             <DetailPlaceholder
               value={
@@ -370,7 +370,7 @@ const WorkplanDetail: React.FC = () => {
                   ? 'Approval'
                   : 'Non Approval'
               }
-              label="Jenis Work Plan"
+              label="Jenis Work in Progress"
             />
 
             <DetailPlaceholder

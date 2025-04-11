@@ -142,7 +142,7 @@ const BuatWorkplan: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <ActionCard title="Work Plan">
+      <ActionCard title="Work in Progress">
         <Button
           size="sm"
           className="normal-case"
@@ -154,7 +154,7 @@ const BuatWorkplan: React.FC = () => {
             show();
           }}
         >
-          Buat Work Plan
+          Buat Work in Progress
         </Button>
         <Button
           size="sm"
@@ -167,7 +167,7 @@ const BuatWorkplan: React.FC = () => {
         </Button>
       </ActionCard>
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
-        <ContainerCard title="Buat Work Plan Baru">
+        <ContainerCard title="Buat Work in Progress Baru">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
             <WorkplanTypeGroup
               value={workplanType}

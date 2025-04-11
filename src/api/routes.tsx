@@ -154,7 +154,7 @@ export const REJECT_REQUEST_BARANG = (id: string) =>
 // Invoice
 export const CEK_INVOICE = (inv: string) => `invoice?inv=${inv}`;
 
-// WORK PLAN API
+// Work in Progress API
 export const WORKPLAN = 'workplan';
 export const WORKPLAN_UPDATE = (id?: string) => `workplan/update/${id}`;
 export const WORKPLAN_UPDATE_STATUS = (id?: string) => `workplan/status/${id}`;

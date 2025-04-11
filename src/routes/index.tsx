@@ -162,12 +162,12 @@ const Routes = () => {
           ),
         },
 
-        // -- WORK PLAN PATH
+        // -- Work in Progress PATH
         {
           path: '/workplan/me',
           element: (
             <>
-              <PageTitle title={TITLE + 'Work Plan'} />
+              <PageTitle title={TITLE + 'Work in Progress'} />
               <WorkplanSaya />
             </>
           ),
@@ -176,7 +176,7 @@ const Routes = () => {
           path: '/workplan/cc',
           element: (
             <>
-              <PageTitle title={TITLE + 'Work Plan'} />
+              <PageTitle title={TITLE + 'Work in Progress'} />
               <WorkplanCC />
             </>
           ),
@@ -185,7 +185,7 @@ const Routes = () => {
           path: '/workplan/pengajuan',
           element: (
             <>
-              <PageTitle title={TITLE + 'Work Plan'} />
+              <PageTitle title={TITLE + 'Work in Progress'} />
               <BuatWorkplan />
             </>
           ),
@@ -194,7 +194,7 @@ const Routes = () => {
           path: '/workplan/pengajuan/:id',
           element: (
             <>
-              <PageTitle title={TITLE + 'Work Plan'} />
+              <PageTitle title={TITLE + 'Work in Progress'} />
               <WorkplanDetail />
             </>
           ),
@@ -203,7 +203,7 @@ const Routes = () => {
           path: '/workplan/approval/:status',
           element: (
             <>
-              <PageTitle title={TITLE + 'Work Plan'} />
+              <PageTitle title={TITLE + 'Work in Progress'} />
               <WorkplanApproval />
             </>
           ),
@@ -212,7 +212,7 @@ const Routes = () => {
           path: '/workplan/pengajuan/admin/:id',
           element: (
             <>
-              <PageTitle title={TITLE + 'Work Plan'} />
+              <PageTitle title={TITLE + 'Work in Progress'} />
               <WorkplanApprovalDetail />
             </>
           ),

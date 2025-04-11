@@ -38,7 +38,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 const TABLE_HEAD = [
   'ID',
-  'Jenis Work Plan',
+  'Jenis Work in Progress',
   'Tanggal Dibuat',
   'Cabang / Lokasi',
   'Kategori',
@@ -159,7 +159,7 @@ const WorkplanSaya: React.FC = () => {
           <div className="flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Work Plan Saya
+                Work in Progress Saya
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
                 Menampilkan semua workplan
@@ -183,7 +183,7 @@ const WorkplanSaya: React.FC = () => {
                     navigate('/workplan/pengajuan', { replace: false })
                   }
                 >
-                  Buat Work Plan
+                  Buat Work in Progress
                 </MButton>
               </div>
             )}
@@ -198,7 +198,7 @@ const WorkplanSaya: React.FC = () => {
             >
               <input
                 type="text"
-                placeholder="Cari No. Work Plan, cabang, perihal ..."
+                placeholder="Cari No. work in progress, cabang, perihal ..."
                 className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 pr-10 mt-4 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
