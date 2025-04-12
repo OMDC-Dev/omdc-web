@@ -163,7 +163,7 @@ const WorkplanApproval: React.FC = () => {
         {!list?.length ? (
           <CardBody>
             <div className=" h-96 flex justify-center items-center text-black-2 font-semibold text-sm">
-              Belum ada workplan
+              Belum ada work in progress
             </div>
           </CardBody>
         ) : (
