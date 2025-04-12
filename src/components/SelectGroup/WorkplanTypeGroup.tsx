@@ -36,7 +36,7 @@ const WorkplanTypeGroup = ({
   return (
     <div>
       <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">
-        Jenis Work Plan
+        Jenis Work in Progress
       </label>
 
       <div className="relative z-20">

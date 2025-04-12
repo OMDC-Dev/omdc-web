@@ -35,6 +35,7 @@ import {
   exportToExcell,
 } from '../../common/exportToExcell';
 import { useAuth } from '../../hooks/useAuth';
+import WorkplanReortRangeModal from '../../components/Modal/WorkplanReportRangeModal';
 
 const TABLE_HEAD = [
   'ID',
@@ -61,6 +62,7 @@ const WorkplanSaya: React.FC = () => {
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
   const [showWPFilter, setShowWPFilter] = React.useState(false);
+  const [showWPRange, setShowWPRange] = React.useState(false);
   const [filter, setFilter] = React.useState('');
   const navigate = useNavigate();
 
@@ -99,12 +101,14 @@ const WorkplanSaya: React.FC = () => {
     }
   }
 
-  async function downloadWorkplan() {
+  async function downloadWorkplan(date: any) {
     changeType('LOADING');
     show();
 
     const { state, data, error } = await useFetch({
-      url: WORKPLAN + `?limit=5000&page=1`,
+      url:
+        WORKPLAN +
+        `?limit=5000&page=1&startDate=${date.start}&endDate=${date.end}`,
       method: 'GET',
     });
 
@@ -171,7 +175,7 @@ const WorkplanSaya: React.FC = () => {
                   variant={'outlined'}
                   size="sm"
                   color="blue"
-                  onClick={() => downloadWorkplan()}
+                  onClick={() => setShowWPRange(true)}
                 >
                   Download Report
                 </MButton>
@@ -469,6 +473,12 @@ const WorkplanSaya: React.FC = () => {
         visible={showWPFilter}
         toggle={() => setShowWPFilter(!showWPFilter)}
         onApply={(flr: string) => setFilter(flr)}
+      />
+
+      <WorkplanReortRangeModal
+        visible={showWPRange}
+        toggle={() => setShowWPRange(!showWPRange)}
+        onApply={(selectedDate: any) => downloadWorkplan(selectedDate)}
       />
     </DefaultLayout>
   );

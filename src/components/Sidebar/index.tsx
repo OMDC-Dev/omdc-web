@@ -454,7 +454,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
             <div>
               <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
-                Work Plan
+                Work in Progress
               </h3>
 
               <ul className="mb-6 flex flex-col gap-1.5">
@@ -482,7 +482,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }}
                         >
                           <BanknotesIcon className=" h-5 w-5" />
-                          Work Plan
+                          Work in Progress
                           <IconArrow open={open} />
                         </NavLink>
                         <div
@@ -501,7 +501,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Work Plan Saya
+                                    Work in Progress Saya
                                   </NavLink>
                                 </li>
                                 <li>
@@ -512,7 +512,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Work Plan CC ke Saya
+                                    Work in Progress CC ke Saya
                                   </NavLink>
                                 </li>
                               </>
@@ -526,7 +526,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Work Plan
+                                    List Work in Progress
                                   </NavLink>
                                 </li>
                                 <li>
@@ -537,7 +537,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Work Plan Selesai
+                                    Work in Progress Selesai
                                   </NavLink>
                                 </li>
                               </>
