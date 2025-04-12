@@ -81,6 +81,8 @@ const WorkplanDetail: React.FC = () => {
     WP_STATUS == WORKPLAN_STATUS.FINISH ||
     WP_STATUS == WORKPLAN_STATUS.REJECTED;
 
+  const IS_WP_OWNER = workplanDetail?.iduser == user?.iduser;
+
   const IS_EDIT_MODE = state?.isEditMode;
 
   const {
@@ -337,18 +339,20 @@ const WorkplanDetail: React.FC = () => {
               Simpan
             </Button>
 
-            <Button
-              size="sm"
-              className="normal-case"
-              color={'red'}
-              onClick={() => {
-                changeContext('DELETE');
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              Hapus
-            </Button>
+            {IS_WP_OWNER && (
+              <Button
+                size="sm"
+                className="normal-case"
+                color={'red'}
+                onClick={() => {
+                  changeContext('DELETE');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Hapus
+              </Button>
+            )}
           </>
         )}
         <Button
