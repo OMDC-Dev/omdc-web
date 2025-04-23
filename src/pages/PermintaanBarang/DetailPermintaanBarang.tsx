@@ -371,19 +371,20 @@ const DetailPermintaanBarang: React.FC = () => {
                           <span className=" text-xs text-blue-gray-300">
                             Permintaan: {item?.jml_kemasan} {item?.nm_kemasan}
                           </span>
-                          <span className=" text-xs text-blue-gray-300">
+                          <span className="text-xs text-blue-gray-300">
+                            Status:{' '}
+                            <span className={statusTextColor}>
+                              {item?.status_pb || '-'}
+                            </span>
+                          </span>
+
+                          <span className="mt-4 text-xs text-blue-gray-300">
                             Keterangan:
                           </span>
                           <span className=" text-xs text-blue-gray-300">
                             {item?.requestData?.keterangan ||
                               item?.keterangan ||
                               '-'}
-                          </span>
-                          <span className=" mt-4 text-xs text-blue-gray-300">
-                            Status:{' '}
-                            <span className={statusTextColor}>
-                              {item?.status_pb || '-'}
-                            </span>
                           </span>
                           {item.attachment && (
                             <MButton
