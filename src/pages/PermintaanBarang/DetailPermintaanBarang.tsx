@@ -372,7 +372,9 @@ const DetailPermintaanBarang: React.FC = () => {
                             Permintaan: {item?.jml_kemasan} {item?.nm_kemasan}
                           </span>
                           <span className=" text-xs text-blue-gray-300">
-                            Keterangan:{' '}
+                            Keterangan:
+                          </span>
+                          <span className=" text-xs text-blue-gray-300">
                             {item?.requestData?.keterangan ||
                               item?.keterangan ||
                               '-'}
