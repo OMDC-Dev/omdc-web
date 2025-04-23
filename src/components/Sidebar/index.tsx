@@ -1,21 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo-tp.png';
-import IconBarang from '../../images/sidebar/IconBarang';
-import IconSidebar from '../../images/sidebar/IconSidebar';
-import IconArrow from '../../images/sidebar/IconArrow';
-import { useAuth } from '../../hooks/useAuth';
-import { cekAkses } from '../../common/utils';
 import {
   BanknotesIcon,
-  RectangleGroupIcon,
   BellAlertIcon,
+  RectangleGroupIcon,
 } from '@heroicons/react/24/outline';
-import useFetch from '../../hooks/useFetch';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { GET_ICON } from '../../api/routes';
+import { cekAkses } from '../../common/utils';
 import { API_STATES } from '../../constants/ApiEnum';
+import { useAuth } from '../../hooks/useAuth';
+import useFetch from '../../hooks/useFetch';
+import IconArrow from '../../images/sidebar/IconArrow';
+import IconBarang from '../../images/sidebar/IconBarang';
+import IconSidebar from '../../images/sidebar/IconSidebar';
 import useLogo from '../../store/useLogo';
+import SidebarLinkGroup from './SidebarLinkGroup';
 
 // Icon
 
@@ -52,6 +51,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const hasExportExcell = cekAkses('#4');
   const isAdminPB = cekAkses('#7');
   const isAdminWorkplan = cekAkses('#12');
+  const hasTrxBarangAkses = cekAkses('#13');
 
   // close on click outside
   useEffect(() => {
@@ -122,7 +122,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.7.1
+            OMDC v0.9.7.2
           </span>
         </NavLink>
 
@@ -420,6 +420,72 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </NavLink>
                   </li>
                 ) : null}
+                {(hasTrxBarangAkses || hasRequestBarangAkses) && (
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === '/barang-request' ||
+                      pathname.includes('barang-request')
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <NavLink
+                            to="#"
+                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              (pathname === '/barang-request' ||
+                                pathname.includes('barang-request')) &&
+                              'bg-graydark dark:bg-meta-4'
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <RectangleGroupIcon className=" h-5 w-5" />
+                            Trx Permintaan Barang
+                            <IconArrow open={open} />
+                          </NavLink>
+                          {/* <!-- Dropdown Menu Start --> */}
+                          <div
+                            className={`translate transform overflow-hidden ${
+                              !open && 'hidden'
+                            }`}
+                          >
+                            <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <NavLink
+                                  to="/barang-request/waiting"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Dalam Proses
+                                </NavLink>
+                              </li>
+                              <li>
+                                <NavLink
+                                  to="/barang-request/done"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Selesai
+                                </NavLink>
+                              </li>
+                            </ul>
+                          </div>
+                          {/* <!-- Dropdown Menu End --> */}
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+                )}
+                {/* <!-- Menu Item Dashboard --> */}
                 {IS_REVIEWER && (
                   <li>
                     <NavLink

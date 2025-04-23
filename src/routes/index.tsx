@@ -49,12 +49,14 @@ import WorkplanApproval from '../pages/Workplan/WorkplanApproval';
 import WorkplanApprovalDetail from '../pages/Workplan/WorkplanApprovalDetail';
 import WorkplanCC from '../pages/Workplan/WorkplanCC';
 import SuperBanner from '../pages/SuperAdmin/Banner';
+import TrxPermintaanBarang from '../pages/PermintaanBarang/TrxPermintaanBarang';
 
 const Routes = () => {
   const { token, user } = useAuth();
 
   // cek akses
   const hasRequestBarangAkses = token ? cekAkses('#2') : null;
+  const hasTrxBarangAkses = token ? cekAkses('#13') : null;
   const hasMasterBarangAkses = token ? cekAkses('#9') : null;
   const hasPengumumanAkses = token ? cekAkses('#3') : null;
   const isAdminPB = token ? cekAkses('#7') : null;
@@ -416,6 +418,29 @@ const Routes = () => {
   ];
 
   // routes for authenticated user
+  const routesForTrxPermintaanBarang: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/barang-request/:type',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <TrxPermintaanBarang />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
   const routesForMasterBarang: routesTypes[] = [
     {
       path: '/',
@@ -607,6 +632,7 @@ const Routes = () => {
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
     ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
+    ...(hasTrxBarangAkses ? routesForTrxPermintaanBarang : []),
     ...(hasMasterBarangAkses ? routesForMasterBarang : []),
     ...(hasPengumumanAkses ? routesForPengumuman : []),
     ...(isAdminPB ? routesForAdminPB : []),

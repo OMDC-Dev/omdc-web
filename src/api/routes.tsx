@@ -4,7 +4,7 @@ const LOCAL = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = LOCAL;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -90,6 +90,7 @@ export const GET_BARANG = (query = '') => {
 };
 export const CREATE_REQUEST_BARANG = 'barang/create';
 export const LIST_REQUEST_BARANG = 'barang/requested';
+export const LIST_TRX_BARANG = 'barang/barang-requested';
 export const DETAIL_REQUEST_BARANG = (id: number) => {
   return `barang/requested/detail?id_pb=${id}`;
 };
