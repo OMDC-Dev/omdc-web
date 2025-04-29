@@ -632,7 +632,9 @@ const Routes = () => {
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
     ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
-    ...(hasTrxBarangAkses ? routesForTrxPermintaanBarang : []),
+    ...(hasTrxBarangAkses || hasRequestBarangAkses
+      ? routesForTrxPermintaanBarang
+      : []),
     ...(hasMasterBarangAkses ? routesForMasterBarang : []),
     ...(hasPengumumanAkses ? routesForPengumuman : []),
     ...(isAdminPB ? routesForAdminPB : []),
