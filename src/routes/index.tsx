@@ -166,7 +166,7 @@ const Routes = () => {
 
         // -- Work in Progress PATH
         {
-          path: '/workplan/me',
+          path: '/workplan/me/:status',
           element: (
             <>
               <PageTitle title={TITLE + 'Work in Progress'} />

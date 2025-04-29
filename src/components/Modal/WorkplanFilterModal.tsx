@@ -73,7 +73,7 @@ const WorkplanFilterModal = ({
             </div>
           </div>
 
-          <WorkplanTypeStatus value={status} setValue={setStatus} />
+          {/* <WorkplanTypeStatus value={status} setValue={setStatus} /> */}
 
           <div className="flex flex-row justify-center mt-4 gap-4">
             <Button

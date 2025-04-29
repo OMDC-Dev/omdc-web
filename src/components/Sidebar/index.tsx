@@ -445,7 +445,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             }}
                           >
                             <RectangleGroupIcon className=" h-5 w-5" />
-                            Trx Permintaan Barang
+                            List Permintaan Barang
                             <IconArrow open={open} />
                           </NavLink>
                           {/* <!-- Dropdown Menu Start --> */}
@@ -561,13 +561,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <>
                                 <li>
                                   <NavLink
-                                    to="/workplan/me"
+                                    to="/workplan/me/waiting"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Work in Progress Saya
+                                    List Dalam Proses
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/pending"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    List Pending
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/done"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    List Selesai
                                   </NavLink>
                                 </li>
                                 <li>
@@ -578,7 +600,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Work in Progress CC ke Saya
+                                    List CC ke Saya
                                   </NavLink>
                                 </li>
                               </>

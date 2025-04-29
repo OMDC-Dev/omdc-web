@@ -21,12 +21,15 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import useModal from '../../hooks/useModal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import { WORKPLAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
 import { cekAkses, delay, getFormattedDateTable } from '../../common/utils';
-import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
+import {
+  WORKPLAN_STATUS,
+  getWorkplanStatusText,
+} from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
@@ -68,9 +71,18 @@ const WorkplanSaya: React.FC = () => {
   const isWorkplanMaker = cekAkses('#11');
   const { user } = useAuth();
 
+  const { status } = useParams();
+
   React.useEffect(() => {
+    setList([]);
+    setPage(1);
+    setFilter('');
     getMyWorkplan();
-  }, []);
+  }, [status]);
+
+  // React.useEffect(() => {
+  //   getMyWorkplan();
+  // }, []);
 
   async function getMyWorkplan(clearOn?: string) {
     changeType('LOADING');
@@ -81,8 +93,22 @@ const WorkplanSaya: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
+    const _GET_STATUS = _getStatusByParams();
+
+    function _getStatusByParams() {
+      if (status == 'waiting') {
+        return [WORKPLAN_STATUS.ON_PROGRESS, WORKPLAN_STATUS.REVISON];
+      } else if (status == 'pending') {
+        return WORKPLAN_STATUS.PENDING;
+      } else {
+        return WORKPLAN_STATUS.FINISH;
+      }
+    }
+
     const { state, data, error } = await useFetch({
-      url: WORKPLAN + `?limit=${limit}&page=${page}${param}&${filter}`,
+      url:
+        WORKPLAN +
+        `?limit=${limit}&page=${page}${param}&${filter}&status=${_GET_STATUS}`,
       method: 'GET',
     });
 
