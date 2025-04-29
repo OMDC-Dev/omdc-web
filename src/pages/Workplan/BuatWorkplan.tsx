@@ -60,7 +60,6 @@ const BuatWorkplan: React.FC = () => {
   }
 
   const submitButtonDisabled =
-    !workplanType ||
     !tanggalMulai ||
     !tanggalSelesai ||
     !kategori ||
@@ -169,10 +168,10 @@ const BuatWorkplan: React.FC = () => {
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
         <ContainerCard title="Buat Work in Progress Baru">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
-            <WorkplanTypeGroup
+            {/* <WorkplanTypeGroup
               value={workplanType}
               setValue={setWorkplanType}
-            />
+            /> */}
 
             <div className="w-full">
               <DatePicker

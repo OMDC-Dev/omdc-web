@@ -57,7 +57,7 @@ const WorkplanFilterModal = ({
             />
           </div>
 
-          <WorkplanTypeGroup value={workplanType} setValue={setWorkplanType} />
+          {/* <WorkplanTypeGroup value={workplanType} setValue={setWorkplanType} /> */}
 
           <div className="w-full">
             <div>

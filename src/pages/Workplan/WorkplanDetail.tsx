@@ -57,6 +57,8 @@ const WorkplanDetail: React.FC = () => {
   const [selectedProgress, setSelectedProgress] = React.useState<any>();
   const [isChangeFile, setIsChangeFile] = React.useState(false);
   const [commentCount, setCommentCount] = React.useState(0);
+  const [perihal, setPerihal] = React.useState<string>('');
+  const [oldPerihal, setOldPerihal] = React.useState<string>('');
 
   const [showFile, setShowFile] = React.useState(false);
   const [showWPHistory, setShowWPHistory] = React.useState(false);
@@ -98,13 +100,22 @@ const WorkplanDetail: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const submitButtonDisabled = !isHasChanges && tanggalSelesai != null;
+  const submitButtonDisabled =
+    !isHasChanges || tanggalSelesai == null || perihal.length < 1;
 
   React.useEffect(() => {
     getWorkplanDetail();
     getWorkplanProgress(id);
     getCommentCount();
   }, []);
+
+  React.useEffect(() => {
+    if (perihal != oldPerihal) {
+      setIsHasChanges(true);
+    } else {
+      setIsChangeFile(false);
+    }
+  }, [perihal, oldPerihal]);
 
   async function getCommentCount() {
     changeType('LOADING');
@@ -138,6 +149,9 @@ const WorkplanDetail: React.FC = () => {
       setCC(data.cc_users);
       setTanggalSelesai(data.tanggal_selesai);
       getWorkplanProgress(id);
+
+      setPerihal(data.perihal);
+      setOldPerihal(data.perihal);
       hide();
     } else {
       console.log(error);
@@ -174,6 +188,7 @@ const WorkplanDetail: React.FC = () => {
     const body = {
       tanggal_selesai: standardizeDate(tanggalSelesai),
       user_cc: mappedCC,
+      perihal: perihal,
       attachment_after: attachmentAfter,
       attachment_before: attachmentBefore,
       isUpdateAfter: isChangeFile,
@@ -368,14 +383,14 @@ const WorkplanDetail: React.FC = () => {
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
         <ContainerCard title="Detail Work in Progress">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
-            <DetailPlaceholder
+            {/* <DetailPlaceholder
               value={
                 workplanDetail?.jenis_workplan == 'APPROVAL'
                   ? 'Approval'
                   : 'Non Approval'
               }
               label="Jenis Work in Progress"
-            />
+            /> */}
 
             <DetailPlaceholder
               value={workplanDetail?.tanggal_mulai}
@@ -421,11 +436,26 @@ const WorkplanDetail: React.FC = () => {
               label="Cabang / Lokasi"
             />
 
-            <DetailPlaceholder
-              value={workplanDetail?.perihal}
-              label="Perihal"
-              isTextArea
-            />
+            {!IS_EDIT_MODE ? (
+              <DetailPlaceholder
+                value={workplanDetail?.perihal}
+                label="Perihal"
+                isTextArea
+              />
+            ) : (
+              <div className="w-full">
+                <label className="mb-2.5 block text-sm font-medium text-black">
+                  Perihal
+                </label>
+                <textarea
+                  rows={6}
+                  placeholder="Masukan Perihal"
+                  className="w-full rounded border-[1.5px] h-[100px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                  value={perihal}
+                  onChange={(e) => setPerihal(e.target.value)}
+                ></textarea>
+              </div>
+            )}
 
             <DetailPlaceholder
               value={workplanDetail?.kategori}

@@ -39,7 +39,6 @@ import WorkplanReortRangeModal from '../../components/Modal/WorkplanReportRangeM
 
 const TABLE_HEAD = [
   'ID',
-  'Jenis Work in Progress',
   'Tanggal Dibuat',
   'Cabang / Lokasi',
   'Kategori',
@@ -275,7 +274,7 @@ const WorkplanSaya: React.FC = () => {
                             </div>
                           </div>
                         </td>
-                        <td className={classes}>
+                        {/* <td className={classes}>
                           <div className="flex items-center gap-3 ">
                             <div className="flex flex-col">
                               <Chip
@@ -294,7 +293,7 @@ const WorkplanSaya: React.FC = () => {
                               />
                             </div>
                           </div>
-                        </td>
+                        </td> */}
                         <td className={classes}>
                           <div className="w-max">
                             <Typography
