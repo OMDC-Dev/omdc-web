@@ -62,6 +62,8 @@ const WorkplanApproval: React.FC = () => {
   const { status } = useParams();
 
   React.useEffect(() => {
+    setList([]);
+    setPage(1);
     getMyWorkplan();
   }, [status]);
 
@@ -81,14 +83,17 @@ const WorkplanApproval: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
-    const _GET_STATUS =
-      status == 'waiting'
-        ? [
-            WORKPLAN_STATUS.ON_PROGRESS,
-            WORKPLAN_STATUS.REVISON,
-            WORKPLAN_STATUS.PENDING,
-          ]
-        : WORKPLAN_STATUS.FINISH;
+    const _GET_STATUS = _getStatusByParams();
+
+    function _getStatusByParams() {
+      if (status == 'waiting') {
+        return [WORKPLAN_STATUS.ON_PROGRESS, WORKPLAN_STATUS.REVISON];
+      } else if (status == 'pending') {
+        return WORKPLAN_STATUS.PENDING;
+      } else {
+        return WORKPLAN_STATUS.FINISH;
+      }
+    }
 
     const { state, data, error } = await useFetch({
       url:
