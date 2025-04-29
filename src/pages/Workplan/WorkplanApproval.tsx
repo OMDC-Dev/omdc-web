@@ -64,6 +64,7 @@ const WorkplanApproval: React.FC = () => {
   React.useEffect(() => {
     setList([]);
     setPage(1);
+    setFilter('');
     getMyWorkplan();
   }, [status]);
 
