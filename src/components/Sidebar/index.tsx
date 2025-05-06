@@ -122,7 +122,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.7.3
+            OMDC v0.9.7.4
           </span>
         </NavLink>
 
@@ -464,6 +464,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   }
                                 >
                                   Dalam Proses
+                                </NavLink>
+                              </li>
+                              <li>
+                                <NavLink
+                                  to="/barang-request/pending"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Pending
                                 </NavLink>
                               </li>
                               <li>

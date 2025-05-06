@@ -267,13 +267,17 @@ function TrxPermintaanBarang() {
                             </Typography>
                           </div>
                         </td>
-                        <td className={classes}>
+                        <td
+                          className={`${classes} sticky right-[4rem] bg-white z-10`}
+                        >
                           {/* <Typography variant="small" className="font-normal">
                             {item?.status}
                           </Typography> */}
                           {statusChip(item?.status_pb)}
                         </td>
-                        <td className={classes}>
+                        <td
+                          className={`${classes} sticky right-0 bg-white z-10`}
+                        >
                           <Tooltip content="Detail">
                             <IconButton
                               variant="text"
