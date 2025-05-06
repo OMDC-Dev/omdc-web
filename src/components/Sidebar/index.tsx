@@ -594,13 +594,35 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 </li>
                                 <li>
                                   <NavLink
-                                    to="/workplan/cc"
+                                    to="/workplan/cc/waiting"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List CC ke Saya
+                                    List CC Dalam Proses
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/pending"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    List CC Pending
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/done"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    List CC Selesai
                                   </NavLink>
                                 </li>
                               </>

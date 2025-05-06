@@ -84,13 +84,22 @@ const WorkplanCC: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
-    const _GET_STATUS =
-      status == 'waiting'
-        ? WORKPLAN_STATUS.ON_PROGRESS
-        : WORKPLAN_STATUS.FINISH;
+    const _GET_STATUS = _getStatusByParams();
+
+    function _getStatusByParams() {
+      if (status == 'waiting') {
+        return [WORKPLAN_STATUS.ON_PROGRESS, WORKPLAN_STATUS.REVISON];
+      } else if (status == 'pending') {
+        return WORKPLAN_STATUS.PENDING;
+      } else {
+        return WORKPLAN_STATUS.FINISH;
+      }
+    }
 
     const { state, data, error } = await useFetch({
-      url: WORKPLAN + `?limit=${limit}&page=${page}${param}&cc=true&${filter}`,
+      url:
+        WORKPLAN +
+        `?limit=${limit}&page=${page}${param}&cc=true&${filter}&status=${_GET_STATUS}`,
       method: 'GET',
     });
 
@@ -114,10 +123,10 @@ const WorkplanCC: React.FC = () => {
           <div className="flex items-center justify-between gap-8">
             <div>
               <Typography variant="h5" color="black">
-                Work in Progress
+                Work in Progress CC ke Saya
               </Typography>
               <Typography color="gray" className="mt-1 font-normal">
-                Menampilkan semua work in progress
+                Menampilkan semua work in progress yang di share ke saya
               </Typography>
             </div>
           </div>

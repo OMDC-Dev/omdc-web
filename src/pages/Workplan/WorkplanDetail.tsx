@@ -1,12 +1,15 @@
+import { PencilIcon } from '@heroicons/react/24/outline';
 import {
   Button,
   Card,
+  Checkbox,
   Chip,
   IconButton,
   List,
   ListItem,
   ListItemSuffix,
 } from '@material-tailwind/react';
+import { color } from '@material-tailwind/react/types/components/alert';
 import 'flatpickr/dist/flatpickr.min.css';
 import * as React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -26,24 +29,22 @@ import ActionCard from '../../components/ActionCard';
 import { ContainerCard } from '../../components/ContainerCard';
 import { DetailPlaceholder } from '../../components/DetailPlaceholder';
 import DatePicker from '../../components/Forms/DatePicker/DatePicker';
+import CabangModal from '../../components/Modal/CabangModal';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import WorkplanCCModal from '../../components/Modal/WorkplanCCModal';
+import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
+import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
+import WorkplanProgressModal from '../../components/Modal/WorkplanProgressModal';
 import { API_STATES } from '../../constants/ApiEnum';
-import useFetch from '../../hooks/useFetch';
-import useModal from '../../hooks/useModal';
-import DefaultLayout from '../../layout/DefaultLayout';
 import {
   WORKPLAN_STATUS,
   getWorkplanStatusText,
 } from '../../constants/WorkplanStatus';
-import { color } from '@material-tailwind/react/types/components/alert';
-import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
-import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
-import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
-import WorkplanProgressModal from '../../components/Modal/WorkplanProgressModal';
 import { useAuth } from '../../hooks/useAuth';
-import moment from 'moment';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const WorkplanDetail: React.FC = () => {
   const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
@@ -59,6 +60,12 @@ const WorkplanDetail: React.FC = () => {
   const [commentCount, setCommentCount] = React.useState(0);
   const [perihal, setPerihal] = React.useState<string>('');
   const [oldPerihal, setOldPerihal] = React.useState<string>('');
+
+  // cabang
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [cabang, setCabang] = React.useState<string | any>();
+  const [useCabang, setUseCabang] = React.useState(true);
+  const [customLocation, setCustomLocation] = React.useState<string | any>('');
 
   const [showFile, setShowFile] = React.useState(false);
   const [showWPHistory, setShowWPHistory] = React.useState(false);
@@ -100,8 +107,15 @@ const WorkplanDetail: React.FC = () => {
 
   const navigate = useNavigate();
 
+  const DISABLED_BY_CABANG = useCabang && !cabang?.value;
+  const DISABLED_BY_LOCATION = !useCabang && !customLocation?.length;
+
   const submitButtonDisabled =
-    !isHasChanges || tanggalSelesai == null || perihal.length < 1;
+    !isHasChanges ||
+    tanggalSelesai == null ||
+    perihal.length < 1 ||
+    DISABLED_BY_CABANG ||
+    DISABLED_BY_LOCATION;
 
   React.useEffect(() => {
     getWorkplanDetail();
@@ -152,6 +166,20 @@ const WorkplanDetail: React.FC = () => {
 
       setPerihal(data.perihal);
       setOldPerihal(data.perihal);
+
+      if (data.custom_location?.length > 0) {
+        setUseCabang(false);
+        setCabang(null);
+        setCustomLocation(data.custom_location);
+      } else {
+        setUseCabang(true);
+        setCabang({
+          value: data.kd_induk,
+          label: data.cabang_detail.nm_induk,
+        });
+        setCustomLocation(null);
+      }
+
       hide();
     } else {
       console.log(error);
@@ -192,6 +220,8 @@ const WorkplanDetail: React.FC = () => {
       attachment_after: attachmentAfter,
       attachment_before: attachmentBefore,
       isUpdateAfter: isChangeFile,
+      kd_induk: useCabang ? cabang.value : null,
+      location: useCabang ? null : customLocation,
     };
 
     const { state, data, error } = await useFetch({
@@ -427,14 +457,62 @@ const WorkplanDetail: React.FC = () => {
               </div>
             </div>
 
-            <DetailPlaceholder
-              value={
-                workplanDetail?.cabang_detail
-                  ? workplanDetail?.cabang_detail?.nm_induk
-                  : workplanDetail?.custom_location
-              }
-              label="Cabang / Lokasi"
-            />
+            {!IS_EDIT_MODE ? (
+              <DetailPlaceholder
+                value={
+                  workplanDetail?.cabang_detail
+                    ? workplanDetail?.cabang_detail?.nm_induk
+                    : workplanDetail?.custom_location
+                }
+                label="Cabang / Lokasi"
+              />
+            ) : (
+              <>
+                <div className="w-full">
+                  <Checkbox
+                    color={'blue'}
+                    checked={useCabang}
+                    label="Gunakan lokasi dari list cabang"
+                    onClick={() => setUseCabang(!useCabang)}
+                  />
+                </div>
+
+                {useCabang ? (
+                  <div className="w-full">
+                    <div>
+                      <label className="mb-3 block text-sm font-medium text-black">
+                        Cabang
+                      </label>
+                      <div
+                        onClick={() => setShowCabang(!showCabang)}
+                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                      >
+                        {cabang?.label ||
+                          workplanDetail?.cabang_detail?.nm_induk ||
+                          'Pilih Cabang'}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full">
+                    <div>
+                      <label className="mb-3 block text-sm font-medium text-black">
+                        Lokasi
+                      </label>
+                      <input
+                        placeholder="Masukan lokasi"
+                        className="w-full cursor-pointer rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        onChange={(e) => {
+                          setCustomLocation(e.target.value);
+                          setIsHasChanges(true);
+                        }}
+                        value={customLocation}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
 
             {!IS_EDIT_MODE ? (
               <DetailPlaceholder
@@ -836,6 +914,15 @@ const WorkplanDetail: React.FC = () => {
           data={selectedGambar}
           visible={showFile}
           toggle={() => setShowFile(!showFile)}
+        />
+
+        <CabangModal
+          visible={showCabang}
+          toggle={() => setShowCabang(!showCabang)}
+          value={(val: any) => {
+            setCabang(val);
+            setIsHasChanges(true);
+          }}
         />
 
         <WorkplanHistoryModal

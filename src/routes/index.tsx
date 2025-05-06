@@ -175,7 +175,7 @@ const Routes = () => {
           ),
         },
         {
-          path: '/workplan/cc',
+          path: '/workplan/cc/:status',
           element: (
             <>
               <PageTitle title={TITLE + 'Work in Progress'} />
