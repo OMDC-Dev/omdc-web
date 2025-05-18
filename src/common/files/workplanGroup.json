@@ -1,0 +1,10 @@
+[
+  {
+    "label": "Medis",
+    "value": "MEDIC"
+  },
+  {
+    "label": "Non Medis",
+    "value": "NON_MEDIC"
+  }
+]

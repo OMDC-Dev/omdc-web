@@ -242,6 +242,17 @@ const WorkplanApprovalDetail: React.FC = () => {
               label="Jenis Workplan"
             /> */}
             <DetailPlaceholder
+              value={
+                workplanDetail?.group_type
+                  ? workplanDetail?.group_type == 'MEDIC'
+                    ? 'Medis'
+                    : 'Non Medis'
+                  : '-'
+              }
+              label="Grup"
+            />
+
+            <DetailPlaceholder
               value={workplanDetail?.user_detail?.nm_user}
               label="PIC"
             />

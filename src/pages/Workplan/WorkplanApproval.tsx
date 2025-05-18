@@ -59,14 +59,14 @@ const WorkplanApproval: React.FC = () => {
   const [filter, setFilter] = React.useState('');
   const navigate = useNavigate();
 
-  const { status } = useParams();
+  const { status, group } = useParams();
 
   React.useEffect(() => {
     setList([]);
     setPage(1);
     setFilter('');
     getMyWorkplan();
-  }, [status]);
+  }, [status, group]);
 
   React.useEffect(() => {
     // if (filter) {
@@ -85,6 +85,7 @@ const WorkplanApproval: React.FC = () => {
     }
 
     const _GET_STATUS = _getStatusByParams();
+    const _GET_GROUP = group == 'medic' ? 'MEDIC' : 'NON_MEDIC';
 
     function _getStatusByParams() {
       if (status == 'waiting') {
@@ -99,7 +100,7 @@ const WorkplanApproval: React.FC = () => {
     const { state, data, error } = await useFetch({
       url:
         WORKPLAN +
-        `?limit=${limit}&page=${page}${param}&admin=true&status=${_GET_STATUS}&${filter}`,
+        `?limit=${limit}&page=${page}${param}&admin=true&status=${_GET_STATUS}&${filter}&group=${_GET_GROUP}`,
       method: 'GET',
     });
 

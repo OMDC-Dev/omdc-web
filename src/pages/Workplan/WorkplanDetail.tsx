@@ -45,6 +45,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
+import WorkplanGroup from '../../components/SelectGroup/WorkplanGroup';
 
 const WorkplanDetail: React.FC = () => {
   const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
@@ -60,6 +61,7 @@ const WorkplanDetail: React.FC = () => {
   const [commentCount, setCommentCount] = React.useState(0);
   const [perihal, setPerihal] = React.useState<string>('');
   const [oldPerihal, setOldPerihal] = React.useState<string>('');
+  const [group, setGroup] = React.useState('');
 
   // cabang
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
@@ -113,6 +115,7 @@ const WorkplanDetail: React.FC = () => {
   const submitButtonDisabled =
     !isHasChanges ||
     tanggalSelesai == null ||
+    group.length < 1 ||
     perihal.length < 1 ||
     DISABLED_BY_CABANG ||
     DISABLED_BY_LOCATION;
@@ -166,6 +169,10 @@ const WorkplanDetail: React.FC = () => {
 
       setPerihal(data.perihal);
       setOldPerihal(data.perihal);
+
+      if (data.group_type != null) {
+        setGroup(data.group_type);
+      }
 
       if (data.custom_location?.length > 0) {
         setUseCabang(false);
@@ -222,6 +229,7 @@ const WorkplanDetail: React.FC = () => {
       isUpdateAfter: isChangeFile,
       kd_induk: useCabang ? cabang.value : null,
       location: useCabang ? null : customLocation,
+      group: group,
     };
 
     const { state, data, error } = await useFetch({
@@ -421,6 +429,29 @@ const WorkplanDetail: React.FC = () => {
               }
               label="Jenis Work in Progress"
             /> */}
+
+            {IS_EDIT_MODE ? (
+              <div className="w-full">
+                <WorkplanGroup
+                  value={group}
+                  setValue={(val: any) => {
+                    setGroup(val);
+                    setIsHasChanges(true);
+                  }}
+                />
+              </div>
+            ) : (
+              <DetailPlaceholder
+                value={
+                  workplanDetail?.group_type
+                    ? workplanDetail?.group_type == 'MEDIC'
+                      ? 'Medis'
+                      : 'Non Medis'
+                    : '-'
+                }
+                label="Grup"
+              />
+            )}
 
             <DetailPlaceholder
               value={workplanDetail?.tanggal_mulai}

@@ -44,6 +44,7 @@ const TABLE_HEAD = [
   'ID',
   'Tanggal Dibuat',
   'Cabang / Lokasi',
+  'Grup',
   'Kategori',
   'PIC',
   'Perihal',
@@ -339,6 +340,20 @@ const WorkplanSaya: React.FC = () => {
                               {item?.cabang_detail
                                 ? item?.cabang_detail.nm_induk
                                 : item?.custom_location}
+                            </Typography>
+                          </div>
+                        </td>
+                        <td className={classes}>
+                          <div className="w-max">
+                            <Typography
+                              variant="small"
+                              className="font-normal "
+                            >
+                              {item?.group_type
+                                ? item?.group_type == 'MEDIC'
+                                  ? 'Medis'
+                                  : 'Non Medis'
+                                : '-'}
                             </Typography>
                           </div>
                         </td>

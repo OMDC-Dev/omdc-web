@@ -122,7 +122,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.7.4
+            OMDC v0.9.7.5
           </span>
         </NavLink>
 
@@ -338,7 +338,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Pengajuan Perlu Diproses
+                                    Approve R.O.P
                                   </NavLink>
                                 </li>
                                 <li>
@@ -349,7 +349,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Pengajuan Selesai Diproses
+                                    Riwayat Approve R.O.P
                                   </NavLink>
                                 </li>
                                 {IS_REVIEWER && (
@@ -416,7 +416,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       }`}
                     >
                       <RectangleGroupIcon className=" h-5 w-5" />
-                      Pengajuan Permintaan Barang
+                      Approve Permintaan Barang
                     </NavLink>
                   </li>
                 ) : null}
@@ -641,35 +641,68 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <>
                                 <li>
                                   <NavLink
-                                    to="/workplan/approval/waiting"
+                                    to="/workplan/approval/waiting/medic"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Dalam Proses
+                                    Dalam Proses ( Medis )
                                   </NavLink>
                                 </li>
                                 <li>
                                   <NavLink
-                                    to="/workplan/approval/pending"
+                                    to="/workplan/approval/pending/medic"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Pending
+                                    Pending ( Medis )
                                   </NavLink>
                                 </li>
                                 <li>
                                   <NavLink
-                                    to="/workplan/approval/done"
+                                    to="/workplan/approval/done/medic"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Selesai
+                                    Selesai ( Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/waiting/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Dalam Proses ( Non Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/pending/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Pending ( Non Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/done/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Selesai ( Non Medis )
                                   </NavLink>
                                 </li>
                               </>

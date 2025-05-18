@@ -22,9 +22,11 @@ import ModalSelector from '../../components/Modal/ModalSelctor';
 import useFetch from '../../hooks/useFetch';
 import { WORKPLAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
+import WorkplanGroup from '../../components/SelectGroup/WorkplanGroup';
 
 const BuatWorkplan: React.FC = () => {
   const [workplanType, setWorkplanType] = React.useState('');
+  const [group, setGroup] = React.useState('');
   const [tanggalMulai, setTanggalMulai] = React.useState<Date>();
   const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
   const [kategori, setKategori] = React.useState('');
@@ -64,6 +66,7 @@ const BuatWorkplan: React.FC = () => {
     !tanggalSelesai ||
     !kategori ||
     !desc ||
+    !group ||
     disabledByLocation();
 
   // Hit Api
@@ -86,6 +89,7 @@ const BuatWorkplan: React.FC = () => {
       user_cc: mappedCC,
       attachment_before: attachmentBefore,
       custom_location: useCabang ? null : customLocation,
+      group: group,
     };
 
     const { state, data, error } = await useFetch({
@@ -172,6 +176,12 @@ const BuatWorkplan: React.FC = () => {
               value={workplanType}
               setValue={setWorkplanType}
             /> */}
+            <div className="w-full">
+              <WorkplanGroup
+                value={group}
+                setValue={(val: any) => setGroup(val)}
+              />
+            </div>
 
             <div className="w-full">
               <DatePicker
@@ -345,7 +355,7 @@ const BuatWorkplan: React.FC = () => {
           onDone={() => {
             hide();
             type == 'SUCCESS'
-              ? navigate('/workplan/me', { replace: true })
+              ? navigate('/workplan/me/waiting', { replace: true })
               : null;
           }}
         />
