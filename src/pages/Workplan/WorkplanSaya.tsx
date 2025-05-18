@@ -154,7 +154,7 @@ const WorkplanSaya: React.FC = () => {
       headers: [
         'NO',
         'ID WORKPLAN',
-        'JENIS WORKPLAN',
+        'GRUP WORKPLAN',
         'PIC',
         'TANGGAL MULAI',
         'EST. TANGGAL SELESAI',

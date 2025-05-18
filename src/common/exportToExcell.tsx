@@ -249,12 +249,18 @@ export const createWorkplanReportData = (data = []) => {
       createdAt,
       cabang_detail,
       user_detail,
+      group_type,
     } = itemCol;
 
     return {
       no: index + 1,
       wp: workplan_id,
-      js: jenis_workplan == 'APPROVAL' ? 'APPROVAL' : 'NON APPROVAL',
+      js:
+        group_type == null
+          ? '-'
+          : group_type == 'MEDIC'
+          ? 'Medis'
+          : 'Non Medis',
       pc: user_detail.nm_user,
       tm: tanggal_mulai,
       ts: tanggal_selesai,
