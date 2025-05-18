@@ -1,28 +1,20 @@
+import { Button, Checkbox, Chip } from '@material-tailwind/react';
 import * as React from 'react';
-import DefaultLayout from '../../layout/DefaultLayout';
-import {
-  Button,
-  Card,
-  CardHeader,
-  Checkbox,
-  Chip,
-  Typography,
-} from '@material-tailwind/react';
-import { ContainerCard } from '../../components/ContainerCard';
-import WorkplanTypeGroup from '../../components/SelectGroup/WorkplanTypeGroup';
-import DatePicker from '../../components/Forms/DatePicker/DatePicker';
-import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
-import CabangModal from '../../components/Modal/CabangModal';
-import WorkplanCCModal from '../../components/Modal/WorkplanCCModal';
+import { useNavigate } from 'react-router-dom';
+import { WORKPLAN } from '../../api/routes';
 import { compressImage, standardizeDate } from '../../common/utils';
 import ActionCard from '../../components/ActionCard';
-import { useNavigate } from 'react-router-dom';
-import useModal from '../../hooks/useModal';
+import { ContainerCard } from '../../components/ContainerCard';
+import DatePicker from '../../components/Forms/DatePicker/DatePicker';
+import CabangModal from '../../components/Modal/CabangModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import useFetch from '../../hooks/useFetch';
-import { WORKPLAN } from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
+import WorkplanCCModal from '../../components/Modal/WorkplanCCModal';
+import TipePembayaranGroup from '../../components/SelectGroup/TipePembayaranGroup';
 import WorkplanGroup from '../../components/SelectGroup/WorkplanGroup';
+import { API_STATES } from '../../constants/ApiEnum';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const BuatWorkplan: React.FC = () => {
   const [workplanType, setWorkplanType] = React.useState('');
@@ -355,7 +347,7 @@ const BuatWorkplan: React.FC = () => {
           onDone={() => {
             hide();
             type == 'SUCCESS'
-              ? navigate('/workplan/me/waiting', { replace: true })
+              ? navigate('/workplan/me/waiting/medic', { replace: true })
               : null;
           }}
         />
