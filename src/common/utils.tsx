@@ -247,16 +247,28 @@ export function formatCurrencyToNumber(currencyString: string) {
   return parseFloat(cleanedString) || 0;
 }
 
-function convertToPreviewLink(downloadLink: string) {
+function convertToPreviewLink(downloadLink: string): string {
   const downloadPrefix = 'https://drive.google.com/uc?export=download&id=';
   const previewPrefix = 'https://drive.google.com/file/d/';
   const previewSuffix = '/preview';
 
-  if (downloadLink.startsWith(downloadPrefix)) {
-    const fileId = downloadLink.slice(downloadPrefix.length);
-    return `${previewPrefix}${fileId}${previewSuffix}`;
-  } else {
-    return 'Invalid download link format';
+  try {
+    const url = new URL(downloadLink);
+    const hostname = url.hostname;
+
+    // Jika dari Google Drive
+    if (
+      hostname === 'drive.google.com' &&
+      downloadLink.startsWith(downloadPrefix)
+    ) {
+      const fileId = downloadLink.slice(downloadPrefix.length);
+      return `${previewPrefix}${fileId}${previewSuffix}`;
+    }
+
+    // Jika bukan dari Google Drive, seperti omdc.online, balikan apa adanya
+    return downloadLink;
+  } catch (err) {
+    return 'Invalid URL';
   }
 }
 
