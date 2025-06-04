@@ -84,6 +84,10 @@ const WorkplanCC: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
+    if (status == 'due') {
+      param += '&onDueDate=true';
+    }
+
     const _GET_STATUS = _getStatusByParams();
 
     function _getStatusByParams() {
@@ -92,7 +96,9 @@ const WorkplanCC: React.FC = () => {
       } else if (status == 'pending') {
         return WORKPLAN_STATUS.PENDING;
       } else {
-        return WORKPLAN_STATUS.FINISH;
+        return status != 'due'
+          ? WORKPLAN_STATUS.FINISH
+          : WORKPLAN_STATUS.ON_PROGRESS;
       }
     }
 

@@ -122,7 +122,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.7.5 rev 1
+            OMDC v0.9.7.6
           </span>
         </NavLink>
 
@@ -578,7 +578,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Dalam Proses
+                                    Dalam Proses
                                   </NavLink>
                                 </li>
                                 <li>
@@ -589,7 +589,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Pending
+                                    Pending
                                   </NavLink>
                                 </li>
                                 <li>
@@ -600,7 +600,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List Selesai
+                                    Selesai
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/due"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Due Date
                                   </NavLink>
                                 </li>
                                 <li>
@@ -611,7 +622,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List CC Dalam Proses
+                                    CC Dalam Proses
                                   </NavLink>
                                 </li>
                                 <li>
@@ -622,7 +633,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List CC Pending
+                                    CC Pending
                                   </NavLink>
                                 </li>
                                 <li>
@@ -633,7 +644,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    List CC Selesai
+                                    CC Selesai
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/due"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    CC Due Date
                                   </NavLink>
                                 </li>
                               </>
@@ -674,6 +696,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 </li>
                                 <li>
                                   <NavLink
+                                    to="/workplan/approval/due/medic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Due Date ( Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
                                     to="/workplan/approval/waiting/nonmedic"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
@@ -703,6 +736,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     }
                                   >
                                     Selesai ( Non Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/due/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Due Date ( Non Medis )
                                   </NavLink>
                                 </li>
                               </>

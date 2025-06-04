@@ -21,7 +21,7 @@ import {
   TrashIcon,
 } from '@heroicons/react/24/outline';
 import useModal from '../../hooks/useModal';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import { WORKPLAN } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
@@ -73,6 +73,8 @@ const WorkplanSaya: React.FC = () => {
   const { user } = useAuth();
 
   const { status } = useParams();
+  const [searchParams] = useSearchParams();
+  const due = searchParams.get('due');
 
   React.useEffect(() => {
     setList([]);
@@ -94,6 +96,10 @@ const WorkplanSaya: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
+    if (status == 'due') {
+      param += '&onDueDate=true';
+    }
+
     const _GET_STATUS = _getStatusByParams();
 
     function _getStatusByParams() {
@@ -102,7 +108,9 @@ const WorkplanSaya: React.FC = () => {
       } else if (status == 'pending') {
         return WORKPLAN_STATUS.PENDING;
       } else {
-        return WORKPLAN_STATUS.FINISH;
+        return status != 'due'
+          ? WORKPLAN_STATUS.FINISH
+          : WORKPLAN_STATUS.ON_PROGRESS;
       }
     }
 
