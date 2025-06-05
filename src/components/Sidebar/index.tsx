@@ -15,6 +15,7 @@ import IconBarang from '../../images/sidebar/IconBarang';
 import IconSidebar from '../../images/sidebar/IconSidebar';
 import useLogo from '../../store/useLogo';
 import SidebarLinkGroup from './SidebarLinkGroup';
+import { APP_VERSION } from '../../constants/AppEnv';
 
 // Icon
 
@@ -122,7 +123,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.7.6
+            {APP_VERSION}
           </span>
         </NavLink>
 
