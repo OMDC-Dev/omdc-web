@@ -1,4 +1,4 @@
-name: 🚀 Deploy to CPanel via SFTP
+name: 🚀 Deploy to CPanel via SCP
 
 on:
   push:
@@ -18,13 +18,12 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy via SFTP
-        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      - name: Deploy via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: omdc.online
+          host: omdc.online
           username: omdcadmin
+          key: ${{ secrets.CPANEL_SSH_KEY }}
           port: 22
-          protocol: sftp
-          privateKey: ${{ secrets.CPANEL_SSH_KEY }}
-          local-dir: ./dist
-          server-dir: /public_html
+          source: 'dist/*'
+          target: '/home/omdcadmin/public_html/'
