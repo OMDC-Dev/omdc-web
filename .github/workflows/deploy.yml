@@ -1,0 +1,29 @@
+name: 🚀 Deploy to CPanel
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies & build
+        run: |
+          npm install
+          npm run build
+
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.CPANEL_SSH_KEY }}" | base64 --decode > ~/.ssh/omdc_deploy_key
+          chmod 600 ~/.ssh/omdc_deploy_key
+          ssh-keyscan -H omdc.online >> ~/.ssh/known_hosts
+
+      - name: Deploy to CPanel
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/omdc_deploy_key" --exclude='.htaccess' dist/ omdcadmin@omdc.online:~/public_html/

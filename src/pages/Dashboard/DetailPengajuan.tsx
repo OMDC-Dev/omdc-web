@@ -8,6 +8,7 @@ import {
 import { colors } from '@material-tailwind/react/types/generic';
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { usePDF } from 'react-to-pdf';
 import {
   FINANCE_UPDATE_COA,
   REIMBURSEMENT_ACCEPTANCE,
@@ -19,20 +20,17 @@ import formatRupiah from '../../common/formatRupiah';
 import {
   calculateSaldo,
   compressImage,
-  downloadPDF,
-  downloadPDFDirect,
   openInNewTab,
 } from '../../common/utils';
 import Button from '../../components/Button';
+import AdminModal from '../../components/Modal/AdminModal';
+import COAModal from '../../components/Modal/COAModal';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import { API_STATES } from '../../constants/ApiEnum';
 import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
-import COAModal from '../../components/Modal/COAModal';
-import { usePDF } from 'react-to-pdf';
-import AdminModal from '../../components/Modal/AdminModal';
 
 const DetailPengajuan: React.FC = () => {
   const {
@@ -80,6 +78,10 @@ const DetailPengajuan: React.FC = () => {
   // Data Modal State
   const [showFile, setShowFile] = React.useState(false);
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
+
+  const [previewType, setPreviewType] = React.useState<'BASIC' | 'BUKTI'>(
+    'BASIC',
+  );
 
   const { toPDF, targetRef } = usePDF({ filename: 'report.pdf' });
 
@@ -259,7 +261,7 @@ const DetailPengajuan: React.FC = () => {
   function handleAttachment(event: any) {
     const file = event.target.files[0];
     const reader = new FileReader();
-    const maxSize = 5242880;
+    const maxSize = 10485760;
 
     // handle file type
     const fileInfo = {
@@ -276,7 +278,7 @@ const DetailPengajuan: React.FC = () => {
       } else {
         // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
         alert(
-          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 10 MB.',
         );
         event.target.value = null; // Mengosongkan input file
         return;
@@ -637,6 +639,7 @@ const DetailPengajuan: React.FC = () => {
                       <Button
                         onClick={(e: any) => {
                           e.preventDefault();
+                          setPreviewType('BASIC');
                           status?.file_info?.type !== 'application/pdf'
                             ? setShowFile(!showFile)
                             : openInNewTab(status?.attachment);
@@ -650,12 +653,12 @@ const DetailPengajuan: React.FC = () => {
                   <div className="w-full">
                     <div>
                       <label className="mb-3 block text-black dark:text-white">
-                        Lampirkan File ( Maks. 5MB )
+                        Lampirkan File ( hanya PDF, maks. 10MB)
                       </label>
                       <input
                         type="file"
                         className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        accept=".pdf,image/*"
+                        accept={/*".pdf,image/*"*/ '.pdf'}
                         onChange={handleAttachment}
                       />
                     </div>
@@ -715,7 +718,7 @@ const DetailPengajuan: React.FC = () => {
               <div className="p-6.5">
                 <div className="mb-4">
                   <Card className=" rounded-md">
-                    <List>
+                    <List className="max-h-92 overflow-y-auto py-4.5">
                       {data?.item?.map((item: any, index: number) => {
                         return (
                           <ListItem
@@ -802,6 +805,30 @@ const DetailPengajuan: React.FC = () => {
                         className="w-full rounded-md border-[1.5px] border-stroke bg-transparent py-2 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                       />
                     </div>
+                    {status?.bukti_attachment && (
+                      <div className="w-full mt-4.5">
+                        <label className="mb-3 block text-black dark:text-white">
+                          Bukti Pengembalian
+                        </label>
+                        <div className=" flex flex-col gap-4">
+                          <div className="w-full rounded-md border border-stroke py-2 px-6 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white">
+                            {status?.bukti_file_info?.name}
+                          </div>
+                          <Button
+                            onClick={(e: any) => {
+                              e.preventDefault();
+                              setPreviewType('BUKTI');
+                              status?.bukti_file_info?.type !==
+                              'application/pdf'
+                                ? setShowFile(!showFile)
+                                : openInNewTab(status?.bukti_attachment);
+                            }}
+                          >
+                            Lihat Lampiran
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </>
                 ) : null}
               </div>
@@ -882,8 +909,14 @@ const DetailPengajuan: React.FC = () => {
       {/* MODAL CONTAINER */}
       {/* <Modal visible={visible} toggle={toggle} /> */}
       <FileModal
-        type={status?.file_info?.type}
-        data={status?.attachment}
+        type={
+          previewType == 'BASIC'
+            ? data?.file_info?.type
+            : data?.bukti_file_info?.type
+        }
+        data={
+          previewType == 'BASIC' ? data?.attachment : data?.bukti_attachment
+        }
         visible={showFile}
         toggle={() => setShowFile(!showFile)}
       />

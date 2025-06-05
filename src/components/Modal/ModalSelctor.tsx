@@ -84,7 +84,7 @@ const ModalSelector = ({
         <DialogHeader>Sukses</DialogHeader>
         <DialogBody>
           Permintaan anda telah sukses dilakukan dengan nomor pengajuan
-          <div className="text-black font-bold">{code}</div>
+          <span className="text-black font-bold"> {code}</span>
         </DialogBody>
         <DialogFooter>
           <Button

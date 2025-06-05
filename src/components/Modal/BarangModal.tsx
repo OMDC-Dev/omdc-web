@@ -132,12 +132,7 @@ const BarangModal = ({
           </div>
         )}
         <Button
-          disabled={
-            !stock ||
-            !permintaan ||
-            Number(permintaan) < 1 ||
-            buttonDisabledByAkses
-          }
+          disabled={!stock || !permintaan || Number(permintaan) < 1}
           onClick={() => onSaveButtonPress()}
         >
           Simpan

@@ -10,11 +10,13 @@ const CabangModal = ({
   toggle,
   dismissOnBackdrop,
   value,
+  filter,
 }: {
   visible: boolean;
   toggle: any;
   dismissOnBackdrop?: boolean;
   value?: any;
+  filter?: any;
 }) => {
   if (!visible) return null;
 
@@ -38,8 +40,16 @@ const CabangModal = ({
       const doCabang = data.map((item: any) => {
         return { label: item.nm_induk, value: item?.kd_induk };
       });
-      setList(doCabang);
-      console.log(doCabang);
+
+      if (filter?.length) {
+        const flCabang = doCabang.filter((item: any) => {
+          return filter.every((fItem: any) => fItem.value != item.value);
+        });
+
+        setList(flCabang);
+      } else {
+        setList(doCabang);
+      }
     } else {
       setList([]);
     }

@@ -41,12 +41,22 @@ import ListMasterBarang from '../pages/MasterBarang/ListBarang';
 import ListMasterBarangInput from '../pages/MasterBarang/ListBarangInput';
 import BuatPengajuanUlang from '../pages/Dashboard/BuatPengajuanUlang';
 import ManualUploadFile from '../pages/SuperAdmin/ManualUploadFIle';
+import RemarkCA from '../pages/Dashboard/RemarkCA';
+import WorkplanSaya from '../pages/Workplan/WorkplanSaya';
+import BuatWorkplan from '../pages/Workplan/BuatWorkplan';
+import WorkplanDetail from '../pages/Workplan/WorkplanDetail';
+import WorkplanApproval from '../pages/Workplan/WorkplanApproval';
+import WorkplanApprovalDetail from '../pages/Workplan/WorkplanApprovalDetail';
+import WorkplanCC from '../pages/Workplan/WorkplanCC';
+import SuperBanner from '../pages/SuperAdmin/Banner';
+import TrxPermintaanBarang from '../pages/PermintaanBarang/TrxPermintaanBarang';
 
 const Routes = () => {
   const { token, user } = useAuth();
 
   // cek akses
   const hasRequestBarangAkses = token ? cekAkses('#2') : null;
+  const hasTrxBarangAkses = token ? cekAkses('#13') : null;
   const hasMasterBarangAkses = token ? cekAkses('#9') : null;
   const hasPengumumanAkses = token ? cekAkses('#3') : null;
   const isAdminPB = token ? cekAkses('#7') : null;
@@ -153,6 +163,62 @@ const Routes = () => {
             </>
           ),
         },
+
+        // -- Work in Progress PATH
+        {
+          path: '/workplan/me/:status',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Work in Progress'} />
+              <WorkplanSaya />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/cc/:status',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Work in Progress'} />
+              <WorkplanCC />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/pengajuan',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Work in Progress'} />
+              <BuatWorkplan />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/pengajuan/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Work in Progress'} />
+              <WorkplanDetail />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/approval/:status/:group',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Work in Progress'} />
+              <WorkplanApproval />
+            </>
+          ),
+        },
+        {
+          path: '/workplan/pengajuan/admin/:id',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Work in Progress'} />
+              <WorkplanApprovalDetail />
+            </>
+          ),
+        },
       ],
     },
     {
@@ -182,6 +248,15 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Pengajuan'} />
               <RiwayatDiajukan />
+            </>
+          ),
+        },
+        {
+          path: '/reimbursement/remark-ca',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Pengajuan'} />
+              <RemarkCA />
             </>
           ),
         },
@@ -331,6 +406,29 @@ const Routes = () => {
             <>
               <PageTitle title={TITLE + 'Report Permintaan Barang'} />
               <ReportPermintaanBarang />
+            </>
+          ),
+        },
+      ],
+    },
+    {
+      path: '*',
+      element: <Navigate to="/" replace />,
+    },
+  ];
+
+  // routes for authenticated user
+  const routesForTrxPermintaanBarang: routesTypes[] = [
+    {
+      path: '/',
+      element: <ProtectedRoute />,
+      children: [
+        {
+          path: '/barang-request/:type',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Permintaan Barang'} />
+              <TrxPermintaanBarang />
             </>
           ),
         },
@@ -511,6 +609,15 @@ const Routes = () => {
             </>
           ),
         },
+        {
+          path: '/banner',
+          element: (
+            <>
+              <PageTitle title={TITLE + 'Banner'} />
+              <SuperBanner />
+            </>
+          ),
+        },
       ],
     },
     {
@@ -525,6 +632,9 @@ const Routes = () => {
     ...(token && user?.isAdmin == true ? routesForAuthenticatedAdmin : []),
     ...routesForPublic,
     ...(hasRequestBarangAkses ? routesForPermintaanBarang : []),
+    ...(hasTrxBarangAkses || hasRequestBarangAkses
+      ? routesForTrxPermintaanBarang
+      : []),
     ...(hasMasterBarangAkses ? routesForMasterBarang : []),
     ...(hasPengumumanAkses ? routesForPengumuman : []),
     ...(isAdminPB ? routesForAdminPB : []),

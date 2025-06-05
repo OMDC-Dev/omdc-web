@@ -12,7 +12,11 @@ import {
   ListItemSuffix,
 } from '@material-tailwind/react';
 import formatRupiah from '../../common/formatRupiah';
-import { compressImage, hitungTotalNominal } from '../../common/utils';
+import {
+  compressImage,
+  formatCurrencyToNumber,
+  hitungTotalNominal,
+} from '../../common/utils';
 import BankModal from '../../components/Modal/BankModal';
 import useFetch from '../../hooks/useFetch';
 import { GET_BANK_NAME, REIMBURSEMENT } from '../../api/routes';
@@ -87,6 +91,11 @@ const BuatReport: React.FC = () => {
   const [showAdmin, setShowAdmin] = React.useState<boolean>(false);
   const [showItem, setShowItem] = React.useState<boolean>(false);
 
+  // CAR Bukti
+  const [buktiPengembalian, setBuktiPengembalian] = React.useState<any>();
+  const [buktiFileInfo, setBuktiFileInfo] = React.useState<any>();
+  const [needBukti, setNeedBukti] = React.useState(false);
+
   // Const
   const isNeedName = jenis == 'PR' || jenis == 'CAR' || jenis == 'PC';
 
@@ -109,6 +118,12 @@ const BuatReport: React.FC = () => {
     return !payment;
   };
 
+  const disableByNeedBank = () => {
+    if (jenis == 'CAR' && needBukti) {
+      return !buktiFileInfo;
+    }
+  };
+
   const buttonDisabled =
     !jenis ||
     !coa ||
@@ -122,7 +137,8 @@ const BuatReport: React.FC = () => {
     !item?.length ||
     !tipePembayaran ||
     disabledByBank() ||
-    disabledByType();
+    disabledByType() ||
+    disableByNeedBank();
 
   console.log('BUTTON DISABLED ' + buttonDisabled);
   console.log('DISABLED BY BANNK', disabledByBank());
@@ -132,7 +148,7 @@ const BuatReport: React.FC = () => {
   function handleAttachment(event: any) {
     const file = event.target.files[0];
     const reader = new FileReader();
-    const maxSize = 5242880;
+    const maxSize = 10485760;
 
     // handle file type
     const fileInfo = {
@@ -149,7 +165,7 @@ const BuatReport: React.FC = () => {
       } else {
         // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
         alert(
-          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 1 MB.',
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 10 MB.',
         );
         event.target.value = null; // Mengosongkan input file
         return;
@@ -169,6 +185,49 @@ const BuatReport: React.FC = () => {
     };
 
     setFileInfo(fileInfo);
+  }
+
+  // handle attachment
+  function handleAttachmentBuktiPengembalian(event: any) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const maxSize = 10485760;
+
+    // handle file type
+    const fileInfo = {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    };
+
+    if (file.size > maxSize) {
+      console.log('NEED COMPRESS');
+      if (file.type.includes('image')) {
+        compressImage(file, maxSize, handleAttachment);
+        return; // Menghentikan eksekusi lebih lanjut
+      } else {
+        // Memeriksa apakah ukuran file melebihi batas maksimum (1 MB)
+        alert(
+          'Ukuran file terlalu besar! Harap pilih file yang lebih kecil dari 10 MB.',
+        );
+        event.target.value = null; // Mengosongkan input file
+        return;
+      }
+    } else {
+      console.log('AMAN');
+    }
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const base64string: any = reader.result;
+
+      const splitted = base64string?.split(';base64,');
+
+      setBuktiPengembalian(splitted[1]);
+    };
+
+    setBuktiFileInfo(fileInfo);
   }
 
   // handle nominal
@@ -193,9 +252,17 @@ const BuatReport: React.FC = () => {
       console.log('Need Bank');
     }
 
+    if (_sal > 0) {
+      setNeedBukti(true);
+    } else {
+      setNeedBukti(false);
+    }
+
     setPayment('');
     setSelectedBank({});
   }, [nominal]);
+
+  console.log('NEED BUKTI', needBukti);
 
   // handle bank rek
   React.useEffect(() => {
@@ -259,6 +326,9 @@ const BuatReport: React.FC = () => {
       parentId: stateData?.id || '',
       payment_type: paymentType || stateData.payment_type,
       tipePembayaran: tipePembayaran,
+      need_bukti: needBukti,
+      bukti_attachment: buktiPengembalian,
+      bukti_file_info: buktiFileInfo,
     };
 
     const { state, data, error } = await useFetch({
@@ -399,12 +469,12 @@ const BuatReport: React.FC = () => {
                 <div className="mb-4.5">
                   <div>
                     <label className="mb-3 block text-black dark:text-white">
-                      Lampirkan File ( Maks. 5MB )
+                      Lampirkan File ( hanya PDF, maks. 10MB)
                     </label>
                     <input
                       type="file"
                       className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                      accept=".pdf,image/*"
+                      accept={/*".pdf,image/*"*/ '.pdf'}
                       onChange={handleAttachment}
                     />
                   </div>
@@ -549,7 +619,7 @@ const BuatReport: React.FC = () => {
                 {item?.length ? (
                   <div className="mb-4">
                     <Card>
-                      <List>
+                      <List className="max-h-92 overflow-y-auto py-4.5">
                         {item.map((item: any, index: number) => {
                           return (
                             <ListItem
@@ -614,6 +684,21 @@ const BuatReport: React.FC = () => {
                     value={stateData?.nominal}
                   />
                 </div>
+                {needBukti && item.length > 0 && (
+                  <div className=" mb-16">
+                    <div>
+                      <label className="mb-3 block text-black dark:text-white">
+                        Lampirkan Bukti Pengembalian ( Maks. 10MB)
+                      </label>
+                      <input
+                        type="file"
+                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
+                        accept={'.pdf,image/*'}
+                        onChange={handleAttachmentBuktiPengembalian}
+                      />
+                    </div>
+                  </div>
+                )}
                 <Button
                   onClick={(e: any) => {
                     e.preventDefault();

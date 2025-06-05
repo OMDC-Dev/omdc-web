@@ -39,10 +39,15 @@ import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
-import { cekAkses, getFormattedDateTable } from '../../common/utils';
+import {
+  cekAkses,
+  getFormattedDateTable,
+  removeFromState,
+} from '../../common/utils';
 import KategoriFilterGroup from '../../components/SelectGroup/KategoriFilterGroup';
 import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
 import useAdminFilter from '../../hooks/useAdminFilter';
+import CabangModal from '../../components/Modal/CabangModal';
 
 const TABLE_HEAD = [
   '',
@@ -100,6 +105,9 @@ function RiwayatDiajukan() {
   const [selectedIds, setSelectedIds] = React.useState<any>([]);
 
   const [kategoriFilter, setKategoriFilter] = React.useState<string>('');
+
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [selectedCabang, setSelectedCabang] = React.useState<any>([]);
 
   const {
     toggle,
@@ -457,7 +465,7 @@ function RiwayatDiajukan() {
                 </button>
               )}
             </form>
-            <CabangFilterGroup
+            {/* <CabangFilterGroup
               className=" w-full mt-4"
               value={cabangFilter}
               setValue={(val: string) => {
@@ -474,7 +482,7 @@ function RiwayatDiajukan() {
                 //   val,
                 // );
               }}
-            />
+            /> */}
           </div>
 
           {statusType !== 'waiting' && (
@@ -550,6 +558,66 @@ function RiwayatDiajukan() {
               </div>
             </div>
           )}
+
+          <div className="w-full mt-2 lg:max-w-[50%]">
+            <div className="flex flex-row gap-x-4">
+              <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
+                {selectedCabang.length > 0 ? (
+                  <div className="flex-1 flex flex-wrap gap-2 max-h-25 overflow-y-auto">
+                    {selectedCabang.map((item: any, index: number) => {
+                      return (
+                        <Chip
+                          variant={'ghost'}
+                          color={'blue'}
+                          value={item.label}
+                          animate={{
+                            mount: { y: 0 },
+                            unmount: { y: 50 },
+                          }}
+                          onClose={() =>
+                            removeFromState(
+                              selectedCabang,
+                              item,
+                              setSelectedCabang,
+                              'value',
+                            )
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="px-4 text-base">Cabang</p>
+                )}
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Button
+                    color={'blue'}
+                    variant={'outlined'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => setShowCabang(!showCabang)}
+                  >
+                    + Tambahkan
+                  </Button>
+                  <Button
+                    color={'blue'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => {
+                      setPage(1);
+                      setFilters({
+                        cabangFilter: selectedCabang.map(
+                          (item: any) => item.value,
+                        ),
+                      });
+                    }}
+                  >
+                    Terapkan
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {selectedIds?.length > 0 && (
             <div className=" w-full mt-8">
@@ -816,6 +884,12 @@ function RiwayatDiajukan() {
           // setStartDate(cb.startDate);
           // setEndDate(cb.endDate);
         }}
+      />
+      <CabangModal
+        visible={showCabang}
+        toggle={() => setShowCabang(!showCabang)}
+        value={(val: any) => setSelectedCabang([...selectedCabang, val])}
+        filter={selectedCabang}
       />
     </DefaultLayout>
   );

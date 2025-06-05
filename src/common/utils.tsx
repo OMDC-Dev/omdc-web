@@ -91,6 +91,9 @@ export const cekAkses = (akses: string) => {
    * NO NEED APPROVAL -> 1177 -> #8
    * MASTER BARANG -> 1128 -> #9
    * ACCEPT MULTIPLE -> 1190 -> #10
+   * WORKPLAN -> 1199 -> #11
+   * WORKPLAN ADMIN -> 1200 -> #12
+   * TRX BARANG -> 1159 -> #13
    */
   const { user } = useAuth();
 
@@ -134,6 +137,18 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#10') {
     return kd.findIndex((item: string) => item == '1190') !== -1;
+  }
+
+  if (akses == '#11') {
+    return kd.findIndex((item: string) => item == '1199') !== -1;
+  }
+
+  if (akses == '#12') {
+    return kd.findIndex((item: string) => item == '1200') !== -1;
+  }
+
+  if (akses == '#13') {
+    return kd.findIndex((item: string) => item == '1159') !== -1;
   }
 };
 
@@ -220,21 +235,40 @@ export function formatAmount(amountString: string) {
 
 export function formatCurrencyToNumber(currencyString: string) {
   if (!currencyString) return 0;
-  // Hapus karakter non-digit dari string dan konversi menjadi angka
-  const number = parseInt(currencyString.replace(/\D/g, ''), 10);
-  return number;
+
+  // Hapus 'Rp.' di awal string (jika ada) dan semua titik sebagai pemisah ribuan
+  let cleanedString = currencyString
+    .replace(/^Rp\.?\s?/, '')
+    .replace(/\./g, '');
+
+  // Ganti koma menjadi titik sebagai pemisah desimal
+  cleanedString = cleanedString.replace(',', '.');
+
+  return parseFloat(cleanedString) || 0;
 }
 
-function convertToPreviewLink(downloadLink: string) {
+function convertToPreviewLink(downloadLink: string): string {
   const downloadPrefix = 'https://drive.google.com/uc?export=download&id=';
   const previewPrefix = 'https://drive.google.com/file/d/';
   const previewSuffix = '/preview';
 
-  if (downloadLink.startsWith(downloadPrefix)) {
-    const fileId = downloadLink.slice(downloadPrefix.length);
-    return `${previewPrefix}${fileId}${previewSuffix}`;
-  } else {
-    return 'Invalid download link format';
+  try {
+    const url = new URL(downloadLink);
+    const hostname = url.hostname;
+
+    // Jika dari Google Drive
+    if (
+      hostname === 'drive.google.com' &&
+      downloadLink.startsWith(downloadPrefix)
+    ) {
+      const fileId = downloadLink.slice(downloadPrefix.length);
+      return `${previewPrefix}${fileId}${previewSuffix}`;
+    }
+
+    // Jika bukan dari Google Drive, seperti omdc.online, balikan apa adanya
+    return downloadLink;
+  } catch (err) {
+    return 'Invalid URL';
   }
 }
 
@@ -243,10 +277,32 @@ export const openInNewTab = (url: string) => {
   window.open(previewUrl, '_blank', 'noreferrer');
 };
 
-export const getFormattedDateTable = (date: any) => {
+export const getFormattedDateTable = (date: any, format?: any) => {
   if (!date) {
     return '-';
   }
 
-  return moment(date).format('LL');
+  return moment(date).format(format ?? 'LL');
+};
+
+export const removeFromState = (
+  stateData = [],
+  value: any,
+  setState: any,
+  stateKey = '',
+) => {
+  const filterState = stateData.filter(
+    (item) => item[stateKey] !== value[stateKey],
+  );
+
+  setState(filterState);
+};
+
+export const standardizeDate = (dateString?: string | Date) => {
+  const formats = ['YYYY-MM-DD', 'DD-MM-YYYY'];
+  return moment(dateString, formats, true).format('DD-MM-YYYY');
+};
+
+export const delay = async () => {
+  return await new Promise((resolve) => setTimeout(resolve, 0)); // Tunggu re-render
 };

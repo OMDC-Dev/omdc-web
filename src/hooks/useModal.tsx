@@ -18,7 +18,17 @@ const useModal = () => {
     setVisible(true);
   }
 
-  function changeType(type: string) {
+  function changeType(
+    type:
+      | 'LOADING'
+      | 'CONFIRM'
+      | 'OK'
+      | 'SUCCESS'
+      | 'SUCCESSCODE'
+      | 'ERROR'
+      | 'FAILED'
+      | 'NONE',
+  ) {
     setType(type);
   }
 

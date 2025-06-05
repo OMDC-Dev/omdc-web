@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Dalam Proses",
+    "value": 1
+  },
+  {
+    "label": "Ditunda",
+    "value": 2
+  },
+  {
+    "label": "Selesai",
+    "value": 3
+  },
+  {
+    "label": "Revisi",
+    "value": 4
+  },
+  {
+    "label": "Ditolak",
+    "value": 5
+  }
+]

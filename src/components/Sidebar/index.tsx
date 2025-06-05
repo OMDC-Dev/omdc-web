@@ -1,21 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import SidebarLinkGroup from './SidebarLinkGroup';
-import Logo from '../../images/logo/logo-tp.png';
-import IconBarang from '../../images/sidebar/IconBarang';
-import IconSidebar from '../../images/sidebar/IconSidebar';
-import IconArrow from '../../images/sidebar/IconArrow';
-import { useAuth } from '../../hooks/useAuth';
-import { cekAkses } from '../../common/utils';
 import {
   BanknotesIcon,
-  RectangleGroupIcon,
   BellAlertIcon,
+  RectangleGroupIcon,
 } from '@heroicons/react/24/outline';
-import useFetch from '../../hooks/useFetch';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { GET_ICON } from '../../api/routes';
+import { cekAkses } from '../../common/utils';
 import { API_STATES } from '../../constants/ApiEnum';
+import { useAuth } from '../../hooks/useAuth';
+import useFetch from '../../hooks/useFetch';
+import IconArrow from '../../images/sidebar/IconArrow';
+import IconBarang from '../../images/sidebar/IconBarang';
+import IconSidebar from '../../images/sidebar/IconSidebar';
 import useLogo from '../../store/useLogo';
+import SidebarLinkGroup from './SidebarLinkGroup';
+import { APP_VERSION } from '../../constants/AppEnv';
 
 // Icon
 
@@ -51,6 +51,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const hasPengumumanAkses = cekAkses('#3');
   const hasExportExcell = cekAkses('#4');
   const isAdminPB = cekAkses('#7');
+  const isAdminWorkplan = cekAkses('#12');
+  const hasTrxBarangAkses = cekAkses('#13');
 
   // close on click outside
   useEffect(() => {
@@ -121,7 +123,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             alt="Logo"
           />
           <span className=" text-title-sm font-bold text-white">
-            OMDC v0.9.5 rev 8.2
+            {APP_VERSION}
           </span>
         </NavLink>
 
@@ -241,6 +243,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     Ganti Icon
                   </NavLink>
                 </li>
+                <li>
+                  <NavLink
+                    to="/banner"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname.includes('/banner') &&
+                      'bg-graydark dark:bg-meta-4'
+                    }`}
+                  >
+                    <IconBarang />
+                    Banner
+                  </NavLink>
+                </li>
               </ul>
             </div>
           </nav>
@@ -252,7 +266,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             {/* <!-- Menu Group --> */}
             <div>
               <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
-                Menu
+                R.O.P & Permintaan Barang
               </h3>
 
               <ul className="mb-6 flex flex-col gap-1.5">
@@ -325,7 +339,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Pengajuan Perlu Diproses
+                                    Approve R.O.P
                                   </NavLink>
                                 </li>
                                 <li>
@@ -336,9 +350,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Pengajuan Selesai Diproses
+                                    Riwayat Approve R.O.P
                                   </NavLink>
                                 </li>
+                                {IS_REVIEWER && (
+                                  <li>
+                                    <NavLink
+                                      to="/reimbursement/remark-ca"
+                                      className={({ isActive }) =>
+                                        'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                        (isActive && '!text-white')
+                                      }
+                                    >
+                                      Remark Cash Advance Report
+                                    </NavLink>
+                                  </li>
+                                )}
                               </>
                             ) : null}
                           </ul>
@@ -390,10 +417,87 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       }`}
                     >
                       <RectangleGroupIcon className=" h-5 w-5" />
-                      Pengajuan Permintaan Barang
+                      Approve Permintaan Barang
                     </NavLink>
                   </li>
                 ) : null}
+                {(hasTrxBarangAkses || hasRequestBarangAkses) && (
+                  <SidebarLinkGroup
+                    activeCondition={
+                      pathname === '/barang-request' ||
+                      pathname.includes('barang-request')
+                    }
+                  >
+                    {(handleClick, open) => {
+                      return (
+                        <React.Fragment>
+                          <NavLink
+                            to="#"
+                            className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              (pathname === '/barang-request' ||
+                                pathname.includes('barang-request')) &&
+                              'bg-graydark dark:bg-meta-4'
+                            }`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
+                          >
+                            <RectangleGroupIcon className=" h-5 w-5" />
+                            List Permintaan Barang
+                            <IconArrow open={open} />
+                          </NavLink>
+                          {/* <!-- Dropdown Menu Start --> */}
+                          <div
+                            className={`translate transform overflow-hidden ${
+                              !open && 'hidden'
+                            }`}
+                          >
+                            <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <NavLink
+                                  to="/barang-request/waiting"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Dalam Proses
+                                </NavLink>
+                              </li>
+                              <li>
+                                <NavLink
+                                  to="/barang-request/pending"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Pending
+                                </NavLink>
+                              </li>
+                              <li>
+                                <NavLink
+                                  to="/barang-request/done"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Selesai
+                                </NavLink>
+                              </li>
+                            </ul>
+                          </div>
+                          {/* <!-- Dropdown Menu End --> */}
+                        </React.Fragment>
+                      );
+                    }}
+                  </SidebarLinkGroup>
+                )}
+                {/* <!-- Menu Item Dashboard --> */}
                 {IS_REVIEWER && (
                   <li>
                     <NavLink
@@ -423,6 +527,237 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     </NavLink>
                   </li>
                 ) : null}
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
+                Work in Progress
+              </h3>
+
+              <ul className="mb-6 flex flex-col gap-1.5">
+                {/* <!-- Menu Item Dashboard --> */}
+                <SidebarLinkGroup
+                  activeCondition={
+                    pathname === '/workplan/me' || pathname.includes('workplan')
+                  }
+                >
+                  {(handleClick, open) => {
+                    return (
+                      <React.Fragment>
+                        <NavLink
+                          to="#"
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                            (pathname === '/workplan/me' ||
+                              pathname.includes('workplan')) &&
+                            'bg-graydark dark:bg-meta-4'
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            sidebarExpanded
+                              ? handleClick()
+                              : setSidebarExpanded(true);
+                          }}
+                        >
+                          <BanknotesIcon className=" h-5 w-5" />
+                          Work in Progress
+                          <IconArrow open={open} />
+                        </NavLink>
+                        <div
+                          className={`translate transform overflow-hidden ${
+                            !open && 'hidden'
+                          }`}
+                        >
+                          <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                            {!isAdminWorkplan ? (
+                              <>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/waiting"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Dalam Proses
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/pending"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Pending
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/done"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Selesai
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/me/due"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Due Date
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/waiting"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    CC Dalam Proses
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/pending"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    CC Pending
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/done"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    CC Selesai
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/cc/due"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    CC Due Date
+                                  </NavLink>
+                                </li>
+                              </>
+                            ) : (
+                              <>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/waiting/medic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Dalam Proses ( Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/pending/medic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Pending ( Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/done/medic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Selesai ( Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/due/medic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Due Date ( Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/waiting/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Dalam Proses ( Non Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/pending/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Pending ( Non Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/done/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Selesai ( Non Medis )
+                                  </NavLink>
+                                </li>
+                                <li>
+                                  <NavLink
+                                    to="/workplan/approval/due/nonmedic"
+                                    className={({ isActive }) =>
+                                      'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                      (isActive && '!text-white')
+                                    }
+                                  >
+                                    Due Date ( Non Medis )
+                                  </NavLink>
+                                </li>
+                              </>
+                            )}
+                          </ul>
+                        </div>
+                      </React.Fragment>
+                    );
+                  }}
+                </SidebarLinkGroup>
               </ul>
             </div>
           </nav>

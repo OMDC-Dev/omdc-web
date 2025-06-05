@@ -15,6 +15,7 @@ export const USER_COMPLETE = 'user/complete';
 export const UPDATE_PASSWORD = 'user/update-password';
 export const GET_NOTIFICATION = 'pengumuman';
 export const GET_NOTIFICATION_COUNT = 'pengumuman/count';
+export const USER_SESSION = (id: number) => `user/session/${id}`;
 export const READ_NOTIFICATION = (id: number) => {
   return `pengumuman/read/${id}`;
 };
@@ -25,6 +26,9 @@ export const DELETE_PENGUMUMAN = (pid: number) => {
 // REIMBURSEMENT
 export const GET_CABANG = 'cabang';
 export const REIMBURSEMENT = 'reimbursement';
+export const REIMBURSEMENT_REMARK = 'reviewer/remarked';
+export const REIMBURSEMENT_REMARK_CHECK = (id: number, check: boolean) =>
+  `reviewer/remarked/check/${id}?check=${check}`;
 export const REIMBURSEMENT_DETAIL = (id: number) => {
   return `reimbursement/${id}`;
 };
@@ -58,8 +62,9 @@ export const SUPERUSER_REPORT_EXPORT = (
   tipe?: string,
   finance?: string,
   tipePeriode?: string,
+  rop?: string,
 ) => {
-  return `superuser/reimbursement/report?startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}`;
+  return `superuser/reimbursement/report?limit=10000&startDate=${startDate}&endDate=${endDate}&cabang=${cabang}&bank=${bank}&tipe=${tipe}&finance=${finance}&tipePeriode=${tipePeriode}&rop=${rop}`;
 };
 
 // FINANCE
@@ -85,6 +90,7 @@ export const GET_BARANG = (query = '') => {
 };
 export const CREATE_REQUEST_BARANG = 'barang/create';
 export const LIST_REQUEST_BARANG = 'barang/requested';
+export const LIST_TRX_BARANG = 'barang/barang-requested';
 export const DETAIL_REQUEST_BARANG = (id: number) => {
   return `barang/requested/detail?id_pb=${id}`;
 };
@@ -148,3 +154,14 @@ export const REJECT_REQUEST_BARANG = (id: string) =>
 
 // Invoice
 export const CEK_INVOICE = (inv: string) => `invoice?inv=${inv}`;
+
+// Work in Progress API
+export const WORKPLAN = 'workplan';
+export const WORKPLAN_UPDATE = (id?: string) => `workplan/update/${id}`;
+export const WORKPLAN_UPDATE_STATUS = (id?: string) => `workplan/status/${id}`;
+export const WORKPLAN_CC_USER = 'workplan/cc';
+export const WORKPLAN_PROGRESS = (id?: string) => `workplan/progress/${id}`;
+export const WORKPLAN_COMMENT = (id?: string) => `workplan/comment/${id}`;
+
+// BANNER
+export const BANNER = 'banner';

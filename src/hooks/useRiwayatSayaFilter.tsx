@@ -4,7 +4,7 @@ interface RiwayatSayaFilterState {
   tipeFilter: string;
   caFilter: string;
   ropFilter: string;
-  cabangFilter: string;
+  cabangFilter: string[];
   startDate: Date | null;
   endDate: Date | null;
   setFilters: (filters: Partial<RiwayatSayaFilterState>) => void;
@@ -15,7 +15,7 @@ const useRiwayatSayaFilter = create<RiwayatSayaFilterState>((set) => ({
   tipeFilter: '',
   caFilter: '',
   ropFilter: '',
-  cabangFilter: '',
+  cabangFilter: [],
   startDate: null,
   endDate: null,
   setFilters: (filters) => set((state) => ({ ...state, ...filters })),
@@ -24,7 +24,7 @@ const useRiwayatSayaFilter = create<RiwayatSayaFilterState>((set) => ({
       tipeFilter: '',
       caFilter: '',
       ropFilter: '',
-      cabangFilter: '',
+      cabangFilter: [],
       startDate: null,
       endDate: null,
     }),

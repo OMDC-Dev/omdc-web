@@ -24,7 +24,7 @@ import { useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import moment from 'moment';
 import 'moment/locale/id'; // without this line it didn't work
 moment.locale('id');
-import { cekAkses } from '../../common/utils';
+import { cekAkses, removeFromState } from '../../common/utils';
 import { useAuth } from '../../hooks/useAuth';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
@@ -35,6 +35,7 @@ import DateRange from '../../components/DateRange';
 import PeriodeModal from '../../components/Modal/PeriodeModal';
 import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
 import useRiwayatSayafilter from '../../hooks/useRiwayatSayaFilter';
+import CabangModal from '../../components/Modal/CabangModal';
 
 const TABLE_HEAD = [
   'Pengajuan',
@@ -70,6 +71,9 @@ function Reimbursement() {
 
   // const [startDate, setStartDate] = React.useState<Date | null>(null);
   // const [endDate, setEndDate] = React.useState<Date | null>(null);
+
+  const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [selectedCabang, setSelectedCabang] = React.useState<any>([]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -140,6 +144,8 @@ function Reimbursement() {
       if (data.status !== 'Aktif') {
         onLogout();
       }
+
+      setUser({ ...user, isAdmin: data.isAdmin });
     }
   }
 
@@ -333,7 +339,7 @@ function Reimbursement() {
                 </button>
               )}
             </form>
-            <CabangFilterGroup
+            {/* <CabangFilterGroup
               className=" w-full mt-4"
               value={cabangFilter}
               setValue={(val: string) => {
@@ -351,6 +357,7 @@ function Reimbursement() {
                 // );
               }}
             />
+             */}
           </div>
 
           <div className="w-full lg:flex lg:items-center lg:space-x-2 space-y-2 lg:space-y-2">
@@ -421,6 +428,65 @@ function Reimbursement() {
                 //setEndDate(null);
               }}
             />
+          </div>
+          <div className="w-full mt-2 lg:max-w-[50%]">
+            <div className="flex flex-row gap-x-4">
+              <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
+                {selectedCabang.length > 0 ? (
+                  <div className="flex-1 flex flex-wrap gap-2 max-h-25 overflow-y-auto">
+                    {selectedCabang.map((item: any, index: number) => {
+                      return (
+                        <Chip
+                          variant={'ghost'}
+                          color={'blue'}
+                          value={item.label}
+                          animate={{
+                            mount: { y: 0 },
+                            unmount: { y: 50 },
+                          }}
+                          onClose={() =>
+                            removeFromState(
+                              selectedCabang,
+                              item,
+                              setSelectedCabang,
+                              'value',
+                            )
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="px-4 text-base">Cabang</p>
+                )}
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Button
+                    color={'blue'}
+                    variant={'outlined'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => setShowCabang(!showCabang)}
+                  >
+                    + Tambahkan
+                  </Button>
+                  <Button
+                    color={'blue'}
+                    size={'sm'}
+                    className={'normal-case max-h-8'}
+                    onClick={() => {
+                      setPage(1);
+                      setFilters({
+                        cabangFilter: selectedCabang.map(
+                          (item: any) => item.value,
+                        ),
+                      });
+                    }}
+                  >
+                    Terapkan
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </CardHeader>
         {!rList?.length ? (
@@ -555,19 +621,17 @@ function Reimbursement() {
                             {moment(item?.createdAt).format('lll') || '-'}
                           </Typography>
                         </td>
-                        <td className={classes}>
-                          {/* <Typography variant="small" className="font-normal">
-                            {item?.status}
-                          </Typography> */}
+                        <td className={`${classes}`}>
                           {keteranganStatus(item)}
                         </td>
-                        <td className={classes}>
-                          {/* <Typography variant="small" className="font-normal">
-                            {item?.status}
-                          </Typography> */}
+                        <td
+                          className={`${classes} sticky right-[4rem] bg-white z-10`}
+                        >
                           {statusChip(item?.status, item?.status_finance)}
                         </td>
-                        <td className={classes}>
+                        <td
+                          className={`${classes} sticky right-0 bg-white z-10`}
+                        >
                           <Tooltip content="Detail">
                             <IconButton
                               variant="text"
@@ -637,6 +701,12 @@ function Reimbursement() {
           // setStartDate(cb.startDate);
           // setEndDate(cb.endDate);
         }}
+      />
+      <CabangModal
+        visible={showCabang}
+        toggle={() => setShowCabang(!showCabang)}
+        value={(val: any) => setSelectedCabang([...selectedCabang, val])}
+        filter={selectedCabang}
       />
     </DefaultLayout>
   );

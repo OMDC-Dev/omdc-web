@@ -52,7 +52,6 @@ const CabangFilterGroup = ({
         return { label: item.nm_induk, value: item?.kd_induk };
       });
       setList(doCabang);
-      console.log(doCabang);
     } else {
       setList([]);
     }

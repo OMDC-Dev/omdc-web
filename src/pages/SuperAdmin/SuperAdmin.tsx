@@ -1,36 +1,25 @@
-import * as React from 'react';
-import { DocumentTextIcon, TrashIcon } from '@heroicons/react/24/solid';
+import { TrashIcon } from '@heroicons/react/24/solid';
 import {
   Card,
-  CardHeader,
-  Typography,
   CardBody,
-  Button as MButton,
   CardFooter,
+  CardHeader,
   IconButton,
+  Button as MButton,
   Tooltip,
-  Chip,
+  Typography,
 } from '@material-tailwind/react';
-import DefaultLayout from '../../layout/DefaultLayout';
-import useFetch from '../../hooks/useFetch';
-import {
-  DELETE_PENGUMUMAN,
-  DELETE_SUPERUSER,
-  GET_NOTIFICATION,
-  SUPERUSER,
-} from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
-import { useNavigate } from 'react-router-dom';
-import moment from 'moment';
+import * as React from 'react';
+import { DELETE_SUPERUSER, SUPERUSER } from '../../api/routes';
 import Button from '../../components/Button';
-import useModal from '../../hooks/useModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
-import useNotif from '../../store/useNotif';
-import { useAuth } from '../../hooks/useAuth';
-import TypeGroup from '../../components/SelectGroup/TypeGroup';
-import DeptGroup from '../../components/SelectGroup/DeptGroup';
-import { generateRandomNumber } from '../../common/utils';
 import UserModal from '../../components/Modal/UserModal';
+import DeptGroup from '../../components/SelectGroup/DeptGroup';
+import TypeGroup from '../../components/SelectGroup/TypeGroup';
+import { API_STATES } from '../../constants/ApiEnum';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const TABLE_HEAD = [
   'ID User',
@@ -189,7 +178,7 @@ function SuperAdmin() {
         </CardHeader>
         {!list?.length ? (
           <CardBody>
-            <div className=" h-96 flex justify-center items-center text-white font-semibold text-sm">
+            <div className=" h-96 flex justify-center items-center text-black font-semibold text-sm">
               Belum ada pengajuan
             </div>
           </CardBody>

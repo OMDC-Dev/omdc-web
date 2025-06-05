@@ -44,7 +44,7 @@ const AdminModal = ({
     }
 
     const { state, data, error } = await useFetch({
-      url: SUPERUSER + `?limit=100${param}`,
+      url: SUPERUSER + `?limit=1000${param}`,
       method: 'GET',
     });
 

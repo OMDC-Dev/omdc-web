@@ -13,21 +13,27 @@ import {
   formatAmount,
   formatCurrencyToNumber,
   hitungSelisihHari,
+  removeFromState,
+  standardizeDate,
 } from '../../common/utils';
 import useFetch from '../../hooks/useFetch';
 import { SUPERUSER_REPORT_EXPORT } from '../../api/routes';
 import { API_STATES } from '../../constants/ApiEnum';
-import { exportToExcell } from '../../common/exportToExcell';
+import { createReportData, exportToExcell } from '../../common/exportToExcell';
 import formatRupiah from '../../common/formatRupiah';
 import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
 import FinanceStatusFilterGroup from '../../components/SelectGroup/FinanceStatusFilterGroup';
 import PeriodeTipeFilterGroup from '../../components/SelectGroup/PeriodeTipeFilterGroup';
+import { Chip, Button as MButton } from '@material-tailwind/react';
+import JenisROPFilterGroup from '../../components/SelectGroup/JenisROPFilterGroup';
 
 function ReportReimbursement() {
   const [data, setData] = React.useState();
 
-  const [cabang, setCabang] = React.useState<string | any>();
+  // const [cabang, setCabang] = React.useState<string | any>();
+  // const [showCabang, setShowCabang] = React.useState<boolean>(false);
   const [showCabang, setShowCabang] = React.useState<boolean>(false);
+  const [selectedCabang, setSelectedCabang] = React.useState<any>([]);
 
   const [showBank, setShowBank] = React.useState<boolean>(false);
   const [selectedBank, setSelectedBank] = React.useState<any>();
@@ -38,6 +44,7 @@ function ReportReimbursement() {
 
   const [typeFilter, setTypeFilter] = React.useState<string>('');
   const [financeFilter, setFinanceFilter] = React.useState<string>('');
+  const [ropFilter, setROPFilter] = React.useState<string>('');
   const [typePeriodeFilter, setTypePeriodeFilter] = React.useState<string>('');
 
   // === Modal
@@ -68,15 +75,20 @@ function ReportReimbursement() {
 
     changeType('LOADING');
 
+    const mapCabang = selectedCabang?.length
+      ? selectedCabang.map((item: any) => item.value)
+      : [];
+
     const { state, data, error } = await useFetch({
       url: SUPERUSER_REPORT_EXPORT(
         startDate,
         endDate,
-        cabang ? cabang.value : '',
+        mapCabang,
         selectedBank ? selectedBank?.namaBank : '',
         typeFilter,
         financeFilter,
         typePeriodeFilter,
+        ropFilter,
       ),
       method: 'GET',
     });
@@ -184,9 +196,9 @@ function ReportReimbursement() {
     });
 
     const customHeaders = [
+      'Tanggal Request of Payment',
       'Nomor Dokumen',
       'Jenis Request of Payment',
-      'Tanggal Request of Payment',
       'Cabang',
       'ID User',
       'Nama User',
@@ -257,7 +269,7 @@ function ReportReimbursement() {
             acn: IS_CASH ? '' : colData.bank_detail?.accountname,
             an: IS_CASH ? '' : colData.bank_detail?.accountnumber,
             jr: colData.jenis_reimbursement,
-            tp: colData.tanggal_reimbursement,
+            tp: standardizeDate(colData.tanggal_reimbursement),
             cb: colData.kode_cabang,
             id: colData.requester_id,
             rn: colData.requester_name,
@@ -328,7 +340,47 @@ function ReportReimbursement() {
       ],
     };
 
-    exportToExcell(sortedData, customHeaders, title, detailItemSheetData);
+    // Sheet 3
+    const newReportROP = {
+      sheetName: 'Report ROP',
+      data: createReportData(data, typePeriodeFilter),
+      headers: [
+        'NO',
+        'NO DOKUMEN',
+        'BRANCH',
+        'USER',
+        'INVOICE DATE',
+        'TYPE PAYMENT',
+        'INVOICE NO.',
+        'DESCRIPTION',
+        'AMOUNT',
+        'REF DOKUMEN',
+        'NOMINAL CASH ADVANCE',
+        'SALDO',
+        'TOTAL PAYMENT',
+        'BENEFICIARY NAME',
+        'ACCOUNT NO.',
+        'BANK',
+        'PAID BY',
+        'PAID STATUS',
+        'PAYMENT DATE',
+        'MAKER DATE',
+        'PERIOD',
+        'CATATAN MAKER',
+        'CATATAN FINANCE',
+        'LINK GDRIVE',
+        'BUKTI PENGEMBALIAN',
+        'REMARK',
+      ],
+    };
+
+    exportToExcell(
+      sortedData,
+      customHeaders,
+      title,
+      detailItemSheetData,
+      newReportROP,
+    );
     toggle();
   }
 
@@ -342,7 +394,32 @@ function ReportReimbursement() {
         </div>
         <div className=" p-6.5 flex flex-col gap-y-6">
           <div className="w-full">
-            <div>
+            <label className="mb-3 block text-black dark:text-white">
+              Jenis ROP
+            </label>
+            <div className=" flex flex-row gap-x-4">
+              <JenisROPFilterGroup
+                className="mx-0 w-full"
+                typeOnly
+                setValue={(val: string) => setROPFilter(val)}
+                value={ropFilter}
+              />
+              <div className=" w-56">
+                <Button
+                  onClick={() => {
+                    setROPFilter('');
+                  }}
+                  mode="outlined"
+                  className=" h-full"
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full">
+            {/* <div>
               <label className="mb-3 block text-black dark:text-white">
                 Cabang
               </label>
@@ -361,6 +438,60 @@ function ReportReimbursement() {
                   >
                     Reset
                   </Button>
+                </div>
+              </div>
+            </div> */}
+            <div className="w-full">
+              <label className="mb-3 block text-black dark:text-white">
+                Cabang
+              </label>
+              <div className="flex flex-row gap-x-4">
+                <div className="w-full flex items-center flex-row justify-between rounded-md border border-stroke p-2 outline-none transition ">
+                  {selectedCabang.length > 0 ? (
+                    <div className="flex-1 flex flex-wrap gap-2 max-h-25 overflow-y-auto">
+                      {selectedCabang.map((item: any, index: number) => {
+                        return (
+                          <Chip
+                            variant={'ghost'}
+                            color={'blue'}
+                            value={item.label}
+                            animate={{
+                              mount: { y: 0 },
+                              unmount: { y: 50 },
+                            }}
+                            onClose={() =>
+                              removeFromState(
+                                selectedCabang,
+                                item,
+                                setSelectedCabang,
+                                'value',
+                              )
+                            }
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="px-4 text-base">Cabang</p>
+                  )}
+                  <div className="flex flex-row items-center justify-center gap-2">
+                    <MButton
+                      color={'blue'}
+                      size={'sm'}
+                      className={'normal-case max-h-8'}
+                      onClick={() => setShowCabang(!showCabang)}
+                    >
+                      + Tambahkan
+                    </MButton>
+                    {/* <MButton
+                      color={'blue'}
+                      size={'sm'}
+                      className={'normal-case max-h-8'}
+                      onClick={() => {}}
+                    >
+                      Terapkan
+                    </MButton> */}
+                  </div>
                 </div>
               </div>
             </div>
@@ -506,7 +637,8 @@ function ReportReimbursement() {
       <CabangModal
         visible={showCabang}
         toggle={() => setShowCabang(!showCabang)}
-        value={(val: any) => setCabang(val)}
+        value={(val: any) => setSelectedCabang([...selectedCabang, val])}
+        filter={selectedCabang}
       />
       <BankModal
         visible={showBank}
