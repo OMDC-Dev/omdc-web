@@ -1,4 +1,4 @@
-name: 🚀 Deploy to CPanel
+name: 🚀 Deploy to CPanel via SFTP
 
 on:
   push:
@@ -18,13 +18,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.CPANEL_SSH_KEY }}" | base64 --decode > ~/.ssh/omdc_deploy_key
-          chmod 600 ~/.ssh/omdc_deploy_key
-          ssh-keyscan -H omdc.online >> ~/.ssh/known_hosts
-
-      - name: Deploy to CPanel
-        run: |
-          rsync -avz -e "ssh -i ~/.ssh/omdc_deploy_key" --exclude='.htaccess' dist/ omdcadmin@omdc.online:~/public_html/
+      - name: Deploy via SFTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: omdc.online
+          username: omdcadmin
+          port: 22
+          protocol: sftp
+          privateKey: ${{ secrets.CPANEL_SSH_KEY }}
+          local-dir: ./dist
+          server-dir: /public_html
