@@ -1,4 +1,4 @@
-name: 🚀 Deploy to CPanel via SCP
+name: 🚀 Deploy to CPanel
 
 on:
   push:
@@ -18,12 +18,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: omdc.online
-          username: omdcadmin
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          port: 22
-          source: 'dist/*'
-          target: '/home/omdcadmin/public_html/'
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CPANEL_SSH_KEY }}" > ~/.ssh/omdc_deploy_key
+          chmod 600 ~/.ssh/omdc_deploy_key
+          ssh-keyscan -H omdc.online >> ~/.ssh/known_hosts
+
+      - name: Deploy to CPanel
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/omdc_deploy_key" --exclude='.htaccess' dist/ omdcadmin@omdc.online:~/public_html/
