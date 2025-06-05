@@ -20,6 +20,7 @@ jobs:
 
       - name: Setup SSH
         run: |
+          mkdir -p ~/.ssh
           echo "${{ secrets.CPANEL_SSH_KEY }}" | base64 --decode > ~/.ssh/omdc_deploy_key
           chmod 600 ~/.ssh/omdc_deploy_key
           ssh-keyscan -H omdc.online >> ~/.ssh/known_hosts
