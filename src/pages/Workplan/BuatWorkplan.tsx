@@ -59,6 +59,7 @@ const BuatWorkplan: React.FC = () => {
     !kategori ||
     !desc ||
     !group ||
+    !attachmentBefore ||
     disabledByLocation();
 
   // Hit Api
