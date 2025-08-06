@@ -1,44 +1,41 @@
-import * as React from 'react';
-import DefaultLayout from '../../layout/DefaultLayout';
+import {
+  AdjustmentsHorizontalIcon,
+  DocumentTextIcon,
+  PencilIcon,
+} from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardBody,
   CardFooter,
   CardHeader,
+  Chip,
   IconButton,
+  Button as MButton,
   Tooltip,
   Typography,
-  Button as MButton,
-  Chip,
-  Input,
-  Button,
 } from '@material-tailwind/react';
-import ModalSelector from '../../components/Modal/ModalSelctor';
-import {
-  AdjustmentsHorizontalIcon,
-  DocumentTextIcon,
-  PencilIcon,
-  TrashIcon,
-} from '@heroicons/react/24/outline';
-import useModal from '../../hooks/useModal';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import useFetch from '../../hooks/useFetch';
-import { WORKPLAN } from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
-import { cekAkses, delay, getFormattedDateTable } from '../../common/utils';
-import {
-  WORKPLAN_STATUS,
-  getWorkplanStatusText,
-} from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
-import { XMarkIcon } from '@heroicons/react/24/solid';
-import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
+import * as React from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { WORKPLAN } from '../../api/routes';
 import {
   createWorkplanReportData,
   exportToExcell,
 } from '../../common/exportToExcell';
-import { useAuth } from '../../hooks/useAuth';
+import { cekAkses, getFormattedDateTable } from '../../common/utils';
+import ModalSelector from '../../components/Modal/ModalSelctor';
+import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
 import WorkplanReortRangeModal from '../../components/Modal/WorkplanReportRangeModal';
+import { API_STATES } from '../../constants/ApiEnum';
+import {
+  WORKPLAN_STATUS,
+  getWorkplanStatusText,
+} from '../../constants/WorkplanStatus';
+import { useAuth } from '../../hooks/useAuth';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const TABLE_HEAD = [
   'ID',
@@ -104,7 +101,12 @@ const WorkplanSaya: React.FC = () => {
 
     function _getStatusByParams() {
       if (status == 'waiting') {
-        return [WORKPLAN_STATUS.ON_PROGRESS, WORKPLAN_STATUS.REVISON];
+        return [
+          WORKPLAN_STATUS.ON_PROGRESS,
+          WORKPLAN_STATUS.REVISON,
+          WORKPLAN_STATUS.NEED_APPROVAL,
+          WORKPLAN_STATUS.APPROVED,
+        ];
       } else if (status == 'pending') {
         return WORKPLAN_STATUS.PENDING;
       } else {

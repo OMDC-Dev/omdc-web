@@ -4,6 +4,8 @@ export enum WORKPLAN_STATUS {
   FINISH = 3,
   REVISON = 4,
   REJECTED = 5,
+  NEED_APPROVAL = 6,
+  APPROVED = 7,
 }
 
 export function getWorkplanStatusText(status: any) {
@@ -30,6 +32,14 @@ export function getWorkplanStatusText(status: any) {
     case WORKPLAN_STATUS.REJECTED:
       STATUS_TEXT = 'Ditolak';
       STATUS_COLOR = 'red';
+      break;
+    case WORKPLAN_STATUS.NEED_APPROVAL:
+      STATUS_TEXT = 'Menunggu Persetujuan';
+      STATUS_COLOR = 'deep-orange';
+      break;
+    case WORKPLAN_STATUS.APPROVED:
+      STATUS_TEXT = 'Disetujui';
+      STATUS_COLOR = 'green';
       break;
     default:
       STATUS_TEXT = '';

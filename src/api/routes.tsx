@@ -4,7 +4,7 @@ const LOCAL = 'http://127.0.0.1:8080/';
 export const DRIVE_API =
   'https://script.google.com/macros/s/AKfycbwhxNwmUw289LNqMF9ger1Hf4X0VUPGBQkhVWgmkVNrhA2i8fFED0kXn1YI20H0Gfrq/exec';
 
-export const BASE_URL = PROD;
+export const BASE_URL = LOCAL;
 
 // AUTH
 export const LOGIN = 'user/login';
@@ -162,6 +162,8 @@ export const WORKPLAN_UPDATE_STATUS = (id?: string) => `workplan/status/${id}`;
 export const WORKPLAN_CC_USER = 'workplan/cc';
 export const WORKPLAN_PROGRESS = (id?: string) => `workplan/progress/${id}`;
 export const WORKPLAN_COMMENT = (id?: string) => `workplan/comment/${id}`;
+export const WORKPLAN_ATTACHMENT = (wp_id?: string) =>
+  `workplan/attachment/${wp_id}`;
 
 // BANNER
 export const BANNER = 'banner';

@@ -94,7 +94,12 @@ const WorkplanApproval: React.FC = () => {
 
     function _getStatusByParams() {
       if (status == 'waiting') {
-        return [WORKPLAN_STATUS.ON_PROGRESS, WORKPLAN_STATUS.REVISON];
+        return [
+          WORKPLAN_STATUS.ON_PROGRESS,
+          WORKPLAN_STATUS.REVISON,
+          WORKPLAN_STATUS.NEED_APPROVAL,
+          WORKPLAN_STATUS.APPROVED,
+        ];
       } else if (status == 'pending') {
         return WORKPLAN_STATUS.PENDING;
       } else {

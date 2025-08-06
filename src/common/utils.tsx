@@ -94,6 +94,7 @@ export const cekAkses = (akses: string) => {
    * WORKPLAN -> 1199 -> #11
    * WORKPLAN ADMIN -> 1200 -> #12
    * TRX BARANG -> 1159 -> #13
+   * ADMIN APPROVE WP -> 1201 -> $14
    */
   const { user } = useAuth();
 
@@ -149,6 +150,10 @@ export const cekAkses = (akses: string) => {
 
   if (akses == '#13') {
     return kd.findIndex((item: string) => item == '1159') !== -1;
+  }
+
+  if (akses == '#14') {
+    return kd.findIndex((item: string) => item == '1201') !== -1;
   }
 };
 

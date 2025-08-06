@@ -1,37 +1,34 @@
 import { Button, Card, Chip, List, ListItem } from '@material-tailwind/react';
+import { color } from '@material-tailwind/react/types/components/alert';
 import 'flatpickr/dist/flatpickr.min.css';
 import * as React from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   WORKPLAN,
+  WORKPLAN_ATTACHMENT,
   WORKPLAN_COMMENT,
   WORKPLAN_PROGRESS,
-  WORKPLAN_UPDATE,
   WORKPLAN_UPDATE_STATUS,
 } from '../../api/routes';
-import {
-  cekAkses,
-  getFormattedDateTable,
-  standardizeDate,
-} from '../../common/utils';
+import { cekAkses, getFormattedDateTable } from '../../common/utils';
 import ActionCard from '../../components/ActionCard';
 import { ContainerCard } from '../../components/ContainerCard';
 import { DetailPlaceholder } from '../../components/DetailPlaceholder';
 import FileModal from '../../components/Modal/FileModal';
 import ModalSelector from '../../components/Modal/ModalSelctor';
 import WorkplanCCModal from '../../components/Modal/WorkplanCCModal';
+import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
+import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
+import WorkplanProgressModal from '../../components/Modal/WorkplanProgressModal';
+import ImageSelectorWithCaptions from '../../components/MultiImageSelector';
 import { API_STATES } from '../../constants/ApiEnum';
-import useFetch from '../../hooks/useFetch';
-import useModal from '../../hooks/useModal';
-import DefaultLayout from '../../layout/DefaultLayout';
 import {
   WORKPLAN_STATUS,
   getWorkplanStatusText,
 } from '../../constants/WorkplanStatus';
-import { color } from '@material-tailwind/react/types/components/alert';
-import WorkplanHistoryModal from '../../components/Modal/WorkplanHistoryModal';
-import WorkplanCommentModal from '../../components/Modal/WorkplanCommentModal';
-import WorkplanProgressModal from '../../components/Modal/WorkplanProgressModal';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const WorkplanApprovalDetail: React.FC = () => {
   const [showWorkplan, setShowWorkplan] = React.useState<boolean>(false);
@@ -48,15 +45,19 @@ const WorkplanApprovalDetail: React.FC = () => {
   const [showComment, setShowComment] = React.useState<boolean>(false);
   const [showProgress, setShowProgress] = React.useState<boolean>(false);
 
+  const [files, setFiles] = React.useState<any>([]);
+
   const { id } = useParams();
 
   const _status = getWorkplanStatusText(workplanDetail?.status);
   const IS_ADMIN_WP = cekAkses('#12');
+  const IS_ADMIN_WP_APPROVAL = cekAkses('#14');
 
   const WP_STATUS = workplanDetail?.status;
   const IS_FINISHED =
     WP_STATUS == WORKPLAN_STATUS.FINISH ||
     WP_STATUS == WORKPLAN_STATUS.REJECTED;
+  const IS_WP_APPROVED = WP_STATUS == WORKPLAN_STATUS.APPROVED;
 
   const IS_APPROVAL = workplanDetail?.jenis_workplan == 'APPROVAL';
 
@@ -110,6 +111,7 @@ const WorkplanApprovalDetail: React.FC = () => {
       setWorkplanDetail(data);
       setCC(data.cc_users);
       getWorkplanProgress(id);
+      getWorkplanAttachment(id);
       hide();
     } else {
       console.log(error);
@@ -154,6 +156,23 @@ const WorkplanApprovalDetail: React.FC = () => {
     }
   };
 
+  async function getWorkplanAttachment(id: any) {
+    changeType('LOADING');
+    show();
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_ATTACHMENT(id),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setFiles(data);
+      hide();
+    } else {
+      console.log(error);
+      changeType('FAILED');
+    }
+  }
+
   return (
     <DefaultLayout>
       <ActionCard
@@ -173,46 +192,50 @@ const WorkplanApprovalDetail: React.FC = () => {
           </div>
         }
       >
-        {!IS_FINISHED && IS_ADMIN_WP && IS_APPROVAL && (
-          <>
-            <Button
-              size="sm"
-              className="normal-case"
-              color={'green'}
-              onClick={() => {
-                changeContext('DONE');
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              Setujui
-            </Button>
-            <Button
-              size="sm"
-              className="normal-case"
-              color={'amber'}
-              onClick={() => {
-                changeContext('REVISI');
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              Revisi
-            </Button>
-            <Button
-              size="sm"
-              className="normal-case"
-              color={'red'}
-              onClick={() => {
-                changeContext('REJECT');
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              Tolak
-            </Button>
-          </>
-        )}
+        {!IS_FINISHED &&
+          IS_ADMIN_WP &&
+          IS_APPROVAL &&
+          !IS_WP_APPROVED &&
+          IS_ADMIN_WP_APPROVAL && (
+            <>
+              <Button
+                size="sm"
+                className="normal-case"
+                color={'green'}
+                onClick={() => {
+                  changeContext('APPROVE');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Setujui
+              </Button>
+              <Button
+                size="sm"
+                className="normal-case"
+                color={'amber'}
+                onClick={() => {
+                  changeContext('REVISI');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Revisi
+              </Button>
+              <Button
+                size="sm"
+                className="normal-case"
+                color={'red'}
+                onClick={() => {
+                  changeContext('REJECT');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Tolak
+              </Button>
+            </>
+          )}
 
         <Button
           size="sm"
@@ -334,124 +357,15 @@ const WorkplanApprovalDetail: React.FC = () => {
         <div className="flex flex-col gap-y-4.5">
           <ContainerCard title="Attachment">
             <div className=" p-6.5 flex flex-col gap-y-6.5">
-              {/* <div className="w-full">
-                <label className="mb-2.5 block text-sm font-medium text-black">
-                  CC ( Opsional )
-                </label>
-                <div
-                  className={`flex flex-row gap-4 border ${
-                    cc?.length ? '' : 'items-center'
-                  } border-stroke rounded-md border-p p-2`}
-                >
-                  <div className="flex flex-1 flex-wrap gap-2 max-h-[100px] overflow-auto">
-                    {cc?.length ? (
-                      cc?.map((item: any, index: number) => {
-                        return (
-                          <Chip
-                            animate={{ mount: { y: 0 }, unmount: { y: 50 } }}
-                            className="normal-case"
-                            color="blue"
-                            variant="ghost"
-                            value={item?.nm_user}
-                          />
-                        );
-                      })
-                    ) : (
-                      <div className=" ml-2.5">Pilih CC</div>
-                    )}
-                  </div>
-                </div>
-              </div> */}
-
-              {/* <DetailPlaceholder label="Gambar Awal" value={'File Gambar Awal'}>
-                <Button
-                  onClick={() => {
-                    setSelectedGambar(workplanDetail?.attachment_before);
-                    setShowFile(true);
+              <div className="w-full">
+                <ImageSelectorWithCaptions
+                  onChange={(images) => {
+                    setFiles(images);
                   }}
-                  fullWidth
-                  color="blue"
-                  className="mt-2.5 normal-case"
-                >
-                  Lihat Gambar
-                </Button>
-              </DetailPlaceholder> */}
-
-              {!workplanDetail?.attachment_before ? (
-                <div className="w-full">
-                  <Card className="h-16 flex items-center justify-center text-sm">
-                    <p>Tidak ada gambar diunggah</p>
-                  </Card>
-                </div>
-              ) : (
-                // <DetailPlaceholder label="Before" value={'File Gambar Awal'}>
-                //   <div className="flex flex-row items-center gap-2.5">
-                //     <Button
-                //       size="sm"
-                //       onClick={() => {
-                //         setSelectedGambar(workplanDetail?.attachment_before);
-                //         setShowFile(true);
-                //       }}
-                //       fullWidth
-                //       color="blue"
-                //       className="mt-2.5 normal-case"
-                //     >
-                //       Lihat
-                //     </Button>
-                //   </div>
-                // </DetailPlaceholder>
-                <div>
-                  <label className="mb-3 block text-black dark:text-white">
-                    Before
-                  </label>
-                  <img
-                    src={workplanDetail?.attachment_before}
-                    className="w-full aspect-video object-cover bg-gray-200 rounded-lg hover:cursor-pointer"
-                    onClick={() => {
-                      setSelectedGambar(workplanDetail?.attachment_before);
-                      setShowFile(true);
-                    }}
-                  />
-                </div>
-              )}
-
-              {!workplanDetail?.attachment_after ? (
-                <div className="w-full">
-                  <Card className="h-16 flex items-center justify-center text-sm">
-                    <p>Tidak ada gambar diunggah</p>
-                  </Card>
-                </div>
-              ) : (
-                // <DetailPlaceholder label="After" value={'File Gambar Akhir'}>
-                //   <div className="flex flex-row items-center gap-2.5">
-                //     <Button
-                //       size="sm"
-                //       onClick={() => {
-                //         setSelectedGambar(workplanDetail?.attachment_after);
-                //         setShowFile(true);
-                //       }}
-                //       fullWidth
-                //       color="blue"
-                //       className="mt-2.5 normal-case"
-                //     >
-                //       Lihat
-                //     </Button>
-                //   </div>
-                // </DetailPlaceholder>
-                <div>
-                  <label className="mb-3 block text-black dark:text-white">
-                    After
-                  </label>
-                  <img
-                    src={workplanDetail?.attachment_after}
-                    className="w-full aspect-video object-cover bg-gray-200 rounded-lg hover:cursor-pointer"
-                    onClick={() => {
-                      setSelectedGambar(workplanDetail?.attachment_after);
-                      setShowFile(true);
-                    }}
-                  />
-                </div>
-              )}
+                  value={files}
+                  previewOnly={true}
+                />
+              </div>
             </div>
           </ContainerCard>
 
@@ -541,8 +455,8 @@ const WorkplanApprovalDetail: React.FC = () => {
           visible={visible}
           toggle={toggle}
           onConfirm={() => {
-            if (context == 'DONE') {
-              updateStatusWorkplan(WORKPLAN_STATUS.FINISH);
+            if (context == 'APPROVE') {
+              updateStatusWorkplan(WORKPLAN_STATUS.APPROVED);
             } else if (context == 'REVISI') {
               updateStatusWorkplan(WORKPLAN_STATUS.REVISON);
             } else {
