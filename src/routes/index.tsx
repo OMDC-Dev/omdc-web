@@ -166,7 +166,7 @@ const Routes = () => {
 
         // -- Work in Progress PATH
         {
-          path: '/workplan/me/:status',
+          path: '/workplan/me',
           element: (
             <>
               <PageTitle title={TITLE + 'Work in Progress'} />
@@ -174,8 +174,26 @@ const Routes = () => {
             </>
           ),
         },
+        // {
+        //   path: '/workplan/me/:status',
+        //   element: (
+        //     <>
+        //       <PageTitle title={TITLE + 'Work in Progress'} />
+        //       <WorkplanSaya />
+        //     </>
+        //   ),
+        // },
+        // {
+        //   path: '/workplan/cc/:status',
+        //   element: (
+        //     <>
+        //       <PageTitle title={TITLE + 'Work in Progress'} />
+        //       <WorkplanCC />
+        //     </>
+        //   ),
+        // },
         {
-          path: '/workplan/cc/:status',
+          path: '/workplan/cc',
           element: (
             <>
               <PageTitle title={TITLE + 'Work in Progress'} />
