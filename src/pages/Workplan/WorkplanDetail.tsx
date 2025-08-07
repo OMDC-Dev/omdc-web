@@ -76,6 +76,7 @@ const WorkplanDetail: React.FC = () => {
 
   const [workplanDetail, setWorkplanDetail] = React.useState<any>();
   const [selectedGambar, setSelectedGambar] = React.useState<string>('');
+  const [selectedCaption, setSelectedCaption] = React.useState('');
   const [showComment, setShowComment] = React.useState<boolean>(false);
   const [showProgress, setShowProgress] = React.useState<boolean>(false);
 
@@ -770,6 +771,11 @@ const WorkplanDetail: React.FC = () => {
                   isEditMode={IS_EDIT_MODE}
                   value={files}
                   previewOnly={!IS_EDIT_MODE}
+                  onImageClick={(src, caption) => {
+                    setSelectedGambar(src);
+                    setSelectedCaption(caption);
+                    setShowFile(true);
+                  }}
                 />
               </div>
             </div>
@@ -925,7 +931,12 @@ const WorkplanDetail: React.FC = () => {
           type={'image/png'}
           data={selectedGambar}
           visible={showFile}
-          toggle={() => setShowFile(!showFile)}
+          toggle={() => {
+            setShowFile(!showFile);
+            setSelectedGambar('');
+            setSelectedCaption('');
+          }}
+          caption={selectedCaption}
         />
 
         <CabangModal

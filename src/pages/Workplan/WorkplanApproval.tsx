@@ -1,40 +1,36 @@
-import * as React from 'react';
-import DefaultLayout from '../../layout/DefaultLayout';
+import {
+  AdjustmentsHorizontalIcon,
+  DocumentTextIcon,
+} from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import {
   Card,
   CardBody,
   CardFooter,
   CardHeader,
+  Chip,
   IconButton,
+  Button as MButton,
   Tooltip,
   Typography,
-  Button as MButton,
-  Chip,
-  Input,
-  Button,
 } from '@material-tailwind/react';
-import ModalSelector from '../../components/Modal/ModalSelctor';
-import {
-  AdjustmentsHorizontalIcon,
-  DocumentTextIcon,
-  TrashIcon,
-} from '@heroicons/react/24/outline';
-import useModal from '../../hooks/useModal';
-import { useNavigate, useParams } from 'react-router-dom';
-import useFetch from '../../hooks/useFetch';
-import { WORKPLAN } from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
-import { delay, getFormattedDateTable } from '../../common/utils';
-import {
-  WORKPLAN_STATUS,
-  getWorkplanStatusText,
-} from '../../constants/WorkplanStatus';
 import { colors } from '@material-tailwind/react/types/generic';
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import * as React from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { WORKPLAN, WORKPLAN_SUMMARY } from '../../api/routes';
+import { getFormattedDateTable } from '../../common/utils';
+import ModalSelector from '../../components/Modal/ModalSelctor';
 import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
+import SummaryList from '../../components/SummaryList';
+import { API_STATES } from '../../constants/ApiEnum';
+import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 const TABLE_HEAD = [
   'ID',
+  'Jenis Work In Progress',
   'Tanggal Dibuat',
   'Cabang / Lokasi',
   'Grup',
@@ -53,6 +49,8 @@ const WorkplanApproval: React.FC = () => {
   const [page, setPage] = React.useState<number>(1);
   const [pageInfo, setPageInfo] = React.useState<any>();
   const [search, setSearch] = React.useState<string>('');
+  const [summaryList, setSummaryList] = React.useState([]);
+  const [activeStatus, setActiveStatus] = React.useState();
 
   // === Modal
   const { show, hide, toggle, changeType, visible, type } = useModal();
@@ -60,14 +58,15 @@ const WorkplanApproval: React.FC = () => {
   const [filter, setFilter] = React.useState('');
   const navigate = useNavigate();
 
-  const { status, group } = useParams();
+  const { group } = useParams();
+  const location = useLocation();
 
   React.useEffect(() => {
     setList([]);
     setPage(1);
     setFilter('');
     getMyWorkplan();
-  }, [status, group]);
+  }, [activeStatus, group, location.pathname]);
 
   React.useEffect(() => {
     // if (filter) {
@@ -75,6 +74,35 @@ const WorkplanApproval: React.FC = () => {
     // }
     getMyWorkplan();
   }, [filter, page]);
+
+  React.useEffect(() => {
+    getSummary();
+  }, [group]);
+
+  async function getSummary() {
+    changeType('LOADING');
+    show();
+
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_SUMMARY + `?admin=true&group=${group}`,
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      hide();
+
+      setSummaryList(data);
+      if (data.length > 0) {
+        setActiveStatus(data[0]['status']);
+      }
+      changeType('NONE');
+    } else {
+      console.log(error);
+      hide();
+      setSummaryList([]);
+      changeType('NONE');
+    }
+  }
 
   async function getMyWorkplan(clearOn?: string) {
     changeType('LOADING');
@@ -85,34 +113,18 @@ const WorkplanApproval: React.FC = () => {
       param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
     }
 
-    if (status == 'due') {
+    if (activeStatus == 'DUE') {
       param += '&onDueDate=true';
-    }
-
-    const _GET_STATUS = _getStatusByParams();
-    const _GET_GROUP = group == 'medic' ? 'MEDIC' : 'NON_MEDIC';
-
-    function _getStatusByParams() {
-      if (status == 'waiting') {
-        return [
-          WORKPLAN_STATUS.ON_PROGRESS,
-          WORKPLAN_STATUS.REVISON,
-          WORKPLAN_STATUS.NEED_APPROVAL,
-          WORKPLAN_STATUS.APPROVED,
-        ];
-      } else if (status == 'pending') {
-        return WORKPLAN_STATUS.PENDING;
-      } else {
-        return status != 'due'
-          ? WORKPLAN_STATUS.FINISH
-          : WORKPLAN_STATUS.ON_PROGRESS;
-      }
+    } else if (activeStatus == 'ALL') {
+      param += '';
+    } else {
+      param += `&status=${activeStatus}`;
     }
 
     const { state, data, error } = await useFetch({
       url:
         WORKPLAN +
-        `?limit=${limit}&page=${page}${param}&admin=true&status=${_GET_STATUS}&${filter}&group=${_GET_GROUP}`,
+        `?limit=${limit}&page=${page}${param}&admin=true&isWeb=true&group=${group}`,
       method: 'GET',
     });
 
@@ -130,8 +142,68 @@ const WorkplanApproval: React.FC = () => {
     }
   }
 
+  // async function getMyWorkplan(clearOn?: string) {
+  //   changeType('LOADING');
+  //   show();
+  //   let param = '';
+
+  //   if (search) {
+  //     param += clearOn == 'SEARCH' ? '' : `&search=${search}`;
+  //   }
+
+  //   if (status == 'due') {
+  //     param += '&onDueDate=true';
+  //   }
+
+  //   const _GET_STATUS = _getStatusByParams();
+  //   const _GET_GROUP = group == 'medic' ? 'MEDIC' : 'NON_MEDIC';
+
+  //   function _getStatusByParams() {
+  //     if (status == 'waiting') {
+  //       return [
+  //         WORKPLAN_STATUS.ON_PROGRESS,
+  //         WORKPLAN_STATUS.REVISON,
+  //         WORKPLAN_STATUS.NEED_APPROVAL,
+  //         WORKPLAN_STATUS.APPROVED,
+  //       ];
+  //     } else if (status == 'pending') {
+  //       return WORKPLAN_STATUS.PENDING;
+  //     } else {
+  //       return status != 'due'
+  //         ? WORKPLAN_STATUS.FINISH
+  //         : WORKPLAN_STATUS.ON_PROGRESS;
+  //     }
+  //   }
+
+  //   const { state, data, error } = await useFetch({
+  //     url:
+  //       WORKPLAN +
+  //       `?limit=${limit}&page=${page}${param}&admin=true&status=${_GET_STATUS}&${filter}&group=${_GET_GROUP}`,
+  //     method: 'GET',
+  //   });
+
+  //   if (state == API_STATES.OK) {
+  //     setList([]);
+  //     setList(data.rows);
+  //     setPageInfo(data.pageInfo);
+  //     hide();
+  //     changeType('NONE');
+  //   } else {
+  //     console.log(error);
+  //     hide();
+  //     setList([]);
+  //     changeType('NONE');
+  //   }
+  // }
+
   return (
     <DefaultLayout>
+      <SummaryList
+        activeValue={activeStatus}
+        setActiveValue={setActiveStatus}
+        list={summaryList}
+      />
+
       <Card className="h-full w-full">
         <CardHeader floated={false} shadow={false} className="rounded-none">
           <div className="flex items-center justify-between gap-8">
@@ -227,7 +299,7 @@ const WorkplanApproval: React.FC = () => {
                             </div>
                           </div>
                         </td>
-                        {/* <td className={classes}>
+                        <td className={classes}>
                           <div className="flex items-center gap-3 ">
                             <div className="flex flex-col">
                               <Chip
@@ -246,7 +318,7 @@ const WorkplanApproval: React.FC = () => {
                               />
                             </div>
                           </div>
-                        </td> */}
+                        </td>
                         <td className={classes}>
                           <div className="w-max">
                             <Typography

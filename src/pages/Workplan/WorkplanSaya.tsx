@@ -34,7 +34,10 @@ import WorkplanFilterModal from '../../components/Modal/WorkplanFilterModal';
 import WorkplanReortRangeModal from '../../components/Modal/WorkplanReportRangeModal';
 import SummaryList from '../../components/SummaryList';
 import { API_STATES } from '../../constants/ApiEnum';
-import { getWorkplanStatusText } from '../../constants/WorkplanStatus';
+import {
+  WORKPLAN_STATUS,
+  getWorkplanStatusText,
+} from '../../constants/WorkplanStatus';
 import { useAuth } from '../../hooks/useAuth';
 import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
@@ -95,9 +98,6 @@ const WorkplanSaya: React.FC = () => {
       url: WORKPLAN_SUMMARY,
       method: 'GET',
     });
-
-    console.log('DATA', data);
-
     if (state == API_STATES.OK) {
       hide();
 
@@ -509,6 +509,10 @@ const WorkplanSaya: React.FC = () => {
                         >
                           <Tooltip content="Edit">
                             <IconButton
+                              disabled={
+                                item.status == WORKPLAN_STATUS.FINISH ||
+                                item.status == WORKPLAN_STATUS.REJECTED
+                              }
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();

@@ -220,7 +220,7 @@ const Routes = () => {
           ),
         },
         {
-          path: '/workplan/approval/:status/:group',
+          path: '/workplan/approval/:group',
           element: (
             <>
               <PageTitle title={TITLE + 'Work in Progress'} />

@@ -42,6 +42,7 @@ const WorkplanApprovalDetail: React.FC = () => {
 
   const [workplanDetail, setWorkplanDetail] = React.useState<any>();
   const [selectedGambar, setSelectedGambar] = React.useState<string>('');
+  const [selectedCaption, setSelectedCaption] = React.useState<string>('');
   const [showComment, setShowComment] = React.useState<boolean>(false);
   const [showProgress, setShowProgress] = React.useState<boolean>(false);
 
@@ -364,6 +365,11 @@ const WorkplanApprovalDetail: React.FC = () => {
                   }}
                   value={files}
                   previewOnly={true}
+                  onImageClick={(src, caption) => {
+                    setSelectedGambar(src);
+                    setSelectedCaption(caption);
+                    setShowFile(true);
+                  }}
                 />
               </div>
             </div>
@@ -474,8 +480,13 @@ const WorkplanApprovalDetail: React.FC = () => {
         <FileModal
           type={'image/png'}
           data={selectedGambar}
+          caption={selectedCaption}
           visible={showFile}
-          toggle={() => setShowFile(!showFile)}
+          toggle={() => {
+            setShowFile(!showFile);
+            setSelectedGambar('');
+            setSelectedCaption('');
+          }}
         />
 
         <WorkplanHistoryModal

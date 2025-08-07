@@ -1,19 +1,24 @@
-import * as React from 'react';
 import { DocumentTextIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import {
-  Card,
-  CardHeader,
-  Typography,
   Button,
+  Card,
   CardBody,
   CardFooter,
+  CardHeader,
+  Checkbox,
+  Chip,
   IconButton,
   Tooltip,
-  Chip,
-  Checkbox,
+  Typography,
 } from '@material-tailwind/react';
-import DefaultLayout from '../../layout/DefaultLayout';
-import useFetch from '../../hooks/useFetch';
+import moment from 'moment';
+import * as React from 'react';
+import {
+  useLocation,
+  useNavigate,
+  useNavigationType,
+  useParams,
+} from 'react-router-dom';
 import {
   ACCEPT_REVIEW_REIMBURSEMENT_MULTI,
   FINANCE_ACCEPTANCE_MULTI,
@@ -23,69 +28,62 @@ import {
   PENGAJUAN,
   REIMBURSEMENT_ACCEPTANCE_MULTI,
 } from '../../api/routes';
-import { API_STATES } from '../../constants/ApiEnum';
-import {
-  useLocation,
-  useNavigate,
-  useNavigationType,
-  useParams,
-} from 'react-router-dom';
-import moment from 'moment';
-import { useAuth } from '../../hooks/useAuth';
-import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
-import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
-import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
-import useModal from '../../hooks/useModal';
-import ModalSelector from '../../components/Modal/ModalSelctor';
-import DateRange from '../../components/DateRange';
-import PeriodeModal from '../../components/Modal/PeriodeModal';
 import {
   cekAkses,
   getFormattedDateTable,
   removeFromState,
 } from '../../common/utils';
-import KategoriFilterGroup from '../../components/SelectGroup/KategoriFilterGroup';
-import CabangFilterGroup from '../../components/SelectGroup/CabangFilterGroup';
-import useAdminFilter from '../../hooks/useAdminFilter';
+import DateRange from '../../components/DateRange';
 import CabangModal from '../../components/Modal/CabangModal';
-
-const TABLE_HEAD = [
-  '',
-  'Status Approval Saya',
-  'Status Pengajuan',
-  'Pengajuan',
-  'No. Dok',
-  'Kategori Permintaan',
-  'Pembayaran',
-  'Induk Cabang',
-  'Diajukan Oleh',
-  'Nama Client / Vendor',
-  'COA',
-  'Nominal',
-  'Tanggal Disetujui',
-  'Tanggal Pengajuan',
-  'Keterangan Status',
-];
-
-const TABLE_HEAD_FINANCE = [
-  '',
-  'Status Pengajuan',
-  'Status Finance',
-  'Pengajuan',
-  'No. Dok',
-  'Kategori Permintaan',
-  'Pembayaran',
-  'Induk Cabang',
-  'Diajukan Oleh',
-  'Nama Client / Vendor',
-  'COA',
-  'Nominal',
-  'Tanggal Disetujui',
-  'Tanggal Pengajuan',
-  'Keterangan Status',
-];
+import ModalSelector from '../../components/Modal/ModalSelctor';
+import PeriodeModal from '../../components/Modal/PeriodeModal';
+import CashAdvanceFilterGroup from '../../components/SelectGroup/CashAdvanceFilterGroup';
+import StatusROPFilterGroup from '../../components/SelectGroup/StatusROPFilterGroup';
+import TipeFilterGroup from '../../components/SelectGroup/TipeFilterGroup';
+import { API_STATES } from '../../constants/ApiEnum';
+import useAdminFilter from '../../hooks/useAdminFilter';
+import { useAuth } from '../../hooks/useAuth';
+import useFetch from '../../hooks/useFetch';
+import useModal from '../../hooks/useModal';
+import DefaultLayout from '../../layout/DefaultLayout';
 
 function RiwayatDiajukan() {
+  let TABLE_HEAD = [
+    '',
+    'Status Approval Saya',
+    'Status Pengajuan',
+    'Pengajuan',
+    'No. Dok',
+    'Kategori Permintaan',
+    'Pembayaran',
+    'Induk Cabang',
+    'Diajukan Oleh',
+    'Nama Client / Vendor',
+    'COA',
+    'Nominal',
+    'Tanggal Disetujui',
+    'Tanggal Pengajuan',
+    'Keterangan Status',
+  ];
+
+  let TABLE_HEAD_FINANCE = [
+    '',
+    'Status Pengajuan',
+    'Status Finance',
+    'Pengajuan',
+    'No. Dok',
+    'Kategori Permintaan',
+    'Pembayaran',
+    'Induk Cabang',
+    'Diajukan Oleh',
+    'Nama Client / Vendor',
+    'COA',
+    'Nominal',
+    'Tanggal Disetujui',
+    'Tanggal Pengajuan',
+    'Keterangan Status',
+  ];
+
   const location = useLocation();
   const { statusType } = useParams();
 
@@ -123,6 +121,15 @@ function RiwayatDiajukan() {
 
   const hasMultipleAccept = cekAkses('#10');
 
+  function _GET_TABLE_HEAD() {
+    let HEAD = TABLE_HEAD;
+    if (hasMultipleAccept && statusType != 'done') {
+      HEAD.unshift('');
+    }
+
+    return HEAD;
+  }
+
   const SHOW_CHECKBOX =
     (user.type == 'ADMIN' && hasMultipleAccept && statusType == 'waiting') ||
     (user.type == 'REVIEWER' && hasMultipleAccept && statusType == 'waiting') ||
@@ -132,7 +139,7 @@ function RiwayatDiajukan() {
 
   const TABLE =
     ADMIN_TYPE == 'ADMIN' || ADMIN_TYPE == 'REVIEWER' || ADMIN_TYPE == 'MAKER'
-      ? TABLE_HEAD
+      ? _GET_TABLE_HEAD()
       : TABLE_HEAD_FINANCE;
 
   const navigate = useNavigate();
@@ -184,7 +191,7 @@ function RiwayatDiajukan() {
     );
   }
 
-  console.log('ADMIN TYPE', ADMIN_TYPE);
+  console.log('STATUS TYPE', statusType);
 
   async function getReimbursementList(
     clear?: boolean,

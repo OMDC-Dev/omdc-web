@@ -398,6 +398,10 @@ const WorkplanCC: React.FC = () => {
                         >
                           <Tooltip content="Edit">
                             <IconButton
+                              disabled={
+                                item.status == WORKPLAN_STATUS.FINISH ||
+                                item.status == WORKPLAN_STATUS.REJECTED
+                              }
                               variant="text"
                               onClick={(e) => {
                                 e.preventDefault();

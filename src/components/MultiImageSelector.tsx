@@ -29,6 +29,7 @@ interface Props {
       isNew?: boolean;
     }[],
   ) => void;
+  onImageClick?: (src: string, caption: string) => void;
 }
 
 const ImageSelectorWithCaptions: React.FC<Props> = ({
@@ -36,6 +37,7 @@ const ImageSelectorWithCaptions: React.FC<Props> = ({
   value = [],
   previewOnly = false,
   isEditMode = false,
+  onImageClick,
 }) => {
   const [images, setImages] = useState<ImageWithCaption[]>([]);
 
@@ -148,7 +150,10 @@ const ImageSelectorWithCaptions: React.FC<Props> = ({
             key={index}
             className="border border-blue-gray-100 rounded-md p-3 relative bg-white shadow"
           >
-            <div className="aspect-square w-24 mx-auto">
+            <div
+              onClick={() => onImageClick?.(getImageSrc(img), img.caption)}
+              className="aspect-square w-24 mx-auto cursor-pointer"
+            >
               <img
                 src={getImageSrc(img)}
                 alt={`Selected ${index}`}

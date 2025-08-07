@@ -675,16 +675,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <>
                                 <li>
                                   <NavLink
-                                    to="/workplan/approval/waiting/medic"
+                                    to="/workplan/approval/medic"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Dalam Proses ( Medis )
+                                    Work In Progress Medis
                                   </NavLink>
                                 </li>
-                                <li>
+                                {/* <li>
                                   <NavLink
                                     to="/workplan/approval/pending/medic"
                                     className={({ isActive }) =>
@@ -716,19 +716,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   >
                                     Due Date ( Medis )
                                   </NavLink>
-                                </li>
+                                </li> */}
                                 <li>
                                   <NavLink
-                                    to="/workplan/approval/waiting/nonmedic"
+                                    to="/workplan/approval/nonmedic"
                                     className={({ isActive }) =>
                                       'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                       (isActive && '!text-white')
                                     }
                                   >
-                                    Dalam Proses ( Non Medis )
+                                    Work In Progress Non Medis
                                   </NavLink>
                                 </li>
-                                <li>
+                                {/* <li>
                                   <NavLink
                                     to="/workplan/approval/pending/nonmedic"
                                     className={({ isActive }) =>
@@ -760,7 +760,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   >
                                     Due Date ( Non Medis )
                                   </NavLink>
-                                </li>
+                                </li> */}
                               </>
                             )}
                           </ul>
