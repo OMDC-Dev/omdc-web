@@ -15,6 +15,8 @@ import { API_STATES } from '../../constants/ApiEnum';
 import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
+import WorkplanTypeGroup from '../../components/SelectGroup/WorkplanTypeGroup';
+import ImageSelectorWithCaptions from '../../components/MultiImageSelector';
 
 const BuatWorkplan: React.FC = () => {
   const [workplanType, setWorkplanType] = React.useState('');
@@ -31,6 +33,8 @@ const BuatWorkplan: React.FC = () => {
   const [attachmentBefore, setAttachmentBefore] = React.useState();
   const [useCabang, setUseCabang] = React.useState(true);
   const [customLocation, setCustomLocation] = React.useState<string | any>('');
+
+  const [files, setFiles] = React.useState<any>([]);
 
   const {
     show,
@@ -59,8 +63,8 @@ const BuatWorkplan: React.FC = () => {
     !kategori ||
     !desc ||
     !group ||
-    !attachmentBefore ||
-    disabledByLocation();
+    !files.length;
+  disabledByLocation();
 
   // Hit Api
   const submitNewWorkplan = async () => {
@@ -83,6 +87,8 @@ const BuatWorkplan: React.FC = () => {
       attachment_before: attachmentBefore,
       custom_location: useCabang ? null : customLocation,
       group: group,
+      is_multi: true,
+      files: files,
     };
 
     const { state, data, error } = await useFetch({
@@ -165,10 +171,10 @@ const BuatWorkplan: React.FC = () => {
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
         <ContainerCard title="Buat Work in Progress Baru">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
-            {/* <WorkplanTypeGroup
+            <WorkplanTypeGroup
               value={workplanType}
               setValue={setWorkplanType}
-            /> */}
+            />
             <div className="w-full">
               <WorkplanGroup
                 value={group}
@@ -300,7 +306,7 @@ const BuatWorkplan: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full">
+            {/* <div className="w-full">
               <label className="mb-3 block text-sm font-medium text-black">
                 Lampirkan Gambar ( Opsional maks. 10MB)
               </label>
@@ -309,6 +315,12 @@ const BuatWorkplan: React.FC = () => {
                 className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
                 accept={'image/*'}
                 onChange={handleAttachment}
+              />
+            </div> */}
+            <div className="w-full">
+              <ImageSelectorWithCaptions
+                onChange={(images) => setFiles(images)}
+                value={files}
               />
             </div>
           </div>

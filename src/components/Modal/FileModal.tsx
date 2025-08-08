@@ -6,18 +6,32 @@ const FileModal = ({
   toggle,
   type,
   data,
+  caption,
 }: {
   visible: boolean;
   toggle: any;
   type?: string;
   data: string;
+  caption?: string;
 }) => {
   function isImageUrl(str: string) {
     const urlPattern = /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))/i;
     return urlPattern.test(str);
   }
 
-  const dataType = isImageUrl(data) ? data : `data:${type};base64,${data}`;
+  function normalizeImageData(data: any, type = 'image/png') {
+    if (isImageUrl(data)) return data;
+    if (
+      typeof data === 'string' &&
+      data.startsWith('data:') &&
+      data.includes(';base64,')
+    ) {
+      return data;
+    }
+    return `data:${type};base64,${data}`;
+  }
+
+  const dataType = isImageUrl(data) ? data : normalizeImageData(data, type);
 
   return (
     <Dialog className="bg-transparent" open={visible} handler={toggle}>
@@ -29,6 +43,7 @@ const FileModal = ({
           <XMarkIcon className="w-5 h-5 cursor-pointer" onClick={toggle} />
         </div>
         {/* Make the following div take remaining space and allow overflow */}
+        {caption && <p className="mb-4">{caption}</p>}
         <div className="flex-1 overflow-auto">
           <img
             className="w-full h-full object-contain object-center"

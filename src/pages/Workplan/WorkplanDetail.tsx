@@ -15,6 +15,7 @@ import * as React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   WORKPLAN,
+  WORKPLAN_ATTACHMENT,
   WORKPLAN_COMMENT,
   WORKPLAN_PROGRESS,
   WORKPLAN_UPDATE,
@@ -46,6 +47,7 @@ import useFetch from '../../hooks/useFetch';
 import useModal from '../../hooks/useModal';
 import DefaultLayout from '../../layout/DefaultLayout';
 import WorkplanGroup from '../../components/SelectGroup/WorkplanGroup';
+import ImageSelectorWithCaptions from '../../components/MultiImageSelector';
 
 const WorkplanDetail: React.FC = () => {
   const [tanggalSelesai, setTanggalSelesai] = React.useState<Date>();
@@ -74,8 +76,11 @@ const WorkplanDetail: React.FC = () => {
 
   const [workplanDetail, setWorkplanDetail] = React.useState<any>();
   const [selectedGambar, setSelectedGambar] = React.useState<string>('');
+  const [selectedCaption, setSelectedCaption] = React.useState('');
   const [showComment, setShowComment] = React.useState<boolean>(false);
   const [showProgress, setShowProgress] = React.useState<boolean>(false);
+
+  const [files, setFiles] = React.useState<any>([]);
 
   const { id } = useParams();
   const { state } = useLocation();
@@ -91,10 +96,13 @@ const WorkplanDetail: React.FC = () => {
   const IS_FINISHED =
     WP_STATUS == WORKPLAN_STATUS.FINISH ||
     WP_STATUS == WORKPLAN_STATUS.REJECTED;
+  const IS_WAITING_APPROVAL = WP_STATUS == WORKPLAN_STATUS.NEED_APPROVAL;
+  const IS_APPROVED = WP_STATUS == WORKPLAN_STATUS.APPROVED;
 
   const IS_WP_OWNER = workplanDetail?.iduser == user?.iduser;
 
-  const IS_EDIT_MODE = state?.isEditMode;
+  const IS_EDIT_MODE =
+    state?.isEditMode && !IS_WAITING_APPROVAL && !IS_APPROVED && !IS_FINISHED;
 
   const {
     show,
@@ -118,12 +126,14 @@ const WorkplanDetail: React.FC = () => {
     group.length < 1 ||
     perihal.length < 1 ||
     DISABLED_BY_CABANG ||
-    DISABLED_BY_LOCATION;
+    DISABLED_BY_LOCATION ||
+    !files.length;
 
   React.useEffect(() => {
     getWorkplanDetail();
     getWorkplanProgress(id);
     getCommentCount();
+    getWorkplanAttachment(id);
   }, []);
 
   React.useEffect(() => {
@@ -211,6 +221,25 @@ const WorkplanDetail: React.FC = () => {
     }
   }
 
+  async function getWorkplanAttachment(id: any) {
+    changeType('LOADING');
+    show();
+    const { state, data, error } = await useFetch({
+      url: WORKPLAN_ATTACHMENT(id),
+      method: 'GET',
+    });
+
+    if (state == API_STATES.OK) {
+      setFiles(data);
+      hide();
+    } else {
+      console.log(error);
+      changeType('FAILED');
+    }
+  }
+
+  console.log('FILES', files);
+
   const saveWorkplan = async () => {
     changeType('LOADING');
 
@@ -230,6 +259,7 @@ const WorkplanDetail: React.FC = () => {
       kd_induk: useCabang ? cabang.value : null,
       location: useCabang ? null : customLocation,
       group: group,
+      files: files,
     };
 
     const { state, data, error } = await useFetch({
@@ -317,11 +347,13 @@ const WorkplanDetail: React.FC = () => {
     };
   }
 
+  console.log('FILES', files);
+
   return (
     <DefaultLayout>
       <ActionCard
         title={
-          <div className="flex flex-row items-center gap-2.5">
+          <div className="flex flex-row items-center gap-2.5 flex-wrap">
             <Chip
               className="normal-case"
               variant={'ghost'}
@@ -336,34 +368,139 @@ const WorkplanDetail: React.FC = () => {
           </div>
         }
       >
-        {IS_NON_APPROVAL && !IS_FINISHED && IS_EDIT_MODE && (
-          <>
+        <div className="flex flex-wrap gap-2">
+          {!IS_FINISHED && IS_EDIT_MODE && (
+            <>
+              {IS_NON_APPROVAL ? (
+                <>
+                  <Button
+                    size="sm"
+                    className="normal-case"
+                    color={'amber'}
+                    onClick={() => {
+                      changeContext(
+                        WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
+                          WP_STATUS == WORKPLAN_STATUS.REVISON
+                          ? 'PENDING'
+                          : 'ON_PROGRESS',
+                      );
+                      changeType('CONFIRM');
+                      show();
+                    }}
+                  >
+                    {WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
+                    WP_STATUS == WORKPLAN_STATUS.REVISON
+                      ? 'Set ke Pending'
+                      : 'Set ke On Progress'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="normal-case"
+                    disabled={
+                      !progressList?.length ||
+                      WP_STATUS == WORKPLAN_STATUS.PENDING
+                    }
+                    color={'green'}
+                    onClick={() => {
+                      changeContext('DONE');
+                      changeType('CONFIRM');
+                      show();
+                    }}
+                  >
+                    Set ke Selesai
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    size="sm"
+                    className="normal-case"
+                    color={'amber'}
+                    onClick={() => {
+                      changeContext(
+                        WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
+                          WP_STATUS == WORKPLAN_STATUS.REVISON
+                          ? 'PENDING'
+                          : 'ON_PROGRESS',
+                      );
+                      changeType('CONFIRM');
+                      show();
+                    }}
+                  >
+                    {WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
+                    WP_STATUS == WORKPLAN_STATUS.REVISON
+                      ? 'Set ke Pending'
+                      : 'Set ke On Progress'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="normal-case"
+                    disabled={
+                      !progressList?.length ||
+                      WP_STATUS == WORKPLAN_STATUS.PENDING
+                    }
+                    color={'green'}
+                    onClick={() => {
+                      changeContext('NEED_APPROVAL');
+                      changeType('CONFIRM');
+                      show();
+                    }}
+                  >
+                    Request Approval Selesai
+                  </Button>
+                </>
+              )}
+
+              <Button
+                size="sm"
+                className="normal-case"
+                disabled={submitButtonDisabled}
+                color={'blue'}
+                onClick={() => {
+                  changeContext('SAVE');
+                  changeType('CONFIRM');
+                  show();
+                }}
+              >
+                Simpan Perubahan
+              </Button>
+
+              {IS_WP_OWNER && (
+                <Button
+                  size="sm"
+                  className="normal-case"
+                  color={'red'}
+                  onClick={() => {
+                    changeContext('DELETE');
+                    changeType('CONFIRM');
+                    show();
+                  }}
+                >
+                  Hapus
+                </Button>
+              )}
+            </>
+          )}
+
+          {!IS_FINISHED && IS_WAITING_APPROVAL && (
             <Button
               size="sm"
               className="normal-case"
-              color={'amber'}
+              color={'red'}
               onClick={() => {
-                changeContext(
-                  WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
-                    WP_STATUS == WORKPLAN_STATUS.REVISON
-                    ? 'PENDING'
-                    : 'ON_PROGRESS',
-                );
+                changeContext('CANCEL_APPROVAL');
                 changeType('CONFIRM');
                 show();
               }}
             >
-              {WP_STATUS == WORKPLAN_STATUS.ON_PROGRESS ||
-              WP_STATUS == WORKPLAN_STATUS.REVISON
-                ? 'Set ke Pending'
-                : 'Set ke On Progress'}
+              Batalkan Pengajuan
             </Button>
+          )}
+
+          {!IS_FINISHED && IS_APPROVED && (
             <Button
               size="sm"
               className="normal-case"
-              disabled={
-                !progressList?.length || WP_STATUS == WORKPLAN_STATUS.PENDING
-              }
               color={'green'}
               onClick={() => {
                 changeContext('DONE');
@@ -373,62 +510,31 @@ const WorkplanDetail: React.FC = () => {
             >
               Set ke Selesai
             </Button>
-          </>
-        )}
+          )}
 
-        {!IS_FINISHED && IS_EDIT_MODE && (
-          <>
-            <Button
-              size="sm"
-              className="normal-case"
-              disabled={submitButtonDisabled}
-              color={'blue'}
-              onClick={() => {
-                changeContext('SAVE');
-                changeType('CONFIRM');
-                show();
-              }}
-            >
-              Simpan
-            </Button>
-
-            {IS_WP_OWNER && (
-              <Button
-                size="sm"
-                className="normal-case"
-                color={'red'}
-                onClick={() => {
-                  changeContext('DELETE');
-                  changeType('CONFIRM');
-                  show();
-                }}
-              >
-                Hapus
-              </Button>
-            )}
-          </>
-        )}
-        <Button
-          size="sm"
-          variant={'outlined'}
-          className="normal-case"
-          color={'blue'}
-          onClick={() => navigate(-1)}
-        >
-          Kembali
-        </Button>
+          <Button
+            size="sm"
+            variant={'outlined'}
+            className="normal-case"
+            color={'blue'}
+            onClick={() => navigate(-1)}
+          >
+            Kembali
+          </Button>
+        </div>
       </ActionCard>
+
       <div className="grid grid-cols-1 gap-6.5 sm:grid-cols-2">
         <ContainerCard title="Detail Work in Progress">
           <div className=" p-6.5 flex flex-col gap-y-6.5">
-            {/* <DetailPlaceholder
+            <DetailPlaceholder
               value={
                 workplanDetail?.jenis_workplan == 'APPROVAL'
                   ? 'Approval'
                   : 'Non Approval'
               }
               label="Jenis Work in Progress"
-            /> */}
+            />
 
             {IS_EDIT_MODE ? (
               <div className="w-full">
@@ -656,145 +762,22 @@ const WorkplanDetail: React.FC = () => {
                 </Button>
               </DetailPlaceholder> */}
 
-              {!workplanDetail?.attachment_before ? (
-                <div className="w-full">
-                  {!IS_FINISHED && IS_EDIT_MODE ? (
-                    <>
-                      <label className="mb-3 block text-sm font-medium text-black">
-                        Lampirkan Gambar Awal ( Opsional maks. 10MB)
-                      </label>
-                      <input
-                        type="file"
-                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        accept={'image/*'}
-                        onChange={(e) => handleAttachment(e, 'BEFORE')}
-                      />
-                    </>
-                  ) : (
-                    <Card className="h-16 flex items-center justify-center text-sm">
-                      <p>Tidak ada gambar diunggah</p>
-                    </Card>
-                  )}
-                </div>
-              ) : (
-                // <DetailPlaceholder label="Before" value={'File Gambar Awal'}>
-                //   <div className="flex flex-row items-center gap-2.5">
-                //     <Button
-                //       size="sm"
-                //       onClick={() => {
-                //         setSelectedGambar(workplanDetail?.attachment_before);
-                //         setShowFile(true);
-                //       }}
-                //       fullWidth
-                //       color="blue"
-                //       className="mt-2.5 normal-case"
-                //     >
-                //       Lihat
-                //     </Button>
-                //   </div>
-                // </DetailPlaceholder>
-                <div>
-                  <label className="mb-3 block text-black dark:text-white">
-                    Before
-                  </label>
-                  <img
-                    src={workplanDetail?.attachment_before}
-                    className="w-full aspect-video object-cover bg-gray-200 rounded-lg hover:cursor-pointer"
-                    onClick={() => {
-                      setSelectedGambar(workplanDetail?.attachment_before);
-                      setShowFile(true);
-                    }}
-                  />
-                </div>
-              )}
-
-              {!workplanDetail?.attachment_after ? (
-                <div className="w-full">
-                  {!IS_FINISHED && IS_EDIT_MODE ? (
-                    <>
-                      <label className="mb-3 block text-sm font-medium text-black">
-                        Lampirkan Gambar Akhir ( Opsional maks. 10MB)
-                      </label>
-                      <input
-                        type="file"
-                        className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                        accept={'image/*'}
-                        onChange={(e) => handleAttachment(e, 'AFTER')}
-                      />
-                    </>
-                  ) : (
-                    <Card className="h-16 flex items-center justify-center text-sm">
-                      <p>Tidak ada gambar diunggah</p>
-                    </Card>
-                  )}
-                </div>
-              ) : isChangeFile ? (
-                <div className="w-full">
-                  <label className="mb-3 block text-sm font-medium text-black">
-                    Lampirkan Gambar Akhir ( Opsional maks. 10MB)
-                  </label>
-                  <input
-                    type="file"
-                    className="w-full rounded-md border border-stroke p-2 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
-                    accept={'image/*'}
-                    onChange={(e) => handleAttachment(e, 'AFTER')}
-                  />
-                  <Button
-                    variant={'outlined'}
-                    fullWidth
-                    color="blue"
-                    size="sm"
-                    className="normal-case mt-4"
-                    onClick={() => setIsChangeFile(false)}
-                  >
-                    Batalkan
-                  </Button>
-                </div>
-              ) : (
-                // <DetailPlaceholder
-                //   label="Gambar Akhir"
-                //   value={'File Gambar Akhir'}
-                // >
-                //   <div className="flex flex-row items-center gap-2.5">
-                //     <Button
-                //       size="sm"
-                //       onClick={() => {
-                //         setSelectedGambar(workplanDetail?.attachment_after);
-                //         setShowFile(true);
-                //       }}
-                //       fullWidth
-                //       color="blue"
-                //       className="mt-2.5 normal-case"
-                //     >
-                //       Lihat
-                //     </Button>
-
-                //     <Button
-                //       variant={'outlined'}
-                //       size="sm"
-                //       onClick={() => setIsChangeFile(true)}
-                //       fullWidth
-                //       color="blue"
-                //       className="mt-2.5 normal-case"
-                //     >
-                //       Ganti
-                //     </Button>
-                //   </div>
-                // </DetailPlaceholder>
-                <div>
-                  <label className="mb-3 block text-black dark:text-white">
-                    After
-                  </label>
-                  <img
-                    src={workplanDetail?.attachment_after}
-                    className="w-full aspect-video object-cover bg-gray-200 rounded-lg hover:cursor-pointer"
-                    onClick={() => {
-                      setSelectedGambar(workplanDetail?.attachment_after);
-                      setShowFile(true);
-                    }}
-                  />
-                </div>
-              )}
+              <div className="w-full">
+                <ImageSelectorWithCaptions
+                  onChange={(images) => {
+                    setFiles(images);
+                    setIsHasChanges(true);
+                  }}
+                  isEditMode={IS_EDIT_MODE}
+                  value={files}
+                  previewOnly={!IS_EDIT_MODE}
+                  onImageClick={(src, caption) => {
+                    setSelectedGambar(src);
+                    setSelectedCaption(caption);
+                    setShowFile(true);
+                  }}
+                />
+              </div>
             </div>
           </ContainerCard>
 
@@ -835,7 +818,7 @@ const WorkplanDetail: React.FC = () => {
                               {item.progress}
                             </div>
 
-                            {!IS_FINISHED && (
+                            {!IS_FINISHED && IS_EDIT_MODE && (
                               <ListItemSuffix>
                                 <IconButton
                                   onClick={() => {
@@ -924,6 +907,10 @@ const WorkplanDetail: React.FC = () => {
               updateStatusWorkplan(WORKPLAN_STATUS.ON_PROGRESS);
             } else if (context == 'DONE') {
               updateStatusWorkplan(WORKPLAN_STATUS.FINISH);
+            } else if (context == 'NEED_APPROVAL') {
+              updateStatusWorkplan(WORKPLAN_STATUS.NEED_APPROVAL);
+            } else if (context == 'CANCEL_APPROVAL') {
+              updateStatusWorkplan(WORKPLAN_STATUS.ON_PROGRESS);
             } else {
               deleteWorkplan();
             }
@@ -944,7 +931,12 @@ const WorkplanDetail: React.FC = () => {
           type={'image/png'}
           data={selectedGambar}
           visible={showFile}
-          toggle={() => setShowFile(!showFile)}
+          toggle={() => {
+            setShowFile(!showFile);
+            setSelectedGambar('');
+            setSelectedCaption('');
+          }}
+          caption={selectedCaption}
         />
 
         <CabangModal

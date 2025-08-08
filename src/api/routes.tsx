@@ -162,6 +162,10 @@ export const WORKPLAN_UPDATE_STATUS = (id?: string) => `workplan/status/${id}`;
 export const WORKPLAN_CC_USER = 'workplan/cc';
 export const WORKPLAN_PROGRESS = (id?: string) => `workplan/progress/${id}`;
 export const WORKPLAN_COMMENT = (id?: string) => `workplan/comment/${id}`;
+export const WORKPLAN_ATTACHMENT = (wp_id?: string) =>
+  `workplan/attachment/${wp_id}`;
+export const WORKPLAN_SUMMARY = 'workplan-stat';
+export const WORKPLAN_SUMMARY_CC = 'workplan-stat-cc';
 
 // BANNER
 export const BANNER = 'banner';
