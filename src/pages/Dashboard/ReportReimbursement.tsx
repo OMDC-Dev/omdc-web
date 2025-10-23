@@ -149,8 +149,8 @@ function ReportReimbursement() {
         )
         .join(', \n');
 
-      const parsedBankDetail = bank_detail.bankname
-        ? `${bank_detail.bankname}, Data: ${bank_detail.accountname} - ${bank_detail.accountnumber}`
+      const parsedBankDetail = bank_detail?.bankname
+        ? `${bank_detail?.bankname}, Data: ${bank_detail.accountname} - ${bank_detail.accountnumber}`
         : '-';
 
       const parsedAcceptedBy = accepted_by
